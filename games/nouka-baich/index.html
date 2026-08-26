@@ -2565,6 +2565,8 @@
             const sec = parseInt(btn.getAttribute('data-timer'), 10);
             CONFIG.sessionDuration = sec;
             STATE.sessionTimer = 0;
+            STATE.sessionEnded = false;
+            if (sessionProgressEl) sessionProgressEl.style.width = '0%';
             document.querySelectorAll('.pill-btn[data-timer]').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             const sessionDisp = document.getElementById('session-display');
