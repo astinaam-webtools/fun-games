@@ -62,6 +62,10 @@ GAMES.forEach((gameRelPath) => {
   // Responsive & DPR capping
   assert(content.includes('devicePixelRatio') || content.includes('setPixelRatio'), `${gameName} must configure pixel ratio`);
 
+  // Syntax & Typos Check: Ensure no invalid color strings or malformed addColorStop calls
+  assert(!content.includes('rgbaa'), `${gameName} must not contain 'rgbaa' typo`);
+  assert(!content.includes('rgbba'), `${gameName} must not contain 'rgbba' typo`);
+
   console.log(`✓ ${gameName} passed all verification checks.`);
 });
 
