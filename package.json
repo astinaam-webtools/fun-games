@@ -1,0 +1,17 @@
+{
+  "name": "fun-games",
+  "version": "1.0.0",
+  "description": "Little Explorers Playroom — 3D sensory web games for infants, Smart TVs, and ultrawide displays",
+  "scripts": {
+    "test": "node test/verify_games.test.js"
+  },
+  "keywords": [
+    "threejs",
+    "sensory-games",
+    "infant",
+    "web-audio-api",
+    "smart-tv"
+  ],
+  "author": "astinaam-webtools",
+  "license": "MIT"
+}
