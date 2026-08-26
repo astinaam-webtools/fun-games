@@ -1,0 +1,2360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Floating Bubble Aquarium - Infant 3D Sensory Experience</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#0984e3">
+  <style>
+    /* ==========================================================================
+       RESET & BASE ERGONOMICS (INFANT-SAFE, TOUCH-LOCK, TV-READY)
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    :root {
+      --primary-cyan: #00cec9;
+      --deep-aqua: #0984e3;
+      --biolum-pink: #ff7675;
+      --biolum-yellow: #ffeaa7;
+      --biolum-mint: #55efc4;
+      --biolum-purple: #a29bfe;
+      --glass-bg: rgba(255, 255, 255, 0.88);
+      --glass-border: rgba(255, 255, 255, 0.95);
+      --text-dark: #2d3436;
+      --text-muted: #636e72;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #05263b;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      touch-action: none;
+      overscroll-behavior: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* 3D Canvas Host */
+    #canvas-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      cursor: pointer;
+    }
+
+    /* Soft Underwater Vignette & Caustic Lighting Overlay */
+    .vignette-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
+      box-shadow: inset 0 0 100px rgba(0, 168, 255, 0.35), inset 0 0 180px rgba(5, 38, 59, 0.65);
+      mix-blend-mode: soft-light;
+    }
+
+    /* Super Aquarium Bloom Radial Burst Overlay */
+    .bloom-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 3;
+      opacity: 0;
+      background: radial-gradient(circle at center, rgba(85, 239, 196, 0.45) 0%, rgba(162, 155, 254, 0.35) 50%, rgba(9, 132, 227, 0.4) 100%);
+      transition: opacity 0.4s ease;
+    }
+
+    .bloom-overlay.active {
+      opacity: 1;
+      animation: bloomPulse 0.8s ease-out forwards;
+    }
+
+    @keyframes bloomPulse {
+      0% { opacity: 0.8; transform: scale(0.98); }
+      50% { opacity: 1.0; transform: scale(1.02); }
+      100% { opacity: 0; transform: scale(1.0); }
+    }
+
+    /* 2D Touch / Tap Screen Bubbles Overlay */
+    #screen-bubbles-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 4;
+      overflow: hidden;
+    }
+
+    .screen-bubble {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle at 32% 32%, rgba(255, 255, 255, 0.95), rgba(129, 236, 236, 0.5) 45%, rgba(162, 155, 254, 0.6) 80%, rgba(255, 255, 255, 0.8) 100%);
+      box-shadow: 0 8px 24px rgba(0, 206, 201, 0.3), inset 0 0 16px rgba(255, 255, 255, 0.9);
+      border: 2px solid rgba(255, 255, 255, 0.92);
+      pointer-events: auto;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: floatScreenBubble 6s infinite ease-in-out alternate;
+    }
+
+    .screen-bubble:hover, .screen-bubble:active {
+      transform: scale(1.2);
+    }
+
+    @keyframes floatScreenBubble {
+      0% { transform: translateY(0px) rotate(0deg); }
+      100% { transform: translateY(-24px) rotate(15deg); }
+    }
+
+    /* Screen Ripple on Tap */
+    .touch-ripple {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%) scale(0);
+      animation: rippleExpand 0.75s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+      border: 3px solid rgba(255, 255, 255, 0.95);
+      box-shadow: 0 0 30px rgba(0, 206, 201, 0.8);
+      z-index: 5;
+    }
+
+    @keyframes rippleExpand {
+      0% { transform: translate(-50%, -50%) scale(0.1); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(3.5); opacity: 0; }
+    }
+
+    /* Session Progress Bar */
+    .session-progress-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.25);
+      z-index: 20;
+    }
+
+    .session-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #55efc4 0%, #81ecec 30%, #74b9ff 70%, #a29bfe 100%);
+      transition: width 0.5s linear;
+      box-shadow: 0 0 12px rgba(85, 239, 196, 0.8);
+    }
+
+    /* UI Overlay Layer */
+    .ui-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px 24px;
+      padding-top: max(20px, env(safe-area-inset-top));
+      padding-bottom: max(20px, env(safe-area-inset-bottom));
+      padding-left: max(24px, env(safe-area-inset-left));
+      padding-right: max(24px, env(safe-area-inset-right));
+      transition: opacity 0.5s ease;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      pointer-events: auto;
+    }
+
+    .brand-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 8px 20px;
+      border-radius: 999px;
+      box-shadow: 0 8px 26px rgba(0, 0, 0, 0.1);
+      border: 2px solid var(--glass-border);
+      animation: floatBadge 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatBadge {
+      0% { transform: translateY(0px); }
+      100% { transform: translateY(-4px); }
+    }
+
+    .brand-icon {
+      font-size: 26px;
+      display: inline-block;
+      animation: gentleSwim 3s ease-in-out infinite;
+    }
+
+    @keyframes gentleSwim {
+      0%, 100% { transform: rotate(0deg) scale(1); }
+      30% { transform: rotate(-8deg) scale(1.1); }
+      70% { transform: rotate(8deg) scale(1.1); }
+    }
+
+    .brand-title {
+      font-weight: 800;
+      font-size: 16px;
+      letter-spacing: 0.5px;
+      background: linear-gradient(135deg, #0984e3 0%, #00cec9 50%, #6c5ce7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .aspect-badge {
+      font-size: 11px;
+      background: #e0f2fe;
+      color: #0284c7;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .glass-btn {
+      background: var(--glass-bg);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 2px solid var(--glass-border);
+      border-radius: 999px;
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-dark);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: auto;
+      min-width: 48px;
+      min-height: 48px;
+      outline: none;
+    }
+
+    .glass-btn:hover, .glass-btn:focus-visible {
+      transform: translateY(-2px) scale(1.05);
+      background: rgba(255, 255, 255, 1.0);
+      box-shadow: 0 10px 25px rgba(0, 206, 201, 0.35);
+      color: #0984e3;
+    }
+
+    .glass-btn:active {
+      transform: scale(0.94);
+    }
+
+    .icon-btn {
+      width: 48px;
+      height: 48px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 18px;
+    }
+
+    /* Bottom Prompt Banner */
+    .prompt-banner {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      padding: 14px 32px;
+      border-radius: 999px;
+      border: 3px solid #ffffff;
+      box-shadow: 0 12px 38px rgba(0, 168, 255, 0.35);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      pointer-events: auto;
+      cursor: pointer;
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: pulseAquariumGlow 2.8s infinite ease-in-out;
+      max-width: 90vw;
+    }
+
+    @keyframes pulseAquariumGlow {
+      0%, 100% { box-shadow: 0 8px 30px rgba(0, 206, 201, 0.35); transform: translateX(-50%) scale(1); }
+      50% { box-shadow: 0 16px 45px rgba(116, 185, 255, 0.6); transform: translateX(-50%) scale(1.02); }
+    }
+
+    .prompt-banner.hidden {
+      opacity: 0;
+      transform: translateX(-50%) translateY(40px) scale(0.9);
+      pointer-events: none;
+    }
+
+    .prompt-icon {
+      font-size: 32px;
+      animation: bubbleFloatIcon 2s infinite ease-in-out;
+    }
+
+    @keyframes bubbleFloatIcon {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .prompt-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .prompt-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #2d3436;
+    }
+
+    .prompt-subtitle {
+      font-size: 12px;
+      font-weight: 600;
+      color: #636e72;
+    }
+
+    /* Parent Settings Modal */
+    .settings-modal {
+      position: absolute;
+      top: 80px;
+      right: 24px;
+      width: 320px;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 24px;
+      border: 2px solid rgba(255, 255, 255, 0.98);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+      padding: 20px;
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transform-origin: top right;
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: auto;
+    }
+
+    .settings-modal.collapsed {
+      opacity: 0;
+      transform: scale(0.8) translateY(-20px);
+      pointer-events: none;
+    }
+
+    .settings-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #f1f2f6;
+    }
+
+    .settings-header h3 {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .setting-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .setting-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .setting-control {
+      display: flex;
+      gap: 8px;
+    }
+
+    .pill-btn {
+      flex: 1;
+      padding: 8px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 12px;
+      border: 2px solid #e4e7eb;
+      background: #f8f9fa;
+      color: var(--text-muted);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pill-btn.active {
+      background: #0984e3;
+      border-color: #00cec9;
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(9, 132, 227, 0.4);
+    }
+
+    .slider-input {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      accent-color: #00cec9;
+      cursor: pointer;
+    }
+
+    /* Mobile Adaptations */
+    @media (max-width: 600px) {
+      .brand-title { display: none; }
+      .aspect-badge { display: none; }
+      .prompt-banner {
+        padding: 10px 20px;
+        bottom: 16px;
+        gap: 10px;
+      }
+      .prompt-title { font-size: 14px; }
+      .prompt-subtitle { font-size: 11px; }
+      .settings-modal {
+        width: calc(100vw - 32px);
+        right: 16px;
+        top: 72px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Sensory Session Progress Bar -->
+  <div class="session-progress-container">
+    <div class="session-progress-bar" id="session-progress"></div>
+  </div>
+
+  <!-- Three.js Canvas Container -->
+  <div id="canvas-container"></div>
+
+  <!-- Ambient Water Lighting & Overlays -->
+  <div class="vignette-overlay"></div>
+  <div class="bloom-overlay" id="bloom-overlay"></div>
+  <div id="screen-bubbles-container"></div>
+
+  <!-- UI Overlay Layer -->
+  <div class="ui-layer">
+    <header class="top-bar">
+      <div class="brand-badge">
+        <span class="brand-icon">🐬</span>
+        <span class="brand-title">Bubble Aquarium</span>
+        <span class="aspect-badge" id="aspect-badge">🌊 21:9 Ready</span>
+      </div>
+
+      <div class="top-actions">
+        <a href="../../index.html" class="glass-btn" style="text-decoration: none; color: #2d3436;" title="Back to Game Hub" id="btn-home">
+          <span>🏠</span> <span>Playroom</span>
+        </a>
+        <button class="glass-btn icon-btn" id="btn-sound" title="Toggle Sound / Ocean Pad" aria-label="Toggle Sound">
+          <span id="sound-icon">🔊</span>
+        </button>
+        <button class="glass-btn icon-btn" id="btn-fullscreen" title="Fullscreen Mode" aria-label="Toggle Fullscreen">
+          <span>⛶</span>
+        </button>
+        <button class="glass-btn icon-btn" id="btn-settings" title="Parent Settings" aria-label="Settings">
+          <span>⚙️</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Bottom Interactive Prompt Banner -->
+    <div class="prompt-banner" id="prompt-banner">
+      <span class="prompt-icon">🫧</span>
+      <div class="prompt-text">
+        <span class="prompt-title">Tap to Pop Bubbles & Tickle Fish!</span>
+        <span class="prompt-subtitle">Multi-touch palm bloom • Soothing pentatonic ocean harp</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Parent Settings Panel -->
+  <div class="settings-modal collapsed" id="settings-panel">
+    <div class="settings-header">
+      <h3><span>🫧</span> Aquarium Controls</h3>
+      <button class="glass-btn icon-btn" style="width:34px; height:34px; font-size:14px; min-width:34px; min-height:34px;" id="btn-close-settings">✕</button>
+    </div>
+
+    <!-- Ocean Biome Depth / Mood -->
+    <div class="setting-item">
+      <div class="setting-label">
+        <span>Biome & Lighting</span>
+        <span id="biome-display">Sunlit Lagoon</span>
+      </div>
+      <div class="setting-control">
+        <button class="pill-btn active" data-biome="lagoon">Lagoon</button>
+        <button class="pill-btn" data-biome="twilight">Twilight</button>
+        <button class="pill-btn" data-biome="abyss">Abyss</button>
+      </div>
+    </div>
+
+    <!-- Swim Speed -->
+    <div class="setting-item">
+      <div class="setting-label">
+        <span>Creature Pace</span>
+        <span id="speed-display">Gentle</span>
+      </div>
+      <div class="setting-control">
+        <button class="pill-btn" data-speed="calm">Calm</button>
+        <button class="pill-btn active" data-speed="gentle">Gentle</button>
+        <button class="pill-btn" data-speed="lively">Playful</button>
+      </div>
+    </div>
+
+    <!-- Session Duration -->
+    <div class="setting-item">
+      <div class="setting-label">
+        <span>Session Timer</span>
+        <span id="session-display">3 Min</span>
+      </div>
+      <div class="setting-control">
+        <button class="pill-btn" data-timer="120">2 min</button>
+        <button class="pill-btn active" data-timer="180">3 min</button>
+        <button class="pill-btn" data-timer="300">5 min</button>
+        <button class="pill-btn" data-timer="0">Off</button>
+      </div>
+    </div>
+
+    <!-- Audio Volume -->
+    <div class="setting-item">
+      <div class="setting-label">
+        <span>Ocean Harp Volume</span>
+        <span id="volume-display">70%</span>
+      </div>
+      <input type="range" class="slider-input" id="volume-slider" min="0" max="100" value="70">
+    </div>
+  </div>
+
+  <!-- Three.js CDN r128 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <script>
+    /* ==========================================================================
+       FLOATING BUBBLE AQUARIUM - 3D INFANT SENSORY ENGINE
+       Self-contained, zero-runtime allocation, Web Audio synthesizer.
+       ========================================================================== */
+
+    (function() {
+      'use strict';
+
+      // --- CONFIGURATION & STATE ---
+      const CONFIG = {
+        sessionDuration: 180, // Default 3 minutes
+        bubblePoolSize: 75,
+        planktonCount: 350,
+        ripplePoolSize: 25,
+        baseSpeedMultiplier: 1.0,
+      };
+
+      const STATE = {
+        biome: 'lagoon', // 'lagoon' | 'twilight' | 'abyss'
+        speedMultiplier: 1.0,
+        soundEnabled: true,
+        volume: 0.7,
+        sessionTimer: 0,
+        sessionActive: true,
+        noteIndex: 0,
+        time: 0,
+        lastInteractionTime: 0,
+        aspectRatio: window.innerWidth / window.innerHeight,
+        isPortrait: window.innerHeight > window.innerWidth,
+      };
+
+      // --- BIOME PALETTES ---
+      const BIOMES = {
+        lagoon: {
+          name: 'Sunlit Lagoon',
+          fogColor: 0x0abde3,
+          bgColor: 0x0abde3,
+          waterAmbience: 0x48dbfb,
+          lightColor: 0xffffff,
+          lightIntensity: 1.2,
+          coralEmissive: 0x00d2d3,
+          sandColor: 0xfff275,
+          abyssDepth: 0.1,
+        },
+        twilight: {
+          name: 'Coral Twilight',
+          fogColor: 0x341f97,
+          bgColor: 0x2e1a80,
+          waterAmbience: 0x5f27cd,
+          lightColor: 0xff9ff3,
+          lightIntensity: 0.95,
+          coralEmissive: 0xff6b81,
+          sandColor: 0x54a0ff,
+          abyssDepth: 0.5,
+        },
+        abyss: {
+          name: 'Bioluminescent Abyss',
+          fogColor: 0x04192b,
+          bgColor: 0x020d18,
+          waterAmbience: 0x01a3a4,
+          lightColor: 0x55efc4,
+          lightIntensity: 0.7,
+          coralEmissive: 0x00cec9,
+          sandColor: 0x0c2461,
+          abyssDepth: 0.9,
+        }
+      };
+
+      // --- PROCEDURAL TEXTURE GENERATOR & CACHE ---
+      const TextureGenerator = {
+        cache: new Map(),
+
+        createCanvas(w, h) {
+          const c = document.createElement('canvas');
+          c.width = w;
+          c.height = h;
+          return { canvas: c, ctx: c.getContext('2d') };
+        },
+
+        // Shimmering bubble highlight texture for 3D & 2D bubbles
+        createBubbleTexture() {
+          const key = 'bubble_glow';
+          if (this.cache.has(key)) return this.cache.get(key);
+
+          const { canvas, ctx } = this.createCanvas(256, 256);
+          const cx = 128, cy = 128, r = 120;
+
+          // Transparent body with soft iridescent rainbow border
+          const grad = ctx.createRadialGradient(cx, cy, r * 0.4, cx, cy, r);
+          grad.addColorStop(0, 'rgba(255, 255, 255, 0.05)');
+          grad.addColorStop(0.65, 'rgba(85, 239, 196, 0.25)');
+          grad.addColorStop(0.85, 'rgba(116, 185, 255, 0.6)');
+          grad.addColorStop(0.96, 'rgba(255, 255, 255, 0.95)');
+          grad.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
+
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Glinting crescent specular highlight
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+          ctx.beginPath();
+          ctx.ellipse(cx - 42, cy - 42, 28, 14, -Math.PI / 4, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Second tiny dot highlight
+          ctx.beginPath();
+          ctx.arc(cx + 46, cy + 46, 8, 0, Math.PI * 2);
+          ctx.fill();
+
+          const tex = new THREE.CanvasTexture(canvas);
+          tex.encoding = THREE.sRGBEncoding;
+          this.cache.set(key, tex);
+          return tex;
+        },
+
+        // Cute smiling Clownfish Texture with bright stripes & blush
+        createClownfishTexture() {
+          const key = 'clownfish_tex';
+          if (this.cache.has(key)) return this.cache.get(key);
+
+          const { canvas, ctx } = this.createCanvas(512, 256);
+
+          // Orange body gradient
+          const bgGrad = ctx.createLinearGradient(0, 0, 512, 0);
+          bgGrad.addColorStop(0, '#ff793f');
+          bgGrad.addColorStop(0.5, '#ff5252');
+          bgGrad.addColorStop(1, '#ff793f');
+          ctx.fillStyle = bgGrad;
+          ctx.fillRect(0, 0, 512, 256);
+
+          // White bands with black crisp borders
+          ctx.fillStyle = '#ffffff';
+          ctx.strokeStyle = '#2d3436';
+          ctx.lineWidth = 6;
+
+          // Band 1 (Head band)
+          ctx.beginPath();
+          ctx.ellipse(140, 128, 32, 120, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+
+          // Band 2 (Mid body)
+          ctx.beginPath();
+          ctx.ellipse(290, 128, 38, 120, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+
+          // Band 3 (Tail base)
+          ctx.beginPath();
+          ctx.ellipse(430, 128, 22, 90, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+
+          // Big Sparkly Baby Eyes
+          ctx.fillStyle = '#2d3436';
+          ctx.beginPath();
+          ctx.arc(65, 95, 20, 0, Math.PI * 2);
+          ctx.fill();
+          // Eye Highlights
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(58, 88, 8, 0, Math.PI * 2);
+          ctx.arc(72, 102, 4, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Rosy Cheeks
+          ctx.fillStyle = 'rgba(255, 107, 129, 0.6)';
+          ctx.beginPath();
+          ctx.arc(55, 135, 16, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Cheerful Smile
+          ctx.strokeStyle = '#2d3436';
+          ctx.lineWidth = 5;
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.arc(45, 125, 18, 0.2 * Math.PI, 0.8 * Math.PI);
+          ctx.stroke();
+
+          const tex = new THREE.CanvasTexture(canvas);
+          tex.encoding = THREE.sRGBEncoding;
+          this.cache.set(key, tex);
+          return tex;
+        },
+
+        // Friendly Dolphin Texture (Pastel cyan/blue with soft white belly & smile)
+        createDolphinTexture() {
+          const key = 'dolphin_tex';
+          if (this.cache.has(key)) return this.cache.get(key);
+
+          const { canvas, ctx } = this.createCanvas(512, 256);
+
+          // Ocean Pastel Blue Top
+          const bgGrad = ctx.createLinearGradient(0, 0, 0, 256);
+          bgGrad.addColorStop(0, '#74b9ff');
+          bgGrad.addColorStop(0.55, '#81ecec');
+          bgGrad.addColorStop(1, '#ffffff');
+          ctx.fillStyle = bgGrad;
+          ctx.fillRect(0, 0, 512, 256);
+
+          // Soft White Belly
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.ellipse(256, 210, 240, 60, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Big Sparkly Dolphin Eye
+          ctx.fillStyle = '#2d3436';
+          ctx.beginPath();
+          ctx.arc(70, 100, 16, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(64, 94, 6, 0, Math.PI * 2);
+          ctx.arc(75, 105, 3, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Rosy Cheeks
+          ctx.fillStyle = 'rgba(255, 118, 117, 0.6)';
+          ctx.beginPath();
+          ctx.arc(60, 135, 14, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Friendly Upcurved Dolphin Smile
+          ctx.strokeStyle = '#2d3436';
+          ctx.lineWidth = 4;
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.arc(45, 120, 20, 0.15 * Math.PI, 0.75 * Math.PI);
+          ctx.stroke();
+
+          const tex = new THREE.CanvasTexture(canvas);
+          tex.encoding = THREE.sRGBEncoding;
+          this.cache.set(key, tex);
+          return tex;
+        },
+
+        // Bioluminescent Jellyfish Bell Texture with glowing dots & fringe
+        createJellyfishTexture(colorHue = '#a29bfe') {
+          const key = `jelly_${colorHue}`;
+          if (this.cache.has(key)) return this.cache.get(key);
+
+          const { canvas, ctx } = this.createCanvas(256, 256);
+          const cx = 128, cy = 128;
+
+          // Radial bioluminescent glow
+          const grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, 120);
+          grad.addColorStop(0, '#ffffff');
+          grad.addColorStop(0.3, colorHue);
+          grad.addColorStop(0.7, 'rgba(85, 239, 196, 0.7)');
+          grad.addColorStop(0.95, 'rgba(255, 255, 255, 0.85)');
+          grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, 256, 256);
+
+          // Glowing bioluminescent speckle rings
+          ctx.fillStyle = '#ffffff';
+          for (let r = 35; r <= 95; r += 20) {
+            const dots = Math.floor(r * 0.4);
+            for (let i = 0; i < dots; i++) {
+              const ang = (i / dots) * Math.PI * 2;
+              const px = cx + Math.cos(ang) * r;
+              const py = cy + Math.sin(ang) * r;
+              ctx.beginPath();
+              ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+
+          const tex = new THREE.CanvasTexture(canvas);
+          tex.encoding = THREE.sRGBEncoding;
+          this.cache.set(key, tex);
+          return tex;
+        },
+
+        // Sea Star / Starfish Texture
+        createStarfishTexture() {
+          const key = 'starfish_tex';
+          if (this.cache.has(key)) return this.cache.get(key);
+
+          const { canvas, ctx } = this.createCanvas(256, 256);
+          const cx = 128, cy = 128;
+
+          const grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, 120);
+          grad.addColorStop(0, '#ffeaa7');
+          grad.addColorStop(0.6, '#ff7675');
+          grad.addColorStop(1, '#d63031');
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, 256, 256);
+
+          // Bumpy suction speckles
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+          for (let i = 0; i < 60; i++) {
+            const rx = 20 + Math.random() * 216;
+            const ry = 20 + Math.random() * 216;
+            ctx.beginPath();
+            ctx.arc(rx, ry, 2 + Math.random() * 3, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          const tex = new THREE.CanvasTexture(canvas);
+          tex.encoding = THREE.sRGBEncoding;
+          this.cache.set(key, tex);
+          return tex;
+        },
+
+        // Animated Seabed Caustics Texture
+        createCausticsTexture() {
+          const key = 'caustics_tex';
+          if (this.cache.has(key)) return this.cache.get(key);
+
+          const { canvas, ctx } = this.createCanvas(256, 256);
+          ctx.fillStyle = '#0984e3';
+          ctx.fillRect(0, 0, 256, 256);
+
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+          ctx.lineWidth = 8;
+          ctx.lineCap = 'round';
+
+          // Flowing Voronoi-like web
+          for (let i = 0; i < 8; i++) {
+            ctx.beginPath();
+            ctx.moveTo(Math.random() * 256, Math.random() * 256);
+            ctx.bezierCurveTo(
+              Math.random() * 256, Math.random() * 256,
+              Math.random() * 256, Math.random() * 256,
+              Math.random() * 256, Math.random() * 256
+            );
+            ctx.stroke();
+          }
+
+          const tex = new THREE.CanvasTexture(canvas);
+          tex.encoding = THREE.sRGBEncoding;
+          tex.wrapS = THREE.RepeatWrapping;
+          tex.wrapT = THREE.RepeatWrapping;
+          tex.repeat.set(4, 4);
+          this.cache.set(key, tex);
+          return tex;
+        }
+      };
+
+      // --- SENSORY SOUND ENGINE (WEB AUDIO API SYNTHESIZER) ---
+      const SoundSystem = {
+        ctx: null,
+        masterGain: null,
+        compressor: null,
+        ambientPadGain: null,
+        padOscillators: [],
+        activeVoices: 0,
+        maxPolyphony: 10,
+        initialized: false,
+
+        // Consonant Ocean Harp Pentatonic Scale (F3 to A6 in Hz)
+        pentatonicScale: [
+          174.61, 196.00, 220.00, 261.63, 293.66, // F3, G3, A3, C4, D4
+          349.23, 392.00, 440.00, 523.25, 587.33, // F4, G4, A4, C5, D5
+          698.46, 783.99, 880.00, 1046.50, 1174.66 // F5, G5, A5, C6, D6
+        ],
+
+        padFrequencies: [87.31, 130.81, 174.61, 261.63], // F2, C3, F3, C4
+
+        init() {
+          if (this.initialized) return;
+          try {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            this.ctx = new AudioContextClass();
+
+            // Master Dynamics Compressor / Limiter (Prevents sudden loud bursts for infants)
+            this.compressor = this.ctx.createDynamicsCompressor();
+            this.compressor.threshold.setValueAtTime(-18, this.ctx.currentTime);
+            this.compressor.knee.setValueAtTime(24, this.ctx.currentTime);
+            this.compressor.ratio.setValueAtTime(14, this.ctx.currentTime);
+            this.compressor.attack.setValueAtTime(0.003, this.ctx.currentTime);
+            this.compressor.release.setValueAtTime(0.25, this.ctx.currentTime);
+
+            // Master Gain
+            this.masterGain = this.ctx.createGain();
+            const initGain = STATE.soundEnabled ? STATE.volume : 0;
+            this.masterGain.gain.setValueAtTime(initGain, this.ctx.currentTime);
+
+            this.compressor.connect(this.masterGain);
+            this.masterGain.connect(this.ctx.destination);
+
+            this.startUnderwaterPad();
+            this.initialized = true;
+          } catch (e) {
+            console.warn('Web Audio initialization error:', e);
+          }
+        },
+
+        resume() {
+          if (!this.ctx) this.init();
+          if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume();
+          }
+        },
+
+        suspend() {
+          if (this.ctx && this.ctx.state === 'running') {
+            this.ctx.suspend();
+          }
+        },
+
+        setVolume(val) {
+          STATE.volume = val;
+          if (this.masterGain && this.ctx) {
+            const targetGain = STATE.soundEnabled ? STATE.volume : 0;
+            this.masterGain.gain.setTargetAtTime(targetGain, this.ctx.currentTime, 0.05);
+          }
+        },
+
+        toggleSound() {
+          STATE.soundEnabled = !STATE.soundEnabled;
+          if (this.masterGain && this.ctx) {
+            const targetGain = STATE.soundEnabled ? STATE.volume : 0;
+            this.masterGain.gain.setTargetAtTime(targetGain, this.ctx.currentTime, 0.05);
+          }
+          return STATE.soundEnabled;
+        },
+
+        // Warm, comforting underwater ambient pad drone
+        startUnderwaterPad() {
+          if (!this.ctx) return;
+          const now = this.ctx.currentTime;
+
+          this.ambientPadGain = this.ctx.createGain();
+          this.ambientPadGain.gain.setValueAtTime(0.08, now);
+
+          // Warm Low-pass Filter for soothing womb-like acoustics
+          const padFilter = this.ctx.createBiquadFilter();
+          padFilter.type = 'lowpass';
+          padFilter.frequency.setValueAtTime(320, now);
+          padFilter.Q.setValueAtTime(1.4, now);
+
+          this.padFrequencies.forEach((freq, idx) => {
+            const osc = this.ctx.createOscillator();
+            osc.type = idx % 2 === 0 ? 'sine' : 'triangle';
+            osc.frequency.setValueAtTime(freq, now);
+            osc.detune.setValueAtTime((idx - 1.5) * 6, now);
+
+            const voiceGain = this.ctx.createGain();
+            voiceGain.gain.setValueAtTime(0.2, now);
+
+            osc.connect(voiceGain);
+            voiceGain.connect(padFilter);
+            osc.start(now);
+            this.padOscillators.push(osc);
+          });
+
+          padFilter.connect(this.ambientPadGain);
+          this.ambientPadGain.connect(this.compressor);
+        },
+
+        // Play gentle resonant pentatonic ocean harp note
+        playHarpNote(pitchIndex = null, isBloom = false) {
+          if (!this.ctx || !STATE.soundEnabled) return;
+          this.resume();
+
+          if (this.activeVoices >= this.maxPolyphony) return;
+          this.activeVoices++;
+
+          const now = this.ctx.currentTime;
+          const idx = pitchIndex !== null ? (pitchIndex % this.pentatonicScale.length) : STATE.noteIndex;
+          const freq = this.pentatonicScale[idx];
+          STATE.noteIndex = (STATE.noteIndex + 1) % this.pentatonicScale.length;
+
+          // Primary sine oscillator
+          const osc1 = this.ctx.createOscillator();
+          osc1.type = 'sine';
+          osc1.frequency.setValueAtTime(freq, now);
+
+          // Glass marimba harmonic triangle overtone (2.002x freq)
+          const osc2 = this.ctx.createOscillator();
+          osc2.type = 'triangle';
+          osc2.frequency.setValueAtTime(freq * 2.002, now);
+
+          // Gentle resonant filter
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(isBloom ? 3400 : 2200, now);
+          filter.frequency.exponentialRampToValueAtTime(450, now + 1.6);
+
+          // Volume Envelope
+          const gainNode = this.ctx.createGain();
+          gainNode.gain.setValueAtTime(0.0001, now);
+          gainNode.gain.linearRampToValueAtTime(isBloom ? 0.22 : 0.16, now + 0.02);
+          gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 1.8);
+
+          osc1.connect(gainNode);
+          osc2.connect(gainNode);
+          gainNode.connect(filter);
+          filter.connect(this.compressor);
+
+          // Self-cleanup on ended to prevent memory leaks
+          osc1.onended = () => {
+            try {
+              osc1.disconnect();
+              osc2.disconnect();
+              gainNode.disconnect();
+              filter.disconnect();
+            } catch (e) {}
+            this.activeVoices = Math.max(0, this.activeVoices - 1);
+          };
+
+          osc1.start(now);
+          osc2.start(now);
+          osc1.stop(now + 1.9);
+          osc2.stop(now + 1.9);
+        },
+
+        // Play liquid bubble pop ("bloop!")
+        playBubblePop(pitchOffset = 0) {
+          if (!this.ctx || !STATE.soundEnabled) return;
+          this.resume();
+          const now = this.ctx.currentTime;
+
+          const osc = this.ctx.createOscillator();
+          osc.type = 'sine';
+          const basePitch = 420 + Math.random() * 280 + pitchOffset;
+          osc.frequency.setValueAtTime(basePitch, now);
+          osc.frequency.exponentialRampToValueAtTime(basePitch * 1.6, now + 0.12);
+
+          const gain = this.ctx.createGain();
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.linearRampToValueAtTime(0.18, now + 0.015);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
+
+          osc.connect(gain);
+          gain.connect(this.compressor);
+
+          osc.onended = () => {
+            try {
+              osc.disconnect();
+              gain.disconnect();
+            } catch (e) {}
+          };
+
+          osc.start(now);
+          osc.stop(now + 0.22);
+        },
+
+        // Play Super Aquarium Bloom cascading arpeggio
+        playSuperBloom() {
+          if (!this.ctx || !STATE.soundEnabled) return;
+          this.resume();
+
+          const chord = [3, 5, 7, 9, 11, 13, 11, 9, 7];
+          chord.forEach((noteIdx, i) => {
+            setTimeout(() => {
+              this.playHarpNote(noteIdx, true);
+              this.playBubblePop(i * 40);
+            }, i * 75);
+          });
+        }
+      };
+
+      // --- THREE.JS 3D WORLD ARCHITECTURE ---
+      let scene, camera, renderer;
+      let ambientLight, mainDirectionalLight, waterPointLight;
+      let seaBedMesh;
+      const creatures = [];
+      const scratchV3 = new THREE.Vector3();
+      const scratchRaycaster = new THREE.Raycaster();
+      const scratchMouse = new THREE.Vector2();
+
+      // --- ZERO-ALLOCATION OBJECT POOLS ---
+      const Pools = {
+        bubbles: [],
+        ripples: [],
+        planktonPoints: null,
+        planktonPositions: null,
+
+        init(scene) {
+          // 1. 3D Floating Bubbles Pool (Sphere meshes with iridescent shader texture)
+          const bubbleGeo = new THREE.SphereGeometry(1, 16, 16);
+          const bubbleTex = TextureGenerator.createBubbleTexture();
+          const bubbleMat = new THREE.MeshStandardMaterial({
+            map: bubbleTex,
+            transparent: true,
+            opacity: 0.85,
+            roughness: 0.1,
+            metalness: 0.1,
+            emissive: new THREE.Color(0x81ecec),
+            emissiveIntensity: 0.4,
+            depthWrite: false,
+          });
+
+          for (let i = 0; i < CONFIG.bubblePoolSize; i++) {
+            const mesh = new THREE.Mesh(bubbleGeo, bubbleMat.clone());
+            mesh.visible = false;
+            mesh.userData = {
+              active: false,
+              vx: 0, vy: 0, vz: 0,
+              baseScale: 1,
+              wobblePhase: Math.random() * Math.PI * 2,
+              wobbleSpeed: 2 + Math.random() * 2,
+              life: 0,
+              maxLife: 8,
+            };
+            scene.add(mesh);
+            this.bubbles.push(mesh);
+          }
+
+          // 2. 3D Shockwave Rings Pool (Torus mesh for tap ripples)
+          const ringGeo = new THREE.TorusGeometry(1, 0.08, 8, 24);
+          const ringMat = new THREE.MeshBasicMaterial({
+            color: 0x55efc4,
+            transparent: true,
+            opacity: 0.9,
+            depthWrite: false,
+          });
+
+          for (let i = 0; i < CONFIG.ripplePoolSize; i++) {
+            const ring = new THREE.Mesh(ringGeo, ringMat.clone());
+            ring.visible = false;
+            ring.userData = {
+              active: false,
+              scaleProgress: 0,
+              maxScale: 4 + Math.random() * 2,
+            };
+            scene.add(ring);
+            this.ripples.push(ring);
+          }
+
+          // 3. Bioluminescent Plankton Particle System (Static BufferGeometry)
+          const pGeo = new THREE.BufferGeometry();
+          const pPositions = new Float32Array(CONFIG.planktonCount * 3);
+          const pColors = new Float32Array(CONFIG.planktonCount * 3);
+
+          const colorA = new THREE.Color(0x55efc4);
+          const colorB = new THREE.Color(0xa29bfe);
+
+          for (let i = 0; i < CONFIG.planktonCount; i++) {
+            pPositions[i * 3 + 0] = (Math.random() - 0.5) * 60;
+            pPositions[i * 3 + 1] = (Math.random() - 0.5) * 40;
+            pPositions[i * 3 + 2] = (Math.random() - 0.5) * 40;
+
+            const mixed = colorA.clone().lerp(colorB, Math.random());
+            pColors[i * 3 + 0] = mixed.r;
+            pColors[i * 3 + 1] = mixed.g;
+            pColors[i * 3 + 2] = mixed.b;
+          }
+
+          pGeo.setAttribute('position', new THREE.BufferAttribute(pPositions, 3));
+          pGeo.setAttribute('color', new THREE.BufferAttribute(pColors, 3));
+
+          const pMat = new THREE.PointsMaterial({
+            size: 0.35,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.75,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+          });
+
+          this.planktonPoints = new THREE.Points(pGeo, pMat);
+          this.planktonPositions = pPositions;
+          scene.add(this.planktonPoints);
+        },
+
+        // Spawn a 3D bubble from pre-allocated pool
+        spawnBubble(x, y, z, vx = 0, vy = 2.5, vz = 0, scale = 1, colorHex = 0x81ecec) {
+          const bubble = this.bubbles.find(b => !b.userData.active);
+          if (!bubble) return null;
+
+          bubble.position.set(x, y, z);
+          bubble.userData.active = true;
+          bubble.userData.vx = vx + (Math.random() - 0.5) * 0.4;
+          bubble.userData.vy = vy + Math.random() * 1.2;
+          bubble.userData.vz = vz + (Math.random() - 0.5) * 0.4;
+          bubble.userData.baseScale = scale * (0.6 + Math.random() * 0.8);
+          bubble.userData.life = 0;
+          bubble.userData.maxLife = 6 + Math.random() * 3;
+          bubble.scale.setScalar(bubble.userData.baseScale);
+          bubble.material.emissive.setHex(colorHex);
+          bubble.visible = true;
+          return bubble;
+        },
+
+        // Spawn a 3D tap ring ripple
+        spawnRipple(x, y, z) {
+          const ripple = this.ripples.find(r => !r.userData.active);
+          if (!ripple) return;
+
+          ripple.position.set(x, y, z);
+          ripple.rotation.x = Math.PI / 2;
+          ripple.scale.setScalar(0.2);
+          ripple.material.opacity = 0.9;
+          ripple.userData.active = true;
+          ripple.userData.scaleProgress = 0;
+          ripple.visible = true;
+        },
+
+        // Update all active pooled objects
+        update(delta, time) {
+          // Update Bubbles
+          for (let i = 0; i < this.bubbles.length; i++) {
+            const b = this.bubbles[i];
+            if (!b.userData.active) continue;
+
+            b.userData.life += delta;
+            if (b.userData.life >= b.userData.maxLife || b.position.y > 22) {
+              b.userData.active = false;
+              b.visible = false;
+              continue;
+            }
+
+            // Upward movement + gentle wavering current
+            const wobble = Math.sin(time * b.userData.wobbleSpeed + b.userData.wobblePhase) * 0.03;
+            b.position.x += (b.userData.vx + wobble) * delta;
+            b.position.y += b.userData.vy * delta;
+            b.position.z += b.userData.vz * delta;
+
+            // Grow slightly as bubble rises
+            const progress = b.userData.life / b.userData.maxLife;
+            const currentScale = b.userData.baseScale * (1 + progress * 0.4);
+            b.scale.setScalar(currentScale);
+          }
+
+          // Update Ripples
+          for (let i = 0; i < this.ripples.length; i++) {
+            const r = this.ripples[i];
+            if (!r.userData.active) continue;
+
+            r.userData.scaleProgress += delta * 2.8;
+            if (r.userData.scaleProgress >= 1.0) {
+              r.userData.active = false;
+              r.visible = false;
+              continue;
+            }
+
+            const currentScale = THREE.MathUtils.lerp(0.2, r.userData.maxScale, r.userData.scaleProgress);
+            r.scale.setScalar(currentScale);
+            r.material.opacity = (1.0 - r.userData.scaleProgress) * 0.9;
+          }
+
+          // Update Plankton drift
+          if (this.planktonPositions) {
+            const positions = this.planktonPoints.geometry.attributes.position.array;
+            for (let i = 0; i < CONFIG.planktonCount; i++) {
+              positions[i * 3 + 1] += Math.sin(time + i) * 0.01 + 0.015;
+              positions[i * 3 + 0] += Math.cos(time * 0.5 + i) * 0.008;
+
+              if (positions[i * 3 + 1] > 20) {
+                positions[i * 3 + 1] = -20;
+              }
+            }
+            this.planktonPoints.geometry.attributes.position.needsUpdate = true;
+          }
+        }
+      };
+
+      // --- PROCEDURAL 3D CREATURE BUILDERS ---
+      const CreatureFactory = {
+
+        // 1. Bioluminescent Jellyfish
+        createJellyfish(colorHue = '#a29bfe', startPos = { x: 0, y: 0, z: 0 }) {
+          const group = new THREE.Group();
+          group.position.set(startPos.x, startPos.y, startPos.z);
+
+          // Translucent Bell
+          const bellGeo = new THREE.SphereGeometry(2.2, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.55);
+          const bellTex = TextureGenerator.createJellyfishTexture(colorHue);
+          const bellMat = new THREE.MeshStandardMaterial({
+            map: bellTex,
+            transparent: true,
+            opacity: 0.88,
+            roughness: 0.2,
+            metalness: 0.1,
+            side: THREE.DoubleSide,
+            emissive: new THREE.Color(colorHue),
+            emissiveIntensity: 0.6,
+          });
+          const bell = new THREE.Mesh(bellGeo, bellMat);
+          group.add(bell);
+
+          // Glowing Inner Nucleus Core
+          const coreGeo = new THREE.SphereGeometry(0.85, 16, 16);
+          const coreMat = new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.9,
+          });
+          const core = new THREE.Mesh(coreGeo, coreMat);
+          core.position.y = 0.5;
+          group.add(core);
+
+          // Flowing Tentacles
+          const tentacles = [];
+          const numTentacles = 8;
+          const tentacleGeo = new THREE.CylinderGeometry(0.06, 0.02, 4.5, 8, 12);
+          const tentacleMat = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(colorHue),
+            transparent: true,
+            opacity: 0.75,
+            roughness: 0.3,
+            emissive: new THREE.Color(colorHue),
+            emissiveIntensity: 0.4,
+          });
+
+          for (let i = 0; i < numTentacles; i++) {
+            const angle = (i / numTentacles) * Math.PI * 2;
+            const radius = 1.4;
+            const tent = new THREE.Mesh(tentacleGeo, tentacleMat);
+            tent.position.set(Math.cos(angle) * radius, -2.2, Math.sin(angle) * radius);
+            group.add(tent);
+            tentacles.push(tent);
+          }
+
+          const creature = {
+            type: 'jellyfish',
+            group: group,
+            bell: bell,
+            core: core,
+            tentacles: tentacles,
+            baseY: startPos.y,
+            swimSpeed: 0.8 + Math.random() * 0.4,
+            pulsePhase: Math.random() * Math.PI * 2,
+            spinVelocity: 0,
+            update(delta, time) {
+              const speed = STATE.speedMultiplier * this.swimSpeed;
+              const pulse = (Math.sin(time * 2.5 * speed + this.pulsePhase) + 1) * 0.5; // 0 to 1
+
+              // Bell contraction & expansion
+              this.bell.scale.set(1.0 - pulse * 0.25, 1.0 + pulse * 0.35, 1.0 - pulse * 0.25);
+              this.core.scale.setScalar(0.9 + pulse * 0.4);
+
+              // Upward gentle push on pulse
+              this.group.position.y = this.baseY + Math.sin(time * 0.8 * speed + this.pulsePhase) * 2.5;
+              this.group.position.x += Math.cos(time * 0.3 + this.pulsePhase) * 0.015 * speed;
+
+              // Tentacle undulating flow
+              for (let i = 0; i < this.tentacles.length; i++) {
+                const t = this.tentacles[i];
+                t.rotation.z = Math.sin(time * 3 * speed + i) * 0.2;
+                t.rotation.x = Math.cos(time * 3 * speed + i) * 0.2;
+              }
+
+              // Spin reaction when tickled
+              if (this.spinVelocity > 0) {
+                this.group.rotation.y += this.spinVelocity * delta;
+                this.spinVelocity = Math.max(0, this.spinVelocity - delta * 3.5);
+              }
+            },
+            interact() {
+              this.spinVelocity = 12.0;
+              SoundSystem.playHarpNote(null, false);
+              SoundSystem.playBubblePop(60);
+              // Spawn bubble burst from top of bell
+              for (let i = 0; i < 6; i++) {
+                Pools.spawnBubble(
+                  this.group.position.x + (Math.random() - 0.5) * 1.5,
+                  this.group.position.y + 1.5,
+                  this.group.position.z + (Math.random() - 0.5) * 1.5,
+                  (Math.random() - 0.5) * 2,
+                  3.5,
+                  (Math.random() - 0.5) * 2,
+                  0.8,
+                  0xa29bfe
+                );
+              }
+            }
+          };
+
+          creatures.push(creature);
+          scene.add(group);
+          return creature;
+        },
+
+        // 2. Cute Smiling Clownfish
+        createClownfish(startPos = { x: 0, y: 0, z: 0 }, swimRadius = 12, swimSpeed = 1.2) {
+          const group = new THREE.Group();
+          group.position.set(startPos.x, startPos.y, startPos.z);
+
+          // Chubby Aerodynamic Fish Body
+          const bodyGeo = new THREE.SphereGeometry(1.6, 20, 16);
+          bodyGeo.scale(1.4, 1.0, 0.6);
+          const fishTex = TextureGenerator.createClownfishTexture();
+          const bodyMat = new THREE.MeshStandardMaterial({
+            map: fishTex,
+            roughness: 0.3,
+            metalness: 0.1,
+            emissive: new THREE.Color(0xff793f),
+            emissiveIntensity: 0.25,
+          });
+          const body = new THREE.Mesh(bodyGeo, bodyMat);
+          group.add(body);
+
+          // Wiggling Tail Fin
+          const tailGeo = new THREE.ConeGeometry(0.9, 1.4, 4);
+          tailGeo.rotateX(Math.PI / 2);
+          tailGeo.scale(0.2, 1.2, 1.0);
+          const tailMat = new THREE.MeshStandardMaterial({
+            color: 0xff5252,
+            roughness: 0.4,
+          });
+          const tail = new THREE.Mesh(tailGeo, tailMat);
+          tail.position.set(2.0, 0, 0);
+          group.add(tail);
+
+          // Dorsal and Pectoral Fins
+          const finGeo = new THREE.ConeGeometry(0.5, 1.0, 4);
+          finGeo.scale(0.15, 1.0, 0.8);
+          const dorsalFin = new THREE.Mesh(finGeo, tailMat);
+          dorsalFin.position.set(0.2, 1.1, 0);
+          dorsalFin.rotation.z = -0.3;
+          group.add(dorsalFin);
+
+          const creature = {
+            type: 'clownfish',
+            group: group,
+            tail: tail,
+            swimRadius: swimRadius,
+            swimSpeed: swimSpeed,
+            angle: Math.random() * Math.PI * 2,
+            centerPos: { x: startPos.x, y: startPos.y, z: startPos.z },
+            spinVelocity: 0,
+            update(delta, time) {
+              const speed = STATE.speedMultiplier * this.swimSpeed;
+              this.angle += delta * 0.4 * speed;
+
+              // Smooth orbital swimming path
+              const targetX = this.centerPos.x + Math.cos(this.angle) * this.swimRadius;
+              const targetZ = this.centerPos.z + Math.sin(this.angle) * (this.swimRadius * 0.65);
+              const targetY = this.centerPos.y + Math.sin(time * 1.5 * speed + this.angle) * 1.4;
+
+              // Face swim velocity direction
+              const dx = targetX - this.group.position.x;
+              const dz = targetZ - this.group.position.z;
+              const heading = Math.atan2(-dz, dx);
+
+              this.group.position.set(targetX, targetY, targetZ);
+              this.group.rotation.y = heading + Math.PI / 2;
+
+              // Tail fin oscillation
+              this.tail.rotation.y = Math.sin(time * 10 * speed) * 0.45;
+
+              // Spin when tickled
+              if (this.spinVelocity > 0) {
+                this.group.rotation.x += this.spinVelocity * delta;
+                this.spinVelocity = Math.max(0, this.spinVelocity - delta * 4);
+              }
+            },
+            interact() {
+              this.spinVelocity = 14.0;
+              SoundSystem.playHarpNote(null, false);
+              SoundSystem.playBubblePop(100);
+              // Spawn bubbles behind tail
+              for (let i = 0; i < 5; i++) {
+                Pools.spawnBubble(
+                  this.group.position.x,
+                  this.group.position.y,
+                  this.group.position.z,
+                  (Math.random() - 0.5) * 1.5,
+                  2.5,
+                  (Math.random() - 0.5) * 1.5,
+                  0.7,
+                  0xff793f
+                );
+              }
+            }
+          };
+
+          creatures.push(creature);
+          scene.add(group);
+          return creature;
+        },
+
+        // 3. Playful Friendly Dolphin
+        createDolphin(startPos = { x: 0, y: 4, z: -10 }) {
+          const group = new THREE.Group();
+          group.position.set(startPos.x, startPos.y, startPos.z);
+
+          // Smooth Dolphin Body
+          const bodyGeo = new THREE.SphereGeometry(2.2, 24, 16);
+          bodyGeo.scale(2.2, 0.9, 0.75);
+          const dolphinTex = TextureGenerator.createDolphinTexture();
+          const bodyMat = new THREE.MeshStandardMaterial({
+            map: dolphinTex,
+            roughness: 0.2,
+            metalness: 0.15,
+            emissive: new THREE.Color(0x74b9ff),
+            emissiveIntensity: 0.2,
+          });
+          const body = new THREE.Mesh(bodyGeo, bodyMat);
+          group.add(body);
+
+          // Rostrum Snout
+          const snoutGeo = new THREE.ConeGeometry(0.5, 1.4, 12);
+          snoutGeo.rotateZ(Math.PI / 2);
+          const snout = new THREE.Mesh(snoutGeo, bodyMat);
+          snout.position.set(-4.2, -0.2, 0);
+          group.add(snout);
+
+          // Dorsal Fin
+          const finGeo = new THREE.ConeGeometry(0.7, 1.4, 4);
+          finGeo.scale(0.2, 1.0, 0.8);
+          const dorsalFin = new THREE.Mesh(finGeo, bodyMat);
+          dorsalFin.position.set(0.3, 1.6, 0);
+          dorsalFin.rotation.z = 0.4;
+          group.add(dorsalFin);
+
+          // Tail Fluke
+          const flukeGeo = new THREE.BoxGeometry(0.2, 0.3, 2.4);
+          const fluke = new THREE.Mesh(flukeGeo, bodyMat);
+          fluke.position.set(4.4, 0, 0);
+          group.add(fluke);
+
+          const creature = {
+            type: 'dolphin',
+            group: group,
+            fluke: fluke,
+            centerPos: { x: startPos.x, y: startPos.y, z: startPos.z },
+            angle: 0,
+            swimSpeed: 1.0,
+            spinVelocity: 0,
+            update(delta, time) {
+              const speed = STATE.speedMultiplier * this.swimSpeed;
+              this.angle += delta * 0.3 * speed;
+
+              // Graceful figure-8 / arch leap swimming path
+              const radiusX = 22;
+              const radiusZ = 12;
+              const targetX = this.centerPos.x + Math.sin(this.angle) * radiusX;
+              const targetZ = this.centerPos.z + Math.sin(this.angle * 2) * radiusZ;
+              const targetY = this.centerPos.y + Math.sin(this.angle * 3) * 3.5;
+
+              const dx = targetX - this.group.position.x;
+              const dz = targetZ - this.group.position.z;
+              const heading = Math.atan2(-dz, dx);
+
+              this.group.position.set(targetX, targetY, targetZ);
+              this.group.rotation.y = heading - Math.PI / 2;
+              this.group.rotation.z = Math.sin(time * 2 * speed) * 0.15;
+
+              // Fluke flapping
+              this.fluke.rotation.z = Math.sin(time * 6 * speed) * 0.4;
+
+              // Somersault backflip when tickled
+              if (this.spinVelocity > 0) {
+                this.group.rotation.x += this.spinVelocity * delta;
+                this.spinVelocity = Math.max(0, this.spinVelocity - delta * 3.5);
+              }
+            },
+            interact() {
+              this.spinVelocity = 16.0;
+              SoundSystem.playHarpNote(null, true);
+              SoundSystem.playBubblePop(120);
+              for (let i = 0; i < 8; i++) {
+                Pools.spawnBubble(
+                  this.group.position.x + (Math.random() - 0.5) * 2,
+                  this.group.position.y,
+                  this.group.position.z + (Math.random() - 0.5) * 2,
+                  (Math.random() - 0.5) * 2,
+                  4.0,
+                  (Math.random() - 0.5) * 2,
+                  1.0,
+                  0x74b9ff
+                );
+              }
+            }
+          };
+
+          creatures.push(creature);
+          scene.add(group);
+          return creature;
+        },
+
+        // 4. Floating Sea Star
+        createStarfish(startPos = { x: 0, y: -6, z: 0 }) {
+          const group = new THREE.Group();
+          group.position.set(startPos.x, startPos.y, startPos.z);
+
+          // 5-ray star shape
+          const starShape = new THREE.Shape();
+          const spikes = 5, outerR = 1.6, innerR = 0.75;
+          let rot = Math.PI / 2 * 3;
+          let step = Math.PI / spikes;
+
+          starShape.moveTo(0, -outerR);
+          for (let i = 0; i < spikes; i++) {
+            let x = Math.cos(rot) * outerR;
+            let y = Math.sin(rot) * outerR;
+            starShape.lineTo(x, y);
+            rot += step;
+
+            x = Math.cos(rot) * innerR;
+            y = Math.sin(rot) * innerR;
+            starShape.lineTo(x, y);
+            rot += step;
+          }
+          starShape.lineTo(0, -outerR);
+
+          const extrudeSettings = { depth: 0.35, bevelEnabled: true, bevelSegments: 3, steps: 1, bevelSize: 0.15, bevelThickness: 0.15 };
+          const starGeo = new THREE.ExtrudeGeometry(starShape, extrudeSettings);
+          const starTex = TextureGenerator.createStarfishTexture();
+          const starMat = new THREE.MeshStandardMaterial({
+            map: starTex,
+            roughness: 0.4,
+            emissive: new THREE.Color(0xff7675),
+            emissiveIntensity: 0.3,
+          });
+
+          const mesh = new THREE.Mesh(starGeo, starMat);
+          mesh.rotation.x = Math.PI / 2;
+          group.add(mesh);
+
+          const creature = {
+            type: 'starfish',
+            group: group,
+            mesh: mesh,
+            basePos: { x: startPos.x, y: startPos.y, z: startPos.z },
+            spinVelocity: 0,
+            update(delta, time) {
+              const speed = STATE.speedMultiplier;
+              // Gentle tumbling and drifting in water current
+              this.group.rotation.z += delta * 0.4 * speed;
+              this.group.rotation.x = Math.sin(time * 0.8 + this.basePos.x) * 0.3;
+              this.group.position.y = this.basePos.y + Math.sin(time * 1.2 * speed + this.basePos.z) * 1.2;
+
+              if (this.spinVelocity > 0) {
+                this.group.rotation.z += this.spinVelocity * delta;
+                this.spinVelocity = Math.max(0, this.spinVelocity - delta * 4);
+              }
+            },
+            interact() {
+              this.spinVelocity = 15.0;
+              SoundSystem.playHarpNote(null, false);
+              SoundSystem.playBubblePop(180);
+              for (let i = 0; i < 4; i++) {
+                Pools.spawnBubble(this.group.position.x, this.group.position.y, this.group.position.z, 0, 2.8, 0, 0.6, 0xff7675);
+              }
+            }
+          };
+
+          creatures.push(creature);
+          scene.add(group);
+          return creature;
+        }
+      };
+
+      // --- ENVIRONMENT & CORAL REEF BUILDER ---
+      function buildAquariumEnvironment(scene) {
+        // 1. Rolling Seabed with Caustic Shader Layer
+        const sandGeo = new THREE.PlaneGeometry(120, 100, 32, 32);
+        // Create gentle sand dune ripples
+        const posAttr = sandGeo.attributes.position;
+        for (let i = 0; i < posAttr.count; i++) {
+          const vx = posAttr.getX(i);
+          const vy = posAttr.getY(i);
+          posAttr.setZ(i, Math.sin(vx * 0.15) * 1.2 + Math.cos(vy * 0.18) * 1.0);
+        }
+        sandGeo.computeVertexNormals();
+
+        const causticsTex = TextureGenerator.createCausticsTexture();
+        const sandMat = new THREE.MeshStandardMaterial({
+          color: 0x0abde3,
+          map: causticsTex,
+          roughness: 0.6,
+          metalness: 0.1,
+          emissive: new THREE.Color(0x01a3a4),
+          emissiveIntensity: 0.2,
+        });
+
+        seaBedMesh = new THREE.Mesh(sandGeo, sandMat);
+        seaBedMesh.rotation.x = -Math.PI / 2;
+        seaBedMesh.position.y = -12;
+        scene.add(seaBedMesh);
+
+        // 2. Crystalline Pastel Coral Arches
+        const archMat1 = new THREE.MeshStandardMaterial({
+          color: 0xff7675,
+          roughness: 0.3,
+          metalness: 0.1,
+          emissive: new THREE.Color(0xd63031),
+          emissiveIntensity: 0.35,
+        });
+
+        const archMat2 = new THREE.MeshStandardMaterial({
+          color: 0x55efc4,
+          roughness: 0.3,
+          metalness: 0.1,
+          emissive: new THREE.Color(0x00b894),
+          emissiveIntensity: 0.35,
+        });
+
+        const archMat3 = new THREE.MeshStandardMaterial({
+          color: 0xa29bfe,
+          roughness: 0.3,
+          metalness: 0.1,
+          emissive: new THREE.Color(0x6c5ce7),
+          emissiveIntensity: 0.35,
+        });
+
+        // Left Coral Arch
+        const arch1 = new THREE.Mesh(new THREE.TorusGeometry(8, 1.8, 16, 32, Math.PI), archMat1);
+        arch1.position.set(-18, -12, -8);
+        arch1.rotation.y = 0.4;
+        scene.add(arch1);
+
+        // Right Coral Arch
+        const arch2 = new THREE.Mesh(new THREE.TorusGeometry(10, 2.2, 16, 32, Math.PI), archMat2);
+        arch2.position.set(16, -12, -12);
+        arch2.rotation.y = -0.5;
+        scene.add(arch2);
+
+        // Center Depth Arch
+        const arch3 = new THREE.Mesh(new THREE.TorusGeometry(12, 2.5, 16, 32, Math.PI), archMat3);
+        arch3.position.set(0, -12, -22);
+        arch3.rotation.y = 0.1;
+        scene.add(arch3);
+
+        // 3. Glowing Sea Crystals & Branching Coral Clusters on the Floor
+        const crystalGeo = new THREE.OctahedronGeometry(1.6, 0);
+        const crystalMat = new THREE.MeshStandardMaterial({
+          color: 0xffeaa7,
+          roughness: 0.1,
+          metalness: 0.2,
+          emissive: new THREE.Color(0xfdcb6e),
+          emissiveIntensity: 0.7,
+        });
+
+        const crystalPositions = [
+          [-14, -11, -4], [-8, -11, -7], [6, -11, -5], [12, -11, -8], [0, -11, -14], [-22, -11, -12]
+        ];
+
+        crystalPositions.forEach(([cx, cy, cz]) => {
+          const crystal = new THREE.Mesh(crystalGeo, crystalMat);
+          crystal.position.set(cx, cy, cz);
+          crystal.rotation.set(Math.random(), Math.random(), Math.random());
+          scene.add(crystal);
+        });
+
+        // 4. Sunlit Water Caustic Cones / Light Shafts
+        const lightConeGeo = new THREE.CylinderGeometry(0.8, 6, 26, 16, 1, true);
+        const lightConeMat = new THREE.MeshBasicMaterial({
+          color: 0x81ecec,
+          transparent: true,
+          opacity: 0.18,
+          side: THREE.DoubleSide,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+        });
+
+        const conePositions = [-12, -2, 8, 18];
+        conePositions.forEach((cx, idx) => {
+          const cone = new THREE.Mesh(lightConeGeo, lightConeMat);
+          cone.position.set(cx, 4, -10 + idx * 2);
+          cone.rotation.z = (idx - 1.5) * 0.08;
+          scene.add(cone);
+        });
+      }
+
+      // --- INITIALIZE THREE.JS SYSTEM ---
+      function initThree() {
+        const container = document.getElementById('canvas-container');
+
+        // Scene & Fog
+        scene = new THREE.Scene();
+        const currentBiome = BIOMES[STATE.biome];
+        scene.background = new THREE.Color(currentBiome.bgColor);
+        scene.fog = new THREE.FogExp2(currentBiome.fogColor, 0.022);
+
+        // Camera
+        camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 150);
+        camera.position.set(0, 0, 22);
+
+        // Renderer with DPR capping for buttery 60 FPS
+        renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.shadowMap.enabled = false;
+        container.appendChild(renderer.domElement);
+
+        // Ambient & Directional Lighting
+        ambientLight = new THREE.AmbientLight(currentBiome.waterAmbience, 1.2);
+        scene.add(ambientLight);
+
+        mainDirectionalLight = new THREE.DirectionalLight(currentBiome.lightColor, currentBiome.lightIntensity);
+        mainDirectionalLight.position.set(0, 30, 10);
+        scene.add(mainDirectionalLight);
+
+        waterPointLight = new THREE.PointLight(0x00cec9, 1.5, 35);
+        waterPointLight.position.set(0, 5, 0);
+        scene.add(waterPointLight);
+
+        // Build Environment
+        buildAquariumEnvironment(scene);
+
+        // Initialize Zero-Allocation Pools
+        Pools.init(scene);
+
+        // Spawn Pre-instantiated Sea Creatures
+        // 1. Jellyfish
+        CreatureFactory.createJellyfish('#a29bfe', { x: -10, y: 2, z: -6 });
+        CreatureFactory.createJellyfish('#ff7675', { x: 9, y: 4, z: -8 });
+        CreatureFactory.createJellyfish('#55efc4', { x: -2, y: -3, z: -12 });
+        CreatureFactory.createJellyfish('#ffeaa7', { x: 14, y: -2, z: -4 });
+
+        // 2. Clownfish School
+        CreatureFactory.createClownfish({ x: -8, y: -1, z: -5 }, 8, 1.3);
+        CreatureFactory.createClownfish({ x: -6, y: 1, z: -6 }, 7, 1.1);
+        CreatureFactory.createClownfish({ x: 8, y: -2, z: -7 }, 9, 1.2);
+        CreatureFactory.createClownfish({ x: 10, y: 2, z: -8 }, 8, 1.4);
+
+        // 3. Playful Dolphins
+        CreatureFactory.createDolphin({ x: -4, y: 5, z: -10 });
+        CreatureFactory.createDolphin({ x: 6, y: -1, z: -14 });
+
+        // 4. Floating Sea Stars
+        CreatureFactory.createStarfish({ x: -12, y: -7, z: -2 });
+        CreatureFactory.createStarfish({ x: 11, y: -8, z: -3 });
+        CreatureFactory.createStarfish({ x: 0, y: -9, z: -5 });
+        CreatureFactory.createStarfish({ x: -6, y: -5, z: -1 });
+
+        // Spawn initial ambient bubbles
+        for (let i = 0; i < 25; i++) {
+          Pools.spawnBubble(
+            (Math.random() - 0.5) * 35,
+            -10 + Math.random() * 20,
+            (Math.random() - 0.5) * 20,
+            0,
+            1.8 + Math.random(),
+            0,
+            0.8
+          );
+        }
+
+        updateCameraLayout();
+      }
+
+      // --- RESPONSIVE & ADAPTIVE CAMERA ERGONOMICS ---
+      function updateCameraLayout() {
+        if (!camera || !renderer) return;
+
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        const aspect = w / h;
+        STATE.aspectRatio = aspect;
+        STATE.isPortrait = h > w;
+
+        camera.aspect = aspect;
+
+        // Adaptive FOV for mobile portrait vs. 21:9 ultrawide
+        if (aspect < 1.0) {
+          // Portrait phone: expand FOV so the aquarium is visible without clipping
+          camera.fov = 72;
+          camera.position.z = 26;
+        } else if (aspect >= 2.0) {
+          // 21:9 Ultrawide: cinematic panoramic perspective
+          camera.fov = 50;
+          camera.position.z = 20;
+        } else {
+          // 16:9 Standard desktop / TV
+          camera.fov = 55;
+          camera.position.z = 22;
+        }
+
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+
+        // Update Aspect badge text
+        const badge = document.getElementById('aspect-badge');
+        if (badge) {
+          if (aspect >= 2.0) badge.textContent = '⚡ 21:9 Ultrawide';
+          else if (STATE.isPortrait) badge.textContent = '📱 Mobile Touch';
+          else badge.textContent = '📺 TV & Screen Ready';
+        }
+      }
+
+      // --- BIOME TRANSITION LOGIC ---
+      function setBiome(biomeKey) {
+        if (!BIOMES[biomeKey]) return;
+        STATE.biome = biomeKey;
+        const b = BIOMES[biomeKey];
+
+        // Update Three.js visuals
+        if (scene) {
+          scene.background.setHex(b.bgColor);
+          scene.fog.color.setHex(b.fogColor);
+        }
+        if (ambientLight) ambientLight.color.setHex(b.waterAmbience);
+        if (mainDirectionalLight) {
+          mainDirectionalLight.color.setHex(b.lightColor);
+          mainDirectionalLight.intensity = b.lightIntensity;
+        }
+        if (seaBedMesh) {
+          seaBedMesh.material.color.setHex(b.sandColor);
+          seaBedMesh.material.emissive.setHex(b.coralEmissive);
+        }
+
+        // Update UI pill active states
+        document.querySelectorAll('[data-biome]').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.biome === biomeKey);
+        });
+        const display = document.getElementById('biome-display');
+        if (display) display.textContent = b.name;
+      }
+
+      // --- 2D SCREEN BUBBLES GENERATOR ---
+      function spawn2DScreenBubble() {
+        const container = document.getElementById('screen-bubbles-container');
+        if (!container || container.childElementCount >= 6) return;
+
+        const bubble = document.createElement('div');
+        bubble.className = 'screen-bubble';
+        const size = 56 + Math.random() * 32;
+        bubble.style.width = `${size}px`;
+        bubble.style.height = `${size}px`;
+
+        const posX = 8 + Math.random() * 80;
+        const posY = 15 + Math.random() * 70;
+        bubble.style.left = `${posX}%`;
+        bubble.style.top = `${posY}%`;
+
+        // Cute sea creature emoji inside bubble
+        const emojis = ['🫧', '🐠', '🐬', '🪼', '⭐', '🐙', '🐢'];
+        bubble.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+
+        const popHandler = (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          SoundSystem.playBubblePop(150);
+          SoundSystem.playHarpNote(null, false);
+          createScreenRipple(e.clientX || (posX * window.innerWidth / 100), e.clientY || (posY * window.innerHeight / 100));
+
+          // 3D bubble burst at approximate world space
+          scratchMouse.x = (posX / 50) - 1;
+          scratchMouse.y = -(posY / 50) + 1;
+          scratchRaycaster.setFromCamera(scratchMouse, camera);
+          const worldPos = scratchRaycaster.ray.at(15, scratchV3);
+          for (let i = 0; i < 6; i++) {
+            Pools.spawnBubble(worldPos.x, worldPos.y, worldPos.z, (Math.random() - 0.5) * 2, 3.5, (Math.random() - 0.5) * 2, 0.85);
+          }
+
+          bubble.remove();
+          setTimeout(spawn2DScreenBubble, 3000 + Math.random() * 4000);
+        };
+
+        bubble.addEventListener('pointerdown', popHandler);
+        container.appendChild(bubble);
+      }
+
+      function createScreenRipple(x, y) {
+        const ripple = document.createElement('div');
+        ripple.className = 'touch-ripple';
+        const size = 90 + Math.random() * 40;
+        ripple.style.width = `${size}px`;
+        ripple.style.height = `${size}px`;
+        ripple.style.left = `${x}px`;
+        ripple.style.top = `${y}px`;
+        document.body.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 750);
+      }
+
+      // --- SUPER AQUARIUM BLOOM (MULTI-TOUCH PALM GRAB & SPECIAL TRIGGER) ---
+      function triggerSuperBloom(clientX = window.innerWidth / 2, clientY = window.innerHeight / 2) {
+        const overlay = document.getElementById('bloom-overlay');
+        if (overlay) {
+          overlay.classList.remove('active');
+          void overlay.offsetWidth; // Trigger reflow
+          overlay.classList.add('active');
+        }
+
+        SoundSystem.playSuperBloom();
+        createScreenRipple(clientX, clientY);
+
+        // Burst 25+ glowing 3D bubbles across scene
+        for (let i = 0; i < 28; i++) {
+          Pools.spawnBubble(
+            (Math.random() - 0.5) * 20,
+            -8 + Math.random() * 12,
+            (Math.random() - 0.5) * 16,
+            (Math.random() - 0.5) * 4,
+            4.0 + Math.random() * 3,
+            (Math.random() - 0.5) * 4,
+            1.2,
+            0x55efc4
+          );
+        }
+
+        // All creatures perform joyful acrobatics
+        creatures.forEach(c => c.interact());
+      }
+
+      // --- INTERACTION & RAYCASTING HANDLERS ---
+      function handleSceneInteraction(clientX, clientY) {
+        SoundSystem.resume();
+
+        // Hide prompt banner after first touch
+        const banner = document.getElementById('prompt-banner');
+        if (banner && !banner.classList.contains('hidden')) {
+          banner.classList.add('hidden');
+        }
+
+        createScreenRipple(clientX, clientY);
+
+        // Raycasting to tickle creatures
+        scratchMouse.x = (clientX / window.innerWidth) * 2 - 1;
+        scratchMouse.y = -(clientY / window.innerHeight) * 2 + 1;
+        scratchRaycaster.setFromCamera(scratchMouse, camera);
+
+        let hitCreature = false;
+        for (let i = 0; i < creatures.length; i++) {
+          const c = creatures[i];
+          const intersects = scratchRaycaster.intersectObject(c.group, true);
+          if (intersects.length > 0) {
+            c.interact();
+            hitCreature = true;
+            break;
+          }
+        }
+
+        // If open water was tapped, spawn ripple & rising bubble ring
+        if (!hitCreature) {
+          const worldPos = scratchRaycaster.ray.at(18, scratchV3);
+          Pools.spawnRipple(worldPos.x, worldPos.y, worldPos.z);
+          SoundSystem.playHarpNote(null, false);
+          SoundSystem.playBubblePop();
+
+          for (let i = 0; i < 5; i++) {
+            Pools.spawnBubble(
+              worldPos.x + (Math.random() - 0.5) * 2,
+              worldPos.y + (Math.random() - 0.5) * 2,
+              worldPos.z + (Math.random() - 0.5) * 2,
+              (Math.random() - 0.5) * 1.5,
+              3.0,
+              (Math.random() - 0.5) * 1.5,
+              0.9
+            );
+          }
+        }
+      }
+
+      // --- EVENT LISTENERS (TOUCH, KEYS, TV REMOTE, VISIBILITY) ---
+      function setupEventListeners() {
+        // 1. Disable Right-Click & Context Menu
+        document.addEventListener('contextmenu', e => e.preventDefault());
+
+        // 2. Window Resize & Adaptive FOV
+        window.addEventListener('resize', updateCameraLayout);
+
+        // 3. Pointer Down / Touch Interactions
+        const canvasContainer = document.getElementById('canvas-container');
+        canvasContainer.addEventListener('pointerdown', (e) => {
+          handleSceneInteraction(e.clientX, e.clientY);
+        });
+
+        // 4. Multi-Touch Palm Grab Detection (2+ Fingers -> Super Aquarium Bloom!)
+        window.addEventListener('touchstart', (e) => {
+          if (e.touches.length >= 2) {
+            e.preventDefault();
+            const touch1 = e.touches[0];
+            const touch2 = e.touches[1];
+            const midX = (touch1.clientX + touch2.clientX) / 2;
+            const midY = (touch1.clientY + touch2.clientY) / 2;
+            triggerSuperBloom(midX, midY);
+          }
+        }, { passive: false });
+
+        // 5. Safe Keyboard & Baby Slap Handlers
+        window.addEventListener('keydown', (e) => {
+          // TV Remote Back Keys -> Navigate back to hub
+          const tvBackKeys = ['Escape', 'Back', 'GoBack', '10009', '461', '4'];
+          if (tvBackKeys.includes(e.key) || tvBackKeys.includes(String(e.keyCode))) {
+            const settings = document.getElementById('settings-panel');
+            if (settings && !settings.classList.contains('collapsed')) {
+              settings.classList.add('collapsed');
+              return;
+            }
+            window.location.href = '../../index.html';
+            return;
+          }
+
+          // D-Pad / Space / Alphanumeric Key Sensory Bursts
+          if (e.code === 'Space' || e.key === ' ' || e.key.startsWith('Arrow') || e.key === 'Enter') {
+            e.preventDefault();
+            const randX = window.innerWidth * (0.25 + Math.random() * 0.5);
+            const randY = window.innerHeight * (0.3 + Math.random() * 0.4);
+            handleSceneInteraction(randX, randY);
+          } else if (e.key.length === 1) {
+            // Any letter / number baby slap
+            const randX = Math.random() * window.innerWidth;
+            const randY = Math.random() * window.innerHeight;
+            handleSceneInteraction(randX, randY);
+          }
+        });
+
+        // 6. Gamepad TV Remote Support
+        let lastGamepadCheck = 0;
+        function pollGamepad() {
+          const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+          for (let i = 0; i < gamepads.length; i++) {
+            const gp = gamepads[i];
+            if (!gp) continue;
+            // Button 1 (B button / Back)
+            if (gp.buttons[1] && gp.buttons[1].pressed) {
+              window.location.href = '../../index.html';
+              return;
+            }
+            // Button 0 (A button / OK) or D-pad
+            if (gp.buttons[0] && gp.buttons[0].pressed && performance.now() - lastGamepadCheck > 300) {
+              lastGamepadCheck = performance.now();
+              triggerSuperBloom();
+            }
+          }
+          requestAnimationFrame(pollGamepad);
+        }
+        requestAnimationFrame(pollGamepad);
+
+        // 7. Tab Visibility & Minimize Handling
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden) {
+            SoundSystem.suspend();
+          } else {
+            SoundSystem.resume();
+            SoundSystem.playBubblePop(100);
+          }
+        });
+
+        window.addEventListener('blur', () => SoundSystem.suspend());
+        window.addEventListener('focus', () => SoundSystem.resume());
+
+        // 8. Top Bar & UI Button Actions (All buttons auto-blur on click!)
+        document.querySelectorAll('button, a').forEach(btn => {
+          btn.addEventListener('click', function() {
+            this.blur(); // Prevents spacebar/OK from repeatedly triggering button
+          });
+        });
+
+        // Sound Toggle Button
+        const btnSound = document.getElementById('btn-sound');
+        const soundIcon = document.getElementById('sound-icon');
+        btnSound.addEventListener('click', () => {
+          const enabled = SoundSystem.toggleSound();
+          soundIcon.textContent = enabled ? '🔊' : '🔇';
+        });
+
+        // Fullscreen Toggle Button
+        const btnFullscreen = document.getElementById('btn-fullscreen');
+        btnFullscreen.addEventListener('click', () => {
+          if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(() => {});
+          } else {
+            document.exitFullscreen().catch(() => {});
+          }
+        });
+
+        // Parent Settings Toggle
+        const btnSettings = document.getElementById('btn-settings');
+        const settingsPanel = document.getElementById('settings-panel');
+        const btnCloseSettings = document.getElementById('btn-close-settings');
+
+        btnSettings.addEventListener('click', () => {
+          settingsPanel.classList.toggle('collapsed');
+        });
+        btnCloseSettings.addEventListener('click', () => {
+          settingsPanel.classList.add('collapsed');
+        });
+
+        // Biome Selector Buttons
+        document.querySelectorAll('[data-biome]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            setBiome(btn.dataset.biome);
+          });
+        });
+
+        // Speed Selector Buttons
+        document.querySelectorAll('[data-speed]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('[data-speed]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const speedMap = { calm: 0.65, gentle: 1.0, lively: 1.55 };
+            STATE.speedMultiplier = speedMap[btn.dataset.speed] || 1.0;
+            const display = document.getElementById('speed-display');
+            if (display) display.textContent = btn.textContent;
+          });
+        });
+
+        // Session Timer Selector Buttons
+        document.querySelectorAll('[data-timer]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('[data-timer]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            CONFIG.sessionDuration = parseInt(btn.dataset.timer, 10);
+            STATE.sessionTimer = 0;
+            const display = document.getElementById('session-display');
+            if (display) display.textContent = CONFIG.sessionDuration > 0 ? `${CONFIG.sessionDuration / 60} Min` : 'Off';
+          });
+        });
+
+        // Volume Slider
+        const volumeSlider = document.getElementById('volume-slider');
+        const volumeDisplay = document.getElementById('volume-display');
+        volumeSlider.addEventListener('input', (e) => {
+          const val = parseFloat(e.target.value) / 100;
+          SoundSystem.setVolume(val);
+          volumeDisplay.textContent = `${e.target.value}%`;
+        });
+
+        // Spawn initial 2D screen bubbles
+        for (let i = 0; i < 3; i++) {
+          setTimeout(spawn2DScreenBubble, i * 1500);
+        }
+      }
+
+      // --- MAIN ANIMATION & RENDER LOOP ---
+      let lastTime = performance.now();
+
+      function animate(now) {
+        requestAnimationFrame(animate);
+
+        const delta = Math.min((now - lastTime) / 1000, 0.1);
+        lastTime = now;
+        STATE.time += delta;
+
+        // Session Timer Progress
+        if (CONFIG.sessionDuration > 0 && STATE.sessionActive) {
+          STATE.sessionTimer += delta;
+          const progress = Math.min((STATE.sessionTimer / CONFIG.sessionDuration) * 100, 100);
+          const progressBar = document.getElementById('session-progress');
+          if (progressBar) progressBar.style.width = `${progress}%`;
+        }
+
+        // Update 3D Object Pools (Zero allocation!)
+        Pools.update(delta, STATE.time);
+
+        // Update All Sea Creatures
+        for (let i = 0; i < creatures.length; i++) {
+          creatures[i].update(delta, STATE.time);
+        }
+
+        // Animated Ambient Water Caustic Displacement
+        if (seaBedMesh && seaBedMesh.material.map) {
+          seaBedMesh.material.map.offset.x = (STATE.time * 0.02) % 1;
+          seaBedMesh.material.map.offset.y = (STATE.time * 0.015) % 1;
+        }
+
+        // Ambient Spontaneous Bubble Spawning from floor
+        if (Math.random() < 0.08) {
+          Pools.spawnBubble(
+            (Math.random() - 0.5) * 36,
+            -11,
+            (Math.random() - 0.5) * 24,
+            0,
+            2.0 + Math.random() * 1.5,
+            0,
+            0.65 + Math.random() * 0.5
+          );
+        }
+
+        // Render Scene
+        renderer.render(scene, camera);
+      }
+
+      // --- BOOTSTRAP APPLICATION ---
+      window.addEventListener('DOMContentLoaded', () => {
+        initThree();
+        setupEventListeners();
+        animate(performance.now());
+      });
+
+    })();
+  </script>
+</body>
+</html>

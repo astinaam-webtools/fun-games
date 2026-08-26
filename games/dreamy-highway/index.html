@@ -2071,14 +2071,53 @@
           triggerBurstInteraction();
         }, false);
 
-        // Touch & Pointer listener
+        // Disable right click / context menu
+        document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+        // Multi-touch Palm Grab & Touch listener
+        container.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          if (document.activeElement && document.activeElement !== document.body) {
+            document.activeElement.blur();
+          }
+
+          const touches = e.touches;
+          if (touches.length >= 2) {
+            // Kid Palm Grab / Multi-finger gesture -> Super Bloom Burst!
+            for (let i = 0; i < Math.min(touches.length, 5); i++) {
+              const t = touches[i];
+              createScreenRipple(t.clientX, t.clientY);
+            }
+            triggerBurstInteraction(touches[0].clientX, touches[0].clientY);
+            SoundSystem.playChimeBurst(true);
+          } else if (touches.length === 1) {
+            triggerBurstInteraction(touches[0].clientX, touches[0].clientY);
+          }
+        }, { passive: false });
+
+        // Pointer fallback for mouse
         container.addEventListener('pointerdown', (e) => {
+          if (e.pointerType === 'touch') return; // Handled by touchstart
           e.preventDefault();
           if (document.activeElement && document.activeElement !== document.body) {
             document.activeElement.blur();
           }
           triggerBurstInteraction(e.clientX, e.clientY);
         }, false);
+
+        // Visibility Change / Tab Minimize Handling
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden) {
+            // Tab minimized or baby pulled down notification bar -> suspend sound
+            if (SoundSystem.ctx && SoundSystem.ctx.state === 'running') {
+              SoundSystem.ctx.suspend().catch(() => {});
+            }
+          } else {
+            // Tab restored -> resume smoothly
+            SoundSystem.resume();
+            explodeParticleBurst(0, 3.0, -15, 30);
+          }
+        });
 
         // UI Controls
         const btnSound = document.getElementById('btn-sound');

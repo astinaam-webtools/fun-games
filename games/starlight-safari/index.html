@@ -1,0 +1,2565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Starlight Constellation Safari - Infant 3D Sensory Bedtime Game</title>
+  
+  <!-- Three.js r128 CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <style>
+    /* ==========================================================================
+       RESET & BASE STYLES
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    :root {
+      --bg-deep-indigo: #070919;
+      --bg-galaxy-purple: #131238;
+      --accent-star-gold: #fde047;
+      --accent-starlight: #e0e7ff;
+      --accent-nebula-pink: #f472b6;
+      --accent-nebula-cyan: #38bdf8;
+      --accent-nebula-lavender: #a78bfa;
+      --card-bg: rgba(19, 18, 56, 0.78);
+      --card-border: rgba(165, 180, 252, 0.25);
+      --card-border-glow: rgba(253, 224, 71, 0.45);
+      --text-bright: #ffffff;
+      --text-soft: #c7d2fe;
+      --text-muted: #818cf8;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--bg-deep-indigo);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      touch-action: none;
+      overscroll-behavior: none;
+      -webkit-tap-highlight-color: transparent;
+      color: var(--text-bright);
+    }
+
+    #canvas-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      cursor: grab;
+    }
+
+    #canvas-container:active {
+      cursor: grabbing;
+    }
+
+    /* Ambient Soft Night Vignette for bedtime comfort */
+    .vignette-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
+      box-shadow: inset 0 0 120px rgba(7, 9, 25, 0.85), inset 0 0 240px rgba(19, 18, 56, 0.5);
+      mix-blend-mode: multiply;
+    }
+
+    /* Cosmic Aurora Shimmer Overlay */
+    .aurora-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 3;
+      opacity: 0.15;
+      background: radial-gradient(circle at 50% 20%, rgba(167, 139, 250, 0.3) 0%, rgba(56, 189, 248, 0.2) 40%, transparent 75%);
+      transition: opacity 1s ease, background 1s ease;
+      animation: auroraBreathe 8s ease-in-out infinite alternate;
+    }
+
+    @keyframes auroraBreathe {
+      0% { opacity: 0.12; transform: scale(1.0); }
+      100% { opacity: 0.22; transform: scale(1.05); }
+    }
+
+    /* Constellation Super Galaxy Burst Flash Effect */
+    .galaxy-burst-flash {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 4;
+      opacity: 0;
+      background: radial-gradient(circle at center, rgba(253, 224, 71, 0.35) 0%, rgba(167, 139, 250, 0.2) 50%, transparent 80%);
+      transition: opacity 0.1s ease-out;
+    }
+
+    .galaxy-burst-flash.active {
+      opacity: 1;
+      animation: flashFade 0.8s ease-out forwards;
+    }
+
+    @keyframes flashFade {
+      0% { opacity: 0.9; }
+      100% { opacity: 0; }
+    }
+
+    /* ==========================================================================
+       UI OVERLAY LAYER
+       ========================================================================== */
+    .ui-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px 24px;
+      transition: opacity 0.5s ease;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      pointer-events: auto;
+    }
+
+    .brand-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(19, 18, 56, 0.85);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      padding: 8px 22px;
+      border-radius: 999px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), 0 0 16px rgba(165, 180, 252, 0.2);
+      border: 1.5px solid var(--card-border);
+      animation: floatBadge 5s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatBadge {
+      0% { transform: translateY(0px); }
+      100% { transform: translateY(-4px); }
+    }
+
+    .brand-icon {
+      font-size: 24px;
+      display: inline-block;
+      animation: starTwinkle 3s ease-in-out infinite;
+    }
+
+    @keyframes starTwinkle {
+      0%, 100% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 4px #fde047); }
+      50% { transform: scale(1.2) rotate(12deg); filter: drop-shadow(0 0 12px #fde047); }
+    }
+
+    .brand-title {
+      font-weight: 800;
+      font-size: 16px;
+      letter-spacing: 0.5px;
+      background: linear-gradient(135deg, #fde047 0%, #f472b6 50%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .tv-ready-badge {
+      font-size: 11px;
+      background: rgba(56, 189, 248, 0.2);
+      color: #7dd3fc;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .glass-btn {
+      background: rgba(19, 18, 56, 0.85);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1.5px solid var(--card-border);
+      border-radius: 999px;
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-bright);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: auto;
+      text-decoration: none;
+      min-width: 48px;
+      min-height: 48px;
+    }
+
+    .glass-btn:hover, .glass-btn:focus-visible {
+      transform: translateY(-2px) scale(1.05);
+      background: rgba(30, 27, 75, 0.95);
+      border-color: var(--card-border-glow);
+      box-shadow: 0 10px 28px rgba(253, 224, 71, 0.25);
+      color: #fff;
+      outline: none;
+    }
+
+    .glass-btn:active {
+      transform: scale(0.95);
+    }
+
+    .icon-btn {
+      width: 48px;
+      height: 48px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 18px;
+    }
+
+    .btn-playroom {
+      background: linear-gradient(135deg, rgba(79, 70, 229, 0.85) 0%, rgba(124, 58, 237, 0.85) 100%);
+      border-color: rgba(165, 180, 252, 0.5);
+    }
+
+    /* Active Constellation Selector Tabs (Floating Bottom Bar) */
+    .bottom-bar {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      width: 100%;
+      pointer-events: none;
+    }
+
+    .constellation-tabs {
+      display: flex;
+      gap: 8px;
+      background: rgba(19, 18, 56, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1.5px solid var(--card-border);
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.4);
+      pointer-events: auto;
+      max-width: 100%;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .constellation-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .animal-tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-soft);
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.25s ease;
+      white-space: nowrap;
+      min-height: 44px;
+    }
+
+    .animal-tab-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .animal-tab-btn.active {
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(124, 58, 237, 0.5);
+      border: 1px solid rgba(253, 224, 71, 0.4);
+    }
+
+    .animal-tab-btn .tab-icon {
+      font-size: 18px;
+    }
+
+    /* Start / Interactive Prompt Banner */
+    .prompt-banner {
+      background: rgba(19, 18, 56, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 14px 28px;
+      border-radius: 999px;
+      border: 2px solid rgba(253, 224, 71, 0.4);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(253, 224, 71, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      pointer-events: auto;
+      cursor: pointer;
+      transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: pulseGlow 3s infinite ease-in-out;
+      max-width: 90%;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% {
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), 0 0 15px rgba(253, 224, 71, 0.3);
+        transform: scale(1);
+      }
+      50% {
+        box-shadow: 0 12px 45px rgba(0, 0, 0, 0.6), 0 0 28px rgba(167, 139, 250, 0.6);
+        transform: scale(1.02);
+      }
+    }
+
+    .prompt-banner.hidden {
+      opacity: 0;
+      transform: translateY(40px) scale(0.9);
+      pointer-events: none;
+    }
+
+    .prompt-icon {
+      font-size: 28px;
+      animation: gentleBounce 2s infinite ease-in-out;
+    }
+
+    @keyframes gentleBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    .prompt-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .prompt-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .prompt-subtitle {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-soft);
+    }
+
+    /* Screen Touch Ripple Effect */
+    .touch-ripple {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%) scale(0);
+      animation: rippleExpand 0.85s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+      border: 3px solid rgba(253, 224, 71, 0.95);
+      box-shadow: 0 0 30px rgba(253, 224, 71, 0.7), inset 0 0 20px rgba(167, 139, 250, 0.5);
+      z-index: 5;
+    }
+
+    @keyframes rippleExpand {
+      0% {
+        transform: translate(-50%, -50%) scale(0.1);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(3.2);
+        opacity: 0;
+      }
+    }
+
+    .super-burst-ripple {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%) scale(0);
+      animation: superRippleExpand 1.2s cubic-bezier(0.05, 0.7, 0.2, 1) forwards;
+      border: 4px solid #fff;
+      box-shadow: 0 0 60px rgba(253, 224, 71, 0.9), 0 0 100px rgba(167, 139, 250, 0.8);
+      z-index: 6;
+    }
+
+    @keyframes superRippleExpand {
+      0% {
+        transform: translate(-50%, -50%) scale(0.2);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(5.5);
+        opacity: 0;
+      }
+    }
+
+    /* Interactive Floating Screen Stars (Tap to Pop) */
+    .floating-screen-star {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #ffffff 0%, #fde047 50%, #f59e0b 100%);
+      box-shadow: 0 0 20px rgba(253, 224, 71, 0.85), inset 0 0 8px #ffffff;
+      pointer-events: auto;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      z-index: 8;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: floatStar 4s infinite ease-in-out alternate;
+    }
+
+    .floating-screen-star:active {
+      transform: scale(1.3);
+    }
+
+    @keyframes floatStar {
+      0% { transform: translateY(0px) rotate(0deg); }
+      100% { transform: translateY(-14px) rotate(18deg); }
+    }
+
+    /* Parent Settings Modal */
+    .settings-modal {
+      position: absolute;
+      top: 80px;
+      right: 24px;
+      width: 320px;
+      background: rgba(19, 18, 56, 0.96);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-radius: 24px;
+      border: 1.5px solid var(--card-border);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 30px rgba(165, 180, 252, 0.15);
+      padding: 22px;
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transform-origin: top right;
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: auto;
+    }
+
+    .settings-modal.collapsed {
+      opacity: 0;
+      transform: scale(0.85) translateY(-20px);
+      pointer-events: none;
+    }
+
+    .settings-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 1.5px solid rgba(165, 180, 252, 0.15);
+    }
+
+    .settings-header h3 {
+      font-size: 16px;
+      font-weight: 800;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .setting-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .setting-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-soft);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .setting-control {
+      display: flex;
+      gap: 8px;
+    }
+
+    .pill-btn {
+      flex: 1;
+      padding: 8px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 12px;
+      border: 1.5px solid rgba(165, 180, 252, 0.2);
+      background: rgba(30, 27, 75, 0.6);
+      color: var(--text-soft);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+      min-height: 40px;
+    }
+
+    .pill-btn.active {
+      background: #4f46e5;
+      border-color: var(--accent-star-gold);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.5);
+    }
+
+    .slider-input {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      accent-color: #fde047;
+      cursor: pointer;
+      background: #312e81;
+    }
+
+    /* TV Remote Hint Tag */
+    .tv-hint-tag {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 6px 12px;
+      border-radius: 8px;
+    }
+
+    /* Responsive Tweaks */
+    @media (max-width: 600px) {
+      .ui-layer {
+        padding: 14px 16px;
+      }
+      .brand-title {
+        font-size: 14px;
+      }
+      .tv-ready-badge {
+        display: none;
+      }
+      .settings-modal {
+        right: 14px;
+        left: 14px;
+        width: auto;
+      }
+      .animal-tab-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Three.js 3D WebGL Canvas Container -->
+  <div id="canvas-container"></div>
+
+  <!-- Soft Bedtime Lighting Overlays -->
+  <div class="vignette-overlay"></div>
+  <div class="aurora-overlay" id="aurora-overlay"></div>
+  <div class="galaxy-burst-flash" id="galaxy-flash"></div>
+
+  <!-- UI Overlay Layer -->
+  <div class="ui-layer">
+    <!-- Top Bar -->
+    <header class="top-bar">
+      <div class="brand-badge">
+        <span class="brand-icon">✨</span>
+        <span class="brand-title">Starlight Safari</span>
+        <span class="tv-ready-badge">📺 TV & 21:9 Ready</span>
+      </div>
+
+      <div class="top-actions">
+        <a href="../../index.html" class="glass-btn btn-playroom" id="btn-playroom" title="Return to Playroom Hub" aria-label="Return to Playroom Hub">
+          <span>🏠</span>
+          <span>Playroom</span>
+        </a>
+        <button class="glass-btn icon-btn" id="btn-sound" title="Toggle Sound" aria-label="Toggle Sound">
+          <span id="sound-icon">🔊</span>
+        </button>
+        <button class="glass-btn icon-btn" id="btn-settings" title="Parent Settings" aria-label="Parent Settings">
+          <span>⚙️</span>
+        </button>
+        <button class="glass-btn icon-btn" id="btn-fullscreen" title="Toggle Fullscreen" aria-label="Toggle Fullscreen">
+          <span>⛶</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Bottom Interactive Bar -->
+    <div class="bottom-bar">
+      <!-- Start / Sensory Prompt Banner -->
+      <div class="prompt-banner" id="prompt-banner">
+        <span class="prompt-icon">🌟</span>
+        <div class="prompt-text">
+          <span class="prompt-title">Touch stars or press any TV button</span>
+          <span class="prompt-subtitle">Watch glowing animal constellations twinkle & sing lullabies</span>
+        </div>
+      </div>
+
+      <!-- Constellation Selection Tabs -->
+      <nav class="constellation-tabs" id="constellation-tabs" aria-label="Animal Constellations">
+        <button class="animal-tab-btn active" data-animal="all">
+          <span class="tab-icon">🌌</span>
+          <span>All Safari</span>
+        </button>
+        <button class="animal-tab-btn" data-animal="giraffe">
+          <span class="tab-icon">🦒</span>
+          <span>Giraffe</span>
+        </button>
+        <button class="animal-tab-btn" data-animal="lion">
+          <span class="tab-icon">🦁</span>
+          <span>Little Lion</span>
+        </button>
+        <button class="animal-tab-btn" data-animal="elephant">
+          <span class="tab-icon">🐘</span>
+          <span>Elephant</span>
+        </button>
+        <button class="animal-tab-btn" data-animal="bear">
+          <span class="tab-icon">🧸</span>
+          <span>Teddy Bear</span>
+        </button>
+        <button class="animal-tab-btn" data-animal="owl">
+          <span class="tab-icon">🦉</span>
+          <span>Baby Owl</span>
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Parent Settings Panel (Collapsible Drawer) -->
+  <aside class="settings-modal collapsed" id="settings-panel" aria-label="Parent Settings Panel">
+    <div class="settings-header">
+      <h3><span>⚙️</span> Bedtime Controls</h3>
+      <button class="glass-btn icon-btn" id="btn-close-settings" style="width: 36px; height: 36px; font-size: 14px;" aria-label="Close Settings">✕</button>
+    </div>
+
+    <!-- Safari Flight Speed -->
+    <div class="setting-item">
+      <div class="setting-label">
+        <span>Safari Flight Pace</span>
+        <span id="speed-display">Dreamy</span>
+      </div>
+      <div class="setting-control">
+        <button class="pill-btn" data-speed="slow">Soothing</button>
+        <button class="pill-btn active" data-speed="normal">Dreamy</button>
+        <button class="pill-btn" data-speed="fast">Playful</button>
+      </div>
+    </div>
+
+    <!-- Nightlight Aurora Theme -->
+    <div class="setting-item">
+      <div class="setting-label">
+        <span>Starlight Sky Aura</span>
+        <span id="aura-display">Indigo</span>
+      </div>
+      <div class="setting-control">
+        <button class="pill-btn active" data-aura="indigo">Indigo</button>
+        <button class="pill-btn" data-aura="aurora">Aurora</button>
+        <button class="pill-btn" data-aura="warm">Golden</button>
+      </div>
+    </div>
+
+    <!-- Lullaby Volume -->
+    <div class="setting-item">
+      <div class="setting-label">
+        <span>Lullaby Volume</span>
+        <span id="volume-display">80%</span>
+      </div>
+      <input type="range" min="0" max="100" value="80" class="slider-input" id="volume-slider" aria-label="Volume Slider">
+    </div>
+
+    <div class="tv-hint-tag">
+      🎮 TV Remote: D-Pad ◄ ► selects animals, OK or ANY button triggers starlight bursts. Back returns to Playroom.
+    </div>
+  </aside>
+
+  <!-- ==========================================================================
+       GAME JAVASCRIPT ENGINE
+       ========================================================================== -->
+  <script>
+    (function() {
+      'use strict';
+
+      // ========================================================================
+      // 1. GLOBAL STATE & CONFIGURATION
+      // ========================================================================
+      const CONFIG = {
+        flightSpeed: 0.25,      // Orbit drift speed
+        cameraDistance: 32,
+        starfieldCount: 1800,
+        nebulaCount: 36,
+        maxShootingStars: 20,
+        maxBurstParticles: 600,
+        maxScreenStars: 8
+      };
+
+      const STATE = {
+        soundEnabled: true,
+        volume: 0.8,
+        activeAnimal: 'all',    // 'all', 'giraffe', 'lion', 'elephant', 'bear', 'owl'
+        animalIndex: 0,
+        noteIndex: 0,
+        skyAura: 'indigo',
+        targetCamPos: new THREE.Vector3(0, 4, 32),
+        targetCamLookAt: new THREE.Vector3(0, 0, 0),
+        currentCamLookAt: new THREE.Vector3(0, 0, 0),
+        pointerX: 0,
+        pointerY: 0,
+        isPointerDown: false,
+        lastInteractionTime: 0
+      };
+
+      const ANIMAL_KEYS = ['all', 'giraffe', 'lion', 'elephant', 'bear', 'owl'];
+      const gpButtonStates = {};
+
+      // ========================================================================
+      // 2. SENSORY AUDIO ENGINE (100% Web Audio API Synthesizer)
+      // ========================================================================
+      const SoundEngine = {
+        ctx: null,
+        initialized: false,
+        masterGain: null,
+        compressor: null,
+        padOscillators: [],
+        padGain: null,
+        activeVoiceCount: 0,
+        maxPolyphony: 24,
+
+        // Pentatonic Scale in C Major / Lydian (Lullaby-safe, zero dissonance)
+        // C4, D4, E4, G4, A4, C5, D5, E5, G5, A5, C6, D6, E6, G6, A6
+        pentatonicFrequencies: [
+          261.63, 293.66, 329.63, 392.00, 440.00,
+          523.25, 587.33, 659.25, 783.99, 880.00,
+          1046.50, 1174.66, 1318.51, 1567.98, 1760.00
+        ],
+
+        // Warm Bedtime Drone Pad frequencies (C3, G3, C4, E4, G4)
+        droneFrequencies: [130.81, 196.00, 261.63, 329.63, 392.00],
+
+        init() {
+          if (this.initialized) return;
+          try {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            this.ctx = new AudioContextClass();
+
+            // Master Limiter / Dynamics Compressor to prevent overload on baby key-mashes
+            this.compressor = this.ctx.createDynamicsCompressor();
+            this.compressor.threshold.setValueAtTime(-18, this.ctx.currentTime);
+            this.compressor.knee.setValueAtTime(25, this.ctx.currentTime);
+            this.compressor.ratio.setValueAtTime(12, this.ctx.currentTime);
+            this.compressor.attack.setValueAtTime(0.005, this.ctx.currentTime);
+            this.compressor.release.setValueAtTime(0.25, this.ctx.currentTime);
+
+            // Master Gain Node
+            this.masterGain = this.ctx.createGain();
+            const initialGain = STATE.soundEnabled ? STATE.volume : 0;
+            this.masterGain.gain.setValueAtTime(initialGain, this.ctx.currentTime);
+
+            this.compressor.connect(this.masterGain);
+            this.masterGain.connect(this.ctx.destination);
+
+            // Start Dream Drone Pad
+            this.startAmbientLullabyDrone();
+            this.initialized = true;
+          } catch (err) {
+            console.warn('Web Audio API not supported or failed to initialize:', err);
+          }
+        },
+
+        resume() {
+          if (!this.ctx) this.init();
+          if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume().catch(() => {});
+          }
+        },
+
+        suspend() {
+          if (this.ctx && this.ctx.state === 'running') {
+            this.ctx.suspend().catch(() => {});
+          }
+        },
+
+        setVolume(val) {
+          STATE.volume = Math.max(0, Math.min(1, val));
+          if (this.masterGain && this.ctx) {
+            const targetGain = STATE.soundEnabled ? STATE.volume : 0;
+            this.masterGain.gain.setTargetAtTime(targetGain, this.ctx.currentTime, 0.05);
+          }
+        },
+
+        toggleSound() {
+          STATE.soundEnabled = !STATE.soundEnabled;
+          if (this.masterGain && this.ctx) {
+            const targetGain = STATE.soundEnabled ? STATE.volume : 0;
+            this.masterGain.gain.setTargetAtTime(targetGain, this.ctx.currentTime, 0.05);
+          }
+          return STATE.soundEnabled;
+        },
+
+        // Warm Soothing Ambient Drone Pad
+        startAmbientLullabyDrone() {
+          if (!this.ctx) return;
+          const now = this.ctx.currentTime;
+
+          this.padGain = this.ctx.createGain();
+          this.padGain.gain.setValueAtTime(0.08, now);
+
+          const lowpassFilter = this.ctx.createBiquadFilter();
+          lowpassFilter.type = 'lowpass';
+          lowpassFilter.frequency.setValueAtTime(360, now);
+          lowpassFilter.Q.setValueAtTime(1.0, now);
+
+          this.droneFrequencies.forEach((freq, idx) => {
+            const osc = this.ctx.createOscillator();
+            osc.type = (idx % 2 === 0) ? 'sine' : 'triangle';
+            osc.frequency.setValueAtTime(freq, now);
+            osc.detune.setValueAtTime((idx - 2) * 4, now); // Subtle warm chorusing
+
+            const voiceGain = this.ctx.createGain();
+            voiceGain.gain.setValueAtTime(0.2, now);
+
+            osc.connect(voiceGain);
+            voiceGain.connect(lowpassFilter);
+            osc.start(now);
+            this.padOscillators.push(osc);
+          });
+
+          lowpassFilter.connect(this.padGain);
+          this.padGain.connect(this.compressor);
+        },
+
+        // Celesta / Music Box chime voice with proper node disconnection
+        createCelestaVoice(freq, startTime, isSuper = false) {
+          if (this.activeVoiceCount >= this.maxPolyphony) return;
+          this.activeVoiceCount++;
+
+          const now = startTime || this.ctx.currentTime;
+
+          const oscFundamental = this.ctx.createOscillator();
+          oscFundamental.type = 'sine';
+          oscFundamental.frequency.setValueAtTime(freq, now);
+
+          const oscHarmonic = this.ctx.createOscillator();
+          oscHarmonic.type = 'triangle';
+          oscHarmonic.frequency.setValueAtTime(freq * 2.003, now); // Sweet bell-like harmonic
+
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(2800, now);
+          filter.frequency.exponentialRampToValueAtTime(500, now + 1.2);
+
+          const gainNode = this.ctx.createGain();
+          gainNode.gain.setValueAtTime(0.0001, now);
+          gainNode.gain.linearRampToValueAtTime(isSuper ? 0.22 : 0.16, now + 0.015);
+          gainNode.gain.exponentialRampToValueAtTime(0.0001, now + (isSuper ? 1.8 : 1.4));
+
+          oscFundamental.connect(gainNode);
+          oscHarmonic.connect(gainNode);
+          gainNode.connect(filter);
+          filter.connect(this.compressor);
+
+          // Native node cleanup on osc.onended
+          oscFundamental.onended = () => {
+            try {
+              oscFundamental.disconnect();
+              oscHarmonic.disconnect();
+              gainNode.disconnect();
+              filter.disconnect();
+            } catch (e) {}
+            this.activeVoiceCount = Math.max(0, this.activeVoiceCount - 1);
+          };
+
+          const duration = isSuper ? 1.85 : 1.45;
+          oscFundamental.start(now);
+          oscHarmonic.start(now);
+          oscFundamental.stop(now + duration);
+          oscHarmonic.stop(now + duration);
+        },
+
+        // Plays cascading pentatonic chimes
+        playChimeBurst(isSuper = false) {
+          if (!this.ctx || !STATE.soundEnabled) return;
+          this.resume();
+
+          const now = this.ctx.currentTime;
+          const noteCount = isSuper ? 5 : (Math.floor(Math.random() * 2) + 2);
+
+          for (let i = 0; i < noteCount; i++) {
+            const scaleIdx = (STATE.noteIndex + i) % this.pentatonicFrequencies.length;
+            const freq = this.pentatonicFrequencies[scaleIdx];
+            const delay = i * 0.08;
+            this.createCelestaVoice(freq, now + delay, isSuper);
+          }
+          STATE.noteIndex = (STATE.noteIndex + (isSuper ? 3 : 1)) % this.pentatonicFrequencies.length;
+
+          if (isSuper) {
+            this.playShootingStarWhoosh(now);
+          }
+        },
+
+        // Sweet gentle chime pop for floating screen stars
+        playStarPop() {
+          if (!this.ctx || !STATE.soundEnabled) return;
+          this.resume();
+          const now = this.ctx.currentTime;
+
+          const osc = this.ctx.createOscillator();
+          osc.type = 'sine';
+          const randomIdx = Math.floor(Math.random() * 5) + 5; // C5 to G5
+          const pitch = this.pentatonicFrequencies[randomIdx];
+          osc.frequency.setValueAtTime(pitch, now);
+          osc.frequency.exponentialRampToValueAtTime(pitch * 1.5, now + 0.15);
+
+          const gain = this.ctx.createGain();
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.linearRampToValueAtTime(0.18, now + 0.01);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
+
+          osc.connect(gain);
+          gain.connect(this.compressor);
+
+          osc.onended = () => {
+            try {
+              osc.disconnect();
+              gain.disconnect();
+            } catch (e) {}
+          };
+
+          osc.start(now);
+          osc.stop(now + 0.32);
+        },
+
+        // Soft celestial whoosh
+        playShootingStarWhoosh(startTime) {
+          if (!this.ctx) return;
+          const now = startTime || this.ctx.currentTime;
+
+          const osc = this.ctx.createOscillator();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(400, now);
+          osc.frequency.exponentialRampToValueAtTime(1200, now + 0.35);
+          osc.frequency.exponentialRampToValueAtTime(300, now + 0.8);
+
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'bandpass';
+          filter.frequency.setValueAtTime(800, now);
+          filter.Q.setValueAtTime(2.5, now);
+
+          const gain = this.ctx.createGain();
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.linearRampToValueAtTime(0.07, now + 0.2);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.8);
+
+          osc.connect(filter);
+          filter.connect(gain);
+          gain.connect(this.compressor);
+
+          osc.onended = () => {
+            try {
+              osc.disconnect();
+              filter.disconnect();
+              gain.disconnect();
+            } catch (e) {}
+          };
+
+          osc.start(now);
+          osc.stop(now + 0.82);
+        }
+      };
+
+      // ========================================================================
+      // 3. PROCEDURAL TEXTURE GENERATION & CACHING
+      // ========================================================================
+      const TextureGenerator = {
+        cache: {},
+
+        // Radiant 8-point glowing star texture
+        createStarGlowTexture() {
+          if (this.cache.starGlow) return this.cache.starGlow;
+          const canvas = document.createElement('canvas');
+          canvas.width = 128;
+          canvas.height = 128;
+          const ctx = canvas.getContext('2d');
+
+          const cx = 64, cy = 64;
+          // Soft radial gradient
+          const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 60);
+          grad.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
+          grad.addColorStop(0.2, 'rgba(253, 224, 71, 0.9)');
+          grad.addColorStop(0.5, 'rgba(167, 139, 250, 0.4)');
+          grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(cx, cy, 60, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Star Cross Rays
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.moveTo(cx - 50, cy); ctx.lineTo(cx + 50, cy);
+          ctx.moveTo(cx, cy - 50); ctx.lineTo(cx, cy + 50);
+          ctx.stroke();
+
+          // Diagonal Rays
+          ctx.strokeStyle = 'rgba(253, 224, 71, 0.5)';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(cx - 30, cy - 30); ctx.lineTo(cx + 30, cy + 30);
+          ctx.moveTo(cx + 30, cy - 30); ctx.lineTo(cx - 30, cy + 30);
+          ctx.stroke();
+
+          const tex = new THREE.CanvasTexture(canvas);
+          tex.encoding = THREE.sRGBEncoding;
+          this.cache.starGlow = tex;
+          return tex;
+        },
+
+        // Cute smiling star face texture
+        createSmilingStarTexture() {
+          if (this.cache.smilingStar) return this.cache.smilingStar;
+          const canvas = document.createElement('canvas');
+          canvas.width = 256;
+          canvas.height = 256;
+          const ctx = canvas.getContext('2d');
+
+          const cx = 128, cy = 128;
+
+          // Glowing star body
+          const grad = ctx.createRadialGradient(cx, cy, 20, cx, cy, 120);
+          grad.addColorStop(0, '#ffffff');
+          grad.addColorStop(0.5, '#fde047');
+          grad.addColorStop(0.85, '#f59e0b');
+          grad.addColorStop(1, 'rgba(245, 158, 11, 0)');
+
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(cx, cy, 115, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Cute closed smiling eyes ( ◡ ‿ ◡ )
+          ctx.strokeStyle = '#312e81';
+          ctx.lineWidth = 8;
+          ctx.lineCap = 'round';
+
+          // Left Eye
+          ctx.beginPath();
+          ctx.arc(cx - 38, cy - 14, 18, 0.1 * Math.PI, 0.9 * Math.PI, false);
+          ctx.stroke();
+
+          // Right Eye
+          ctx.beginPath();
+          ctx.arc(cx + 38, cy - 14, 18, 0.1 * Math.PI, 0.9 * Math.PI, false);
+          ctx.stroke();
+
+          // Rosy Cheeks
+          ctx.fillStyle = 'rgba(244, 114, 182, 0.65)';
+          ctx.beginPath();
+          ctx.arc(cx - 52, cy + 16, 14, 0, Math.PI * 2);
+          ctx.arc(cx + 52, cy + 16, 14, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Smiling Mouth
+          ctx.strokeStyle = '#312e81';
+          ctx.lineWidth = 7;
+          ctx.beginPath();
+          ctx.arc(cx, cy + 20, 22, 0.15 * Math.PI, 0.85 * Math.PI, false);
+          ctx.stroke();
+
+          const tex = new THREE.CanvasTexture(canvas);
+          tex.encoding = THREE.sRGBEncoding;
+          this.cache.smilingStar = tex;
+          return tex;
+        },
+
+        // Sleepy Crescent Moon Texture
+        createSleepyMoonTexture() {
+          if (this.cache.sleepyMoon) return this.cache.sleepyMoon;
+          const canvas = document.createElement('canvas');
+          canvas.width = 256;
+          canvas.height = 256;
+          const ctx = canvas.getContext('2d');
+
+          const cx = 128, cy = 128;
+
+          // Glowing Crescent
+          ctx.fillStyle = '#fef08a';
+          ctx.shadowColor = '#fde047';
+          ctx.shadowBlur = 20;
+
+          ctx.beginPath();
+          ctx.arc(cx, cy, 100, -0.4 * Math.PI, 0.6 * Math.PI, false);
+          ctx.bezierCurveTo(cx - 10, cy + 80, cx - 10, cy - 80, cx, cy - 100);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.shadowBlur = 0;
+
+          // Sleepy Eyelash
+          ctx.strokeStyle = '#4338ca';
+          ctx.lineWidth = 6;
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.arc(cx + 25, cy - 10, 16, 0.2 * Math.PI, 0.8 * Math.PI, false);
+          ctx.stroke();
+
+          // Rosy cheek
+          ctx.fillStyle = 'rgba(244, 114, 182, 0.5)';
+          ctx.beginPath();
+          ctx.arc(cx + 20, cy + 18, 12, 0, Math.PI * 2);
+          ctx.fill();
+
+          const tex = new THREE.CanvasTexture(canvas);
+          tex.encoding = THREE.sRGBEncoding;
+          this.cache.sleepyMoon = tex;
+          return tex;
+        },
+
+        // Soft Organic Nebula Cloud
+        createNebulaTexture(colorHex) {
+          const key = 'nebula_' + colorHex;
+          if (this.cache[key]) return this.cache[key];
+
+          const canvas = document.createElement('canvas');
+          canvas.width = 128;
+          canvas.height = 128;
+          const ctx = canvas.getContext('2d');
+
+          const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 60);
+          grad.addColorStop(0, colorHex);
+          grad.addColorStop(0.4, colorHex.replace('1.0', '0.4').replace(')', ', 0.4)').replace('rgb', 'rgba'));
+          grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(64, 64, 60, 0, Math.PI * 2);
+          ctx.fill();
+
+          const tex = new THREE.CanvasTexture(canvas);
+          tex.encoding = THREE.sRGBEncoding;
+          this.cache[key] = tex;
+          return tex;
+        }
+      };
+
+      // ========================================================================
+      // 4. THREE.JS 3D SCENE SETUP & LIGHTING
+      // ========================================================================
+      let scene, camera, renderer, container;
+      let starfieldPoints, nebulaGroup;
+      let sleepyMoonMesh, ringedPlanetGroup;
+      const constellationAnimals = {};
+      const animatedObjects = [];
+
+      function initThreeScene() {
+        container = document.getElementById('canvas-container');
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        // Scene
+        scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x070919, 0.015);
+
+        // Camera (Adaptive FOV based on aspect ratio)
+        const isPortrait = height > width;
+        const initialFov = isPortrait ? 75 : 50;
+        camera = new THREE.PerspectiveCamera(initialFov, width / height, 0.1, 1000);
+        camera.position.set(0, 4, CONFIG.cameraDistance);
+        camera.lookAt(0, 0, 0);
+
+        // Renderer with DPR capping
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.setClearColor(0x070919, 1);
+        container.appendChild(renderer.domElement);
+
+        // Ambient Lighting for soft dreamy celestial luminescence
+        const ambientLight = new THREE.AmbientLight(0x4338ca, 0.85);
+        scene.add(ambientLight);
+
+        const moonDirectionalLight = new THREE.DirectionalLight(0xfef08a, 1.2);
+        moonDirectionalLight.position.set(20, 30, 20);
+        scene.add(moonDirectionalLight);
+
+        const starlightPointLight = new THREE.PointLight(0xa78bfa, 1.5, 60);
+        starlightPointLight.position.set(0, 5, 0);
+        scene.add(starlightPointLight);
+
+        // Build Scene Elements
+        createBackgroundStarfield();
+        createNebulaClouds();
+        createSleepyMoon();
+        createRingedPlanet();
+        createConstellationAnimals();
+
+        // Pools
+        ShootingStarPool.init(scene);
+        ParticleBurstPool.init(scene);
+
+        // Window resize
+        window.addEventListener('resize', onWindowResize, false);
+      }
+
+      function onWindowResize() {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const isPortrait = height > width;
+
+        camera.aspect = width / height;
+        camera.fov = isPortrait ? 75 : 50;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      }
+
+      // ========================================================================
+      // 5. CELESTIAL ENVIRONMENT (Starfield, Nebulae, Moon, Ringed Planet)
+      // ========================================================================
+      function createBackgroundStarfield() {
+        const count = CONFIG.starfieldCount;
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(count * 3);
+        const colors = new Float32Array(count * 3);
+        const sizes = new Float32Array(count);
+
+        const colorPalette = [
+          new THREE.Color(0xfde047), // Star Gold
+          new THREE.Color(0xffffff), // Pure White
+          new THREE.Color(0xa78bfa), // Lavender
+          new THREE.Color(0x38bdf8), // Cyan
+          new THREE.Color(0xf472b6)  // Pink
+        ];
+
+        for (let i = 0; i < count; i++) {
+          const radius = 60 + Math.random() * 80;
+          const theta = Math.random() * Math.PI * 2;
+          const phi = Math.acos((Math.random() * 2) - 1);
+
+          positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+          positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+          positions[i * 3 + 2] = radius * Math.cos(phi);
+
+          const col = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+          colors[i * 3] = col.r;
+          colors[i * 3 + 1] = col.g;
+          colors[i * 3 + 2] = col.b;
+
+          sizes[i] = 1.2 + Math.random() * 2.5;
+        }
+
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+        const material = new THREE.PointsMaterial({
+          size: 2.2,
+          vertexColors: true,
+          map: TextureGenerator.createStarGlowTexture(),
+          transparent: true,
+          opacity: 0.85,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false
+        });
+
+        starfieldPoints = new THREE.Points(geometry, material);
+        scene.add(starfieldPoints);
+      }
+
+      function createNebulaClouds() {
+        nebulaGroup = new THREE.Group();
+        const count = CONFIG.nebulaCount;
+        const colors = [
+          'rgba(167, 139, 250, 0.35)', // Lavender
+          'rgba(56, 189, 248, 0.35)',  // Cyan
+          'rgba(244, 114, 182, 0.3)',   // Pink
+          'rgba(253, 224, 71, 0.25)'   // Gold
+        ];
+
+        for (let i = 0; i < count; i++) {
+          const col = colors[i % colors.length];
+          const mat = new THREE.SpriteMaterial({
+            map: TextureGenerator.createNebulaTexture(col),
+            transparent: true,
+            opacity: 0.4 + Math.random() * 0.3,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+          });
+
+          const sprite = new THREE.Sprite(mat);
+          const dist = 35 + Math.random() * 45;
+          const angle = Math.random() * Math.PI * 2;
+          const y = (Math.random() - 0.5) * 35;
+
+          sprite.position.set(Math.cos(angle) * dist, y, Math.sin(angle) * dist);
+          const scale = 25 + Math.random() * 30;
+          sprite.scale.set(scale, scale, 1);
+
+          nebulaGroup.add(sprite);
+        }
+
+        scene.add(nebulaGroup);
+      }
+
+      function createSleepyMoon() {
+        const moonGroup = new THREE.Group();
+        moonGroup.position.set(24, 18, -25);
+
+        // Glowing Sleepy Moon Billboard
+        const moonMat = new THREE.SpriteMaterial({
+          map: TextureGenerator.createSleepyMoonTexture(),
+          transparent: true,
+          opacity: 0.95,
+          blending: THREE.NormalBlending
+        });
+
+        const moonSprite = new THREE.Sprite(moonMat);
+        moonSprite.scale.set(16, 16, 1);
+        moonGroup.add(moonSprite);
+
+        // Soft Moon Corona Glow
+        const haloMat = new THREE.SpriteMaterial({
+          map: TextureGenerator.createStarGlowTexture(),
+          transparent: true,
+          opacity: 0.5,
+          blending: THREE.AdditiveBlending,
+          color: new THREE.Color(0xfef08a)
+        });
+        const haloSprite = new THREE.Sprite(haloMat);
+        haloSprite.scale.set(28, 28, 1);
+        moonGroup.add(haloSprite);
+
+        sleepyMoonMesh = moonGroup;
+        scene.add(moonGroup);
+      }
+
+      function createRingedPlanet() {
+        ringedPlanetGroup = new THREE.Group();
+        ringedPlanetGroup.position.set(-28, -12, -35);
+
+        // Planet Sphere
+        const planetGeo = new THREE.SphereGeometry(4.5, 32, 32);
+        const planetMat = new THREE.MeshStandardMaterial({
+          color: 0x818cf8,
+          roughness: 0.4,
+          metalness: 0.2,
+          emissive: 0x312e81,
+          emissiveIntensity: 0.3
+        });
+        const planetMesh = new THREE.Mesh(planetGeo, planetMat);
+        ringedPlanetGroup.add(planetMesh);
+
+        // Planet Ring
+        const ringGeo = new THREE.RingGeometry(5.8, 9.5, 48);
+        const ringMat = new THREE.MeshBasicMaterial({
+          color: 0xf472b6,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.65,
+          blending: THREE.AdditiveBlending
+        });
+        const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+        ringMesh.rotation.x = Math.PI * 0.45;
+        ringMesh.rotation.y = 0.2;
+        ringedPlanetGroup.add(ringMesh);
+
+        scene.add(ringedPlanetGroup);
+      }
+
+      // ========================================================================
+      // 6. CONSTELLATION ANIMALS PROCEDURAL BUILDERS (5 Friendly Star Animals)
+      // ========================================================================
+      const lineMaterial = new THREE.LineBasicMaterial({
+        color: 0xa5b4fc,
+        transparent: true,
+        opacity: 0.7,
+        blending: THREE.AdditiveBlending,
+        linewidth: 2
+      });
+
+      const goldLineMaterial = new THREE.LineBasicMaterial({
+        color: 0xfde047,
+        transparent: true,
+        opacity: 0.85,
+        blending: THREE.AdditiveBlending,
+        linewidth: 2.5
+      });
+
+      function createConstellationStarNode(size = 0.6, colorHex = 0xfde047) {
+        const group = new THREE.Group();
+        const sphereGeo = new THREE.SphereGeometry(size * 0.5, 16, 16);
+        const sphereMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const sphere = new THREE.Mesh(sphereGeo, sphereMat);
+        group.add(sphere);
+
+        const glowMat = new THREE.SpriteMaterial({
+          map: TextureGenerator.createStarGlowTexture(),
+          color: new THREE.Color(colorHex),
+          transparent: true,
+          opacity: 0.9,
+          blending: THREE.AdditiveBlending
+        });
+        const sprite = new THREE.Sprite(glowMat);
+        sprite.scale.set(size * 3.5, size * 3.5, 1);
+        group.add(sprite);
+
+        return group;
+      }
+
+      function buildConstellationLines(points, isGold = false) {
+        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+        return new THREE.LineSegments(geometry, isGold ? goldLineMaterial : lineMaterial);
+      }
+
+      // --- 1. GIRAFFE CONSTELLATION ---
+      function createGiraffeConstellation() {
+        const giraffeGroup = new THREE.Group();
+        giraffeGroup.position.set(-14, 2, -6);
+
+        // Body & Star Nodes
+        const nodes = [
+          new THREE.Vector3(0, -3, 0),    // Back foot L
+          new THREE.Vector3(1.5, -3, 0),  // Back foot R
+          new THREE.Vector3(0, -1, 0),    // Back hip
+          new THREE.Vector3(2.5, -3, 0),  // Front foot L
+          new THREE.Vector3(3.5, -3, 0),  // Front foot R
+          new THREE.Vector3(3.0, -0.5, 0),// Front chest
+          new THREE.Vector3(3.2, 1.5, 0), // Neck 1
+          new THREE.Vector3(3.5, 3.5, 0), // Neck 2
+          new THREE.Vector3(3.8, 5.5, 0), // Neck top
+          new THREE.Vector3(4.8, 6.2, 0), // Head snout
+          new THREE.Vector3(3.6, 7.0, 0), // Horn tip L
+          new THREE.Vector3(4.2, 7.1, 0), // Horn tip R
+          new THREE.Vector3(-1.0, -1.8, 0)// Tail tip
+        ];
+
+        nodes.forEach(pos => {
+          const starNode = createConstellationStarNode(0.5, 0xfde047);
+          starNode.position.copy(pos);
+          giraffeGroup.add(starNode);
+        });
+
+        // Connecting Lines
+        const linePoints = [
+          nodes[0], nodes[2],  nodes[1], nodes[2],       // Back legs
+          nodes[3], nodes[5],  nodes[4], nodes[5],       // Front legs
+          nodes[2], nodes[5],                            // Body spine
+          nodes[5], nodes[6],  nodes[6], nodes[7], nodes[7], nodes[8], // Tall neck
+          nodes[8], nodes[9],                            // Head
+          nodes[8], nodes[10], nodes[8], nodes[11],      // Horns
+          nodes[2], nodes[12]                            // Tail
+        ];
+        giraffeGroup.add(buildConstellationLines(linePoints, true));
+
+        // Cute glowing stylized head mesh
+        const headGeo = new THREE.SphereGeometry(0.9, 16, 16);
+        const headMat = new THREE.MeshStandardMaterial({
+          color: 0xfef08a,
+          emissive: 0xf59e0b,
+          emissiveIntensity: 0.4,
+          roughness: 0.3
+        });
+        const headMesh = new THREE.Mesh(headGeo, headMat);
+        headMesh.position.set(4.2, 6.0, 0);
+        headMesh.scale.set(1.1, 0.9, 0.9);
+        giraffeGroup.add(headMesh);
+
+        giraffeGroup.userData = {
+          key: 'giraffe',
+          name: 'Giraffe',
+          basePos: giraffeGroup.position.clone(),
+          swayPhase: 0,
+          chimeNote: 0
+        };
+
+        constellationAnimals.giraffe = giraffeGroup;
+        scene.add(giraffeGroup);
+        animatedObjects.push(giraffeGroup);
+      }
+
+      // --- 2. LITTLE LION CONSTELLATION ---
+      function createLionConstellation() {
+        const lionGroup = new THREE.Group();
+        lionGroup.position.set(-6, -5, 2);
+
+        // Mane Sunburst Stars (Circular Array)
+        const maneRadius = 2.2;
+        const maneCount = 10;
+        const maneNodes = [];
+
+        for (let i = 0; i < maneCount; i++) {
+          const angle = (i / maneCount) * Math.PI * 2;
+          const pos = new THREE.Vector3(Math.cos(angle) * maneRadius, Math.sin(angle) * maneRadius + 2.5, 0);
+          maneNodes.push(pos);
+
+          const starNode = createConstellationStarNode(0.45, 0xf59e0b);
+          starNode.position.copy(pos);
+          lionGroup.add(starNode);
+        }
+
+        // Body & Paws Nodes
+        const bodyNodes = [
+          new THREE.Vector3(0, 2.5, 0),   // Head center
+          new THREE.Vector3(-2.5, 1.2, 0),// Body spine
+          new THREE.Vector3(-4.0, 0.5, 0),// Hip
+          new THREE.Vector3(-4.2, -1.8, 0), // Paw Back L
+          new THREE.Vector3(-3.2, -1.8, 0), // Paw Back R
+          new THREE.Vector3(-1.0, -1.8, 0), // Paw Front L
+          new THREE.Vector3(0.0, -1.8, 0),  // Paw Front R
+          new THREE.Vector3(-5.5, 1.8, 0)   // Tail star
+        ];
+
+        bodyNodes.forEach(pos => {
+          const starNode = createConstellationStarNode(0.5, 0xfde047);
+          starNode.position.copy(pos);
+          lionGroup.add(starNode);
+        });
+
+        // Mane Lines & Body Lines
+        const maneLines = [];
+        for (let i = 0; i < maneCount; i++) {
+          maneLines.push(maneNodes[i], maneNodes[(i + 1) % maneCount]);
+          maneLines.push(bodyNodes[0], maneNodes[i]);
+        }
+        lionGroup.add(buildConstellationLines(maneLines, true));
+
+        const bodyLines = [
+          bodyNodes[0], bodyNodes[1],  bodyNodes[1], bodyNodes[2], // Spine
+          bodyNodes[2], bodyNodes[3],  bodyNodes[2], bodyNodes[4], // Back legs
+          bodyNodes[1], bodyNodes[5],  bodyNodes[0], bodyNodes[6], // Front legs
+          bodyNodes[2], bodyNodes[7]                               // Tail
+        ];
+        lionGroup.add(buildConstellationLines(bodyLines, false));
+
+        // Cute smiling face sprite in center of mane
+        const faceSpriteMat = new THREE.SpriteMaterial({
+          map: TextureGenerator.createSmilingStarTexture(),
+          transparent: true,
+          opacity: 0.95
+        });
+        const faceSprite = new THREE.Sprite(faceSpriteMat);
+        faceSprite.position.set(0, 2.5, 0.2);
+        faceSprite.scale.set(2.4, 2.4, 1);
+        lionGroup.add(faceSprite);
+
+        lionGroup.userData = {
+          key: 'lion',
+          name: 'Little Lion',
+          basePos: lionGroup.position.clone(),
+          swayPhase: 1.5,
+          chimeNote: 3
+        };
+
+        constellationAnimals.lion = lionGroup;
+        scene.add(lionGroup);
+        animatedObjects.push(lionGroup);
+      }
+
+      // --- 3. ELEPHANT CONSTELLATION ---
+      function createElephantConstellation() {
+        const elephantGroup = new THREE.Group();
+        elephantGroup.position.set(8, -4, 0);
+
+        // Trunk & Ear Nodes
+        const nodes = [
+          new THREE.Vector3(0, 1.5, 0),    // Head center
+          new THREE.Vector3(1.5, 1.0, 0),  // Trunk base
+          new THREE.Vector3(2.5, 0.5, 0),  // Trunk mid
+          new THREE.Vector3(3.2, 1.5, 0),  // Trunk tip curl up
+          new THREE.Vector3(-1.2, 3.2, 0), // Big Ear Top
+          new THREE.Vector3(-2.2, 1.5, 0), // Big Ear Outer
+          new THREE.Vector3(-1.0, 0.2, 0), // Big Ear Bottom
+          new THREE.Vector3(-3.0, 1.2, 0), // Body back
+          new THREE.Vector3(-4.5, 0.5, 0), // Hip
+          new THREE.Vector3(-4.2, -2.0, 0),// Leg Back L
+          new THREE.Vector3(-3.0, -2.0, 0),// Leg Back R
+          new THREE.Vector3(-0.8, -2.0, 0),// Leg Front L
+          new THREE.Vector3(0.5, -2.0, 0)  // Leg Front R
+        ];
+
+        nodes.forEach(pos => {
+          const starNode = createConstellationStarNode(0.5, 0x38bdf8);
+          starNode.position.copy(pos);
+          elephantGroup.add(starNode);
+        });
+
+        // Lines
+        const lines = [
+          nodes[0], nodes[1],  nodes[1], nodes[2],  nodes[2], nodes[3], // Curved trunk
+          nodes[0], nodes[4],  nodes[4], nodes[5],  nodes[5], nodes[6],  nodes[6], nodes[0], // Big ear
+          nodes[0], nodes[7],  nodes[7], nodes[8],                      // Back body
+          nodes[8], nodes[9],  nodes[8], nodes[10],                     // Back legs
+          nodes[7], nodes[11], nodes[0], nodes[12]                      // Front legs
+        ];
+        elephantGroup.add(buildConstellationLines(lines, true));
+
+        // Soft Glowing Body mesh
+        const bodyMesh = new THREE.Mesh(
+          new THREE.SphereGeometry(1.6, 16, 16),
+          new THREE.MeshStandardMaterial({
+            color: 0x7dd3fc,
+            emissive: 0x0284c7,
+            emissiveIntensity: 0.35,
+            roughness: 0.4
+          })
+        );
+        bodyMesh.position.set(-2.0, 0.8, -0.2);
+        bodyMesh.scale.set(1.4, 1.1, 1.0);
+        elephantGroup.add(bodyMesh);
+
+        elephantGroup.userData = {
+          key: 'elephant',
+          name: 'Elephant',
+          basePos: elephantGroup.position.clone(),
+          swayPhase: 3.0,
+          chimeNote: 5
+        };
+
+        constellationAnimals.elephant = elephantGroup;
+        scene.add(elephantGroup);
+        animatedObjects.push(elephantGroup);
+      }
+
+      // --- 4. TEDDY BEAR CONSTELLATION ---
+      function createBearConstellation() {
+        const bearGroup = new THREE.Group();
+        bearGroup.position.set(14, 4, -4);
+
+        const nodes = [
+          new THREE.Vector3(0, 2.0, 0),    // Head center
+          new THREE.Vector3(-1.2, 3.2, 0), // Ear L
+          new THREE.Vector3(1.2, 3.2, 0),  // Ear R
+          new THREE.Vector3(0, 0.0, 0),    // Tummy badge
+          new THREE.Vector3(-1.8, 0.8, 0), // Arm L
+          new THREE.Vector3(2.2, 1.8, 0),  // Waving Arm R
+          new THREE.Vector3(-1.4, -2.2, 0),// Foot L
+          new THREE.Vector3(1.4, -2.2, 0)  // Foot R
+        ];
+
+        nodes.forEach(pos => {
+          const starNode = createConstellationStarNode(0.55, 0xf472b6);
+          starNode.position.copy(pos);
+          bearGroup.add(starNode);
+        });
+
+        const lines = [
+          nodes[0], nodes[1],  nodes[0], nodes[2], // Ears
+          nodes[0], nodes[3],                      // Neck to tummy
+          nodes[3], nodes[4],  nodes[3], nodes[5], // Arms
+          nodes[3], nodes[6],  nodes[3], nodes[7]  // Feet
+        ];
+        bearGroup.add(buildConstellationLines(lines, true));
+
+        // Cuddly tummy sphere
+        const tummy = new THREE.Mesh(
+          new THREE.SphereGeometry(1.5, 16, 16),
+          new THREE.MeshStandardMaterial({
+            color: 0xfbcfe8,
+            emissive: 0xdb2777,
+            emissiveIntensity: 0.35,
+            roughness: 0.3
+          })
+        );
+        tummy.position.set(0, 0, -0.1);
+        bearGroup.add(tummy);
+
+        // Smiling Face
+        const face = new THREE.Sprite(new THREE.SpriteMaterial({
+          map: TextureGenerator.createSmilingStarTexture(),
+          transparent: true
+        }));
+        face.position.set(0, 2.0, 0.2);
+        face.scale.set(1.8, 1.8, 1);
+        bearGroup.add(face);
+
+        bearGroup.userData = {
+          key: 'bear',
+          name: 'Teddy Bear',
+          basePos: bearGroup.position.clone(),
+          swayPhase: 4.5,
+          chimeNote: 7
+        };
+
+        constellationAnimals.bear = bearGroup;
+        scene.add(bearGroup);
+        animatedObjects.push(bearGroup);
+      }
+
+      // --- 5. BABY OWL CONSTELLATION ---
+      function createOwlConstellation() {
+        const owlGroup = new THREE.Group();
+        owlGroup.position.set(0, 7, -2);
+
+        // Crescent Star Perch Branch
+        const branchNodes = [
+          new THREE.Vector3(-2.8, -1.2, 0),
+          new THREE.Vector3(-1.0, -1.6, 0),
+          new THREE.Vector3(1.0, -1.6, 0),
+          new THREE.Vector3(2.8, -1.2, 0)
+        ];
+
+        // Owl Body & Big Eyes Nodes
+        const owlNodes = [
+          new THREE.Vector3(0, 0.2, 0),    // Body Center
+          new THREE.Vector3(-0.9, 1.4, 0), // Eye L
+          new THREE.Vector3(0.9, 1.4, 0),  // Eye R
+          new THREE.Vector3(-1.2, 2.6, 0), // Ear Tuft L
+          new THREE.Vector3(1.2, 2.6, 0),  // Ear Tuft R
+          new THREE.Vector3(-2.0, 0.2, 0), // Wing L
+          new THREE.Vector3(2.0, 0.2, 0)   // Wing R
+        ];
+
+        branchNodes.concat(owlNodes).forEach(pos => {
+          const starNode = createConstellationStarNode(0.45, 0xa78bfa);
+          starNode.position.copy(pos);
+          owlGroup.add(starNode);
+        });
+
+        const lines = [
+          branchNodes[0], branchNodes[1], branchNodes[1], branchNodes[2], branchNodes[2], branchNodes[3], // Branch
+          owlNodes[0], owlNodes[1],  owlNodes[0], owlNodes[2], // Eyes
+          owlNodes[1], owlNodes[3],  owlNodes[2], owlNodes[4], // Ear tufts
+          owlNodes[0], owlNodes[5],  owlNodes[0], owlNodes[6], // Wings
+          owlNodes[0], branchNodes[1], owlNodes[0], branchNodes[2] // Feet on branch
+        ];
+        owlGroup.add(buildConstellationLines(lines, true));
+
+        // Big Nocturnal Glowing Eyes
+        const eyeMat = new THREE.MeshBasicMaterial({ color: 0xfef08a });
+        const eyeGeo = new THREE.SphereGeometry(0.45, 16, 16);
+
+        const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
+        leftEye.position.set(-0.9, 1.4, 0.1);
+        owlGroup.add(leftEye);
+
+        const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
+        rightEye.position.set(0.9, 1.4, 0.1);
+        owlGroup.add(rightEye);
+
+        owlGroup.userData = {
+          key: 'owl',
+          name: 'Baby Owl',
+          basePos: owlGroup.position.clone(),
+          swayPhase: 2.0,
+          chimeNote: 9
+        };
+
+        constellationAnimals.owl = owlGroup;
+        scene.add(owlGroup);
+        animatedObjects.push(owlGroup);
+      }
+
+      function createConstellationAnimals() {
+        createGiraffeConstellation();
+        createLionConstellation();
+        createElephantConstellation();
+        createBearConstellation();
+        createOwlConstellation();
+      }
+
+      // ========================================================================
+      // 7. ZERO-ALLOCATION OBJECT POOLS (Shooting Stars & Particle Bursts)
+      // ========================================================================
+
+      // --- SHOOTING STAR POOL ---
+      const ShootingStarPool = {
+        pool: [],
+        maxCount: CONFIG.maxShootingStars,
+
+        init(sceneRef) {
+          const trailGeo = new THREE.CylinderGeometry(0.04, 0.4, 5, 8);
+          trailGeo.rotateX(Math.PI / 2);
+
+          for (let i = 0; i < this.maxCount; i++) {
+            const group = new THREE.Group();
+
+            const mat = new THREE.MeshBasicMaterial({
+              color: 0xfde047,
+              transparent: true,
+              opacity: 0,
+              blending: THREE.AdditiveBlending
+            });
+            const mesh = new THREE.Mesh(trailGeo, mat);
+            group.add(mesh);
+
+            // Glowing head sprite
+            const headMat = new THREE.SpriteMaterial({
+              map: TextureGenerator.createStarGlowTexture(),
+              color: new THREE.Color(0xffffff),
+              transparent: true,
+              opacity: 0,
+              blending: THREE.AdditiveBlending
+            });
+            const headSprite = new THREE.Sprite(headMat);
+            headSprite.scale.set(2.5, 2.5, 1);
+            headSprite.position.set(0, 0, 2.5);
+            group.add(headSprite);
+
+            group.visible = false;
+            sceneRef.add(group);
+
+            this.pool.push({
+              group,
+              mesh,
+              headSprite,
+              mat,
+              headMat,
+              active: false,
+              velocity: new THREE.Vector3(),
+              life: 0,
+              maxLife: 1.5
+            });
+          }
+        },
+
+        spawn(origin, targetDir, speed = 35) {
+          const item = this.pool.find(p => !p.active);
+          if (!item) return;
+
+          item.active = true;
+          item.group.visible = true;
+          item.life = 0;
+          item.maxLife = 1.2 + Math.random() * 0.6;
+
+          if (origin) {
+            item.group.position.copy(origin);
+          } else {
+            // Random sky origin
+            item.group.position.set(
+              (Math.random() - 0.5) * 60,
+              15 + Math.random() * 25,
+              -10 + (Math.random() - 0.5) * 30
+            );
+          }
+
+          if (targetDir) {
+            item.velocity.copy(targetDir).normalize().multiplyScalar(speed);
+          } else {
+            item.velocity.set(
+              -15 - Math.random() * 10,
+              -12 - Math.random() * 8,
+              5 + Math.random() * 5
+            );
+          }
+
+          item.group.quaternion.setFromUnitVectors(
+            new THREE.Vector3(0, 0, 1),
+            item.velocity.clone().normalize()
+          );
+
+          SoundEngine.playShootingStarWhoosh();
+        },
+
+        update(delta) {
+          for (let i = 0; i < this.maxCount; i++) {
+            const item = this.pool[i];
+            if (!item.active) continue;
+
+            item.life += delta;
+            const progress = item.life / item.maxLife;
+
+            if (progress >= 1.0) {
+              item.active = false;
+              item.group.visible = false;
+              item.mat.opacity = 0;
+              item.headMat.opacity = 0;
+              continue;
+            }
+
+            // Move
+            item.group.position.addScaledVector(item.velocity, delta);
+
+            // Fade envelope
+            let alpha = 1.0;
+            if (progress < 0.2) alpha = progress / 0.2;
+            else if (progress > 0.6) alpha = (1.0 - progress) / 0.4;
+
+            item.mat.opacity = alpha * 0.85;
+            item.headMat.opacity = alpha * 0.95;
+          }
+        }
+      };
+
+      // --- PARTICLE STARBURST POOL ---
+      const ParticleBurstPool = {
+        maxCount: CONFIG.maxBurstParticles,
+        geometry: null,
+        points: null,
+        positions: null,
+        colors: null,
+        sizes: null,
+        velocities: [],
+        lifetimes: [],
+        maxLifetimes: [],
+        activeFlags: [],
+
+        init(sceneRef) {
+          this.geometry = new THREE.BufferGeometry();
+          this.positions = new Float32Array(this.maxCount * 3);
+          this.colors = new Float32Array(this.maxCount * 3);
+          this.sizes = new Float32Array(this.maxCount);
+
+          for (let i = 0; i < this.maxCount; i++) {
+            this.positions[i * 3] = 0;
+            this.positions[i * 3 + 1] = -9999;
+            this.positions[i * 3 + 2] = 0;
+
+            this.colors[i * 3] = 1;
+            this.colors[i * 3 + 1] = 1;
+            this.colors[i * 3 + 2] = 1;
+
+            this.sizes[i] = 0;
+            this.velocities.push(new THREE.Vector3());
+            this.lifetimes.push(0);
+            this.maxLifetimes.push(1);
+            this.activeFlags.push(false);
+          }
+
+          this.geometry.setAttribute('position', new THREE.BufferAttribute(this.positions, 3));
+          this.geometry.setAttribute('color', new THREE.BufferAttribute(this.colors, 3));
+          this.geometry.setAttribute('size', new THREE.BufferAttribute(this.sizes, 1));
+
+          const mat = new THREE.PointsMaterial({
+            size: 3.5,
+            vertexColors: true,
+            map: TextureGenerator.createStarGlowTexture(),
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+          });
+
+          this.points = new THREE.Points(this.geometry, mat);
+          sceneRef.add(this.points);
+        },
+
+        burst(x, y, z, count = 35, isSuper = false) {
+          const colorPalette = [
+            new THREE.Color(0xfde047), // Gold
+            new THREE.Color(0xf472b6), // Pink
+            new THREE.Color(0x38bdf8), // Cyan
+            new THREE.Color(0xa78bfa), // Lavender
+            new THREE.Color(0xffffff)  // Diamond
+          ];
+
+          let activated = 0;
+          for (let i = 0; i < this.maxCount && activated < count; i++) {
+            if (this.activeFlags[i]) continue;
+
+            this.activeFlags[i] = true;
+            this.lifetimes[i] = 0;
+            this.maxLifetimes[i] = isSuper ? (1.5 + Math.random() * 1.0) : (0.8 + Math.random() * 0.7);
+
+            this.positions[i * 3] = x;
+            this.positions[i * 3 + 1] = y;
+            this.positions[i * 3 + 2] = z;
+
+            const col = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+            this.colors[i * 3] = col.r;
+            this.colors[i * 3 + 1] = col.g;
+            this.colors[i * 3 + 2] = col.b;
+
+            this.sizes[i] = isSuper ? (4.0 + Math.random() * 3.5) : (2.5 + Math.random() * 2.0);
+
+            // Random spherical burst velocity
+            const speed = isSuper ? (6 + Math.random() * 12) : (4 + Math.random() * 7);
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.acos((Math.random() * 2) - 1);
+
+            this.velocities[i].set(
+              speed * Math.sin(phi) * Math.cos(theta),
+              speed * Math.sin(phi) * Math.sin(theta),
+              speed * Math.cos(phi)
+            );
+
+            activated++;
+          }
+
+          this.geometry.attributes.position.needsUpdate = true;
+          this.geometry.attributes.color.needsUpdate = true;
+          this.geometry.attributes.size.needsUpdate = true;
+        },
+
+        update(delta) {
+          let hasUpdates = false;
+
+          for (let i = 0; i < this.maxCount; i++) {
+            if (!this.activeFlags[i]) continue;
+
+            this.lifetimes[i] += delta;
+            const progress = this.lifetimes[i] / this.maxLifetimes[i];
+
+            if (progress >= 1.0) {
+              this.activeFlags[i] = false;
+              this.positions[i * 3 + 1] = -9999;
+              this.sizes[i] = 0;
+              hasUpdates = true;
+              continue;
+            }
+
+            // Drag deceleration & gentle float
+            this.velocities[i].multiplyScalar(0.96);
+            this.velocities[i].y += 0.2 * delta; // Gentle cosmic upward drift
+
+            this.positions[i * 3] += this.velocities[i].x * delta;
+            this.positions[i * 3 + 1] += this.velocities[i].y * delta;
+            this.positions[i * 3 + 2] += this.velocities[i].z * delta;
+
+            // Fade size
+            const alpha = 1.0 - progress;
+            this.sizes[i] = (2.5 + 2.0 * alpha);
+            hasUpdates = true;
+          }
+
+          if (hasUpdates) {
+            this.geometry.attributes.position.needsUpdate = true;
+            this.geometry.attributes.size.needsUpdate = true;
+          }
+        }
+      };
+
+      // ========================================================================
+      // 8. INTERACTIVE SCREEN STARS (Floating tap-to-pop bubbles)
+      // ========================================================================
+      const ScreenStarManager = {
+        stars: [],
+
+        init() {
+          for (let i = 0; i < CONFIG.maxScreenStars; i++) {
+            this.createStar(i * 0.5);
+          }
+        },
+
+        createStar(delay = 0) {
+          const starEl = document.createElement('div');
+          starEl.className = 'floating-screen-star';
+          const size = 44 + Math.random() * 20;
+          starEl.style.width = size + 'px';
+          starEl.style.height = size + 'px';
+          starEl.textContent = '⭐';
+
+          const x = 5 + Math.random() * 90;
+          const y = 15 + Math.random() * 70;
+          starEl.style.left = x + '%';
+          starEl.style.top = y + '%';
+          starEl.style.animationDelay = (Math.random() * -4) + 's';
+
+          starEl.addEventListener('pointerdown', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            this.popStar(starEl, e.clientX, e.clientY);
+          });
+
+          document.body.appendChild(starEl);
+          this.stars.push(starEl);
+        },
+
+        popStar(element, clientX, clientY) {
+          createScreenRipple(clientX, clientY);
+          SoundEngine.playStarPop();
+          ParticleBurstPool.burst(0, 0, 0, 25);
+
+          element.remove();
+          const idx = this.stars.indexOf(element);
+          if (idx > -1) this.stars.splice(idx, 1);
+
+          // Respawn another star after a brief delay
+          setTimeout(() => {
+            if (this.stars.length < CONFIG.maxScreenStars) {
+              this.createStar();
+            }
+          }, 2000 + Math.random() * 2000);
+        }
+      };
+
+      // ========================================================================
+      // 9. SENSORY BURST & INTERACTION HANDLER
+      // ========================================================================
+      const raycaster = new THREE.Raycaster();
+      const mouseVec = new THREE.Vector2();
+
+      function triggerBurstInteraction(screenX, screenY, isSuper = false) {
+        SoundEngine.resume();
+        SoundEngine.playChimeBurst(isSuper);
+
+        // Screen Ripple
+        const posX = screenX !== undefined ? screenX : window.innerWidth / 2;
+        const posY = screenY !== undefined ? screenY : window.innerHeight / 2;
+
+        if (isSuper) {
+          createSuperGalaxyRipple(posX, posY);
+          const flash = document.getElementById('galaxy-flash');
+          if (flash) {
+            flash.classList.remove('active');
+            void flash.offsetWidth; // trigger reflow
+            flash.classList.add('active');
+          }
+        } else {
+          createScreenRipple(posX, posY);
+        }
+
+        // 3D Raycasting check to see if an animal was directly touched
+        let targetX = 0, targetY = 0, targetZ = 0;
+        let hitAnimal = false;
+
+        if (screenX !== undefined && screenY !== undefined && camera) {
+          mouseVec.x = (screenX / window.innerWidth) * 2 - 1;
+          mouseVec.y = -(screenY / window.innerHeight) * 2 + 1;
+          raycaster.setFromCamera(mouseVec, camera);
+
+          const intersects = raycaster.intersectObjects(animatedObjects, true);
+          if (intersects.length > 0) {
+            let hitGroup = intersects[0].object;
+            while (hitGroup.parent && hitGroup.parent !== scene) {
+              hitGroup = hitGroup.parent;
+            }
+            if (hitGroup && hitGroup.userData && hitGroup.userData.key) {
+              hitAnimal = true;
+              targetX = hitGroup.position.x;
+              targetY = hitGroup.position.y;
+              targetZ = hitGroup.position.z;
+              hitGroup.rotation.y += Math.PI * 2; // Fun spin reaction
+              setActiveAnimal(hitGroup.userData.key);
+            }
+          }
+        }
+
+        if (!hitAnimal) {
+          if (STATE.activeAnimal !== 'all' && constellationAnimals[STATE.activeAnimal]) {
+            const animalPos = constellationAnimals[STATE.activeAnimal].position;
+            targetX = animalPos.x;
+            targetY = animalPos.y;
+            targetZ = animalPos.z;
+          }
+        }
+
+        // 3D Shooting Star & Particle Burst
+        ShootingStarPool.spawn();
+        ParticleBurstPool.burst(targetX, targetY, targetZ, isSuper ? 65 : 30, isSuper);
+
+        // Hide prompt banner on first interaction
+        const promptBanner = document.getElementById('prompt-banner');
+        if (promptBanner && !promptBanner.classList.contains('hidden')) {
+          promptBanner.classList.add('hidden');
+        }
+      }
+
+      function createScreenRipple(x, y) {
+        const ripple = document.createElement('div');
+        ripple.className = 'touch-ripple';
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        document.body.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 900);
+      }
+
+      function createSuperGalaxyRipple(x, y) {
+        const ripple = document.createElement('div');
+        ripple.className = 'super-burst-ripple';
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        document.body.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 1300);
+      }
+
+      // Select and Focus Animal Constellation
+      function setActiveAnimal(animalKey) {
+        STATE.activeAnimal = animalKey;
+        STATE.animalIndex = ANIMAL_KEYS.indexOf(animalKey);
+
+        // Update Tab UI
+        document.querySelectorAll('.animal-tab-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.getAttribute('data-animal') === animalKey);
+        });
+
+        // Set Camera Targets
+        if (animalKey === 'all') {
+          STATE.targetCamPos.set(0, 4, CONFIG.cameraDistance);
+          STATE.targetCamLookAt.set(0, 0, 0);
+        } else if (constellationAnimals[animalKey]) {
+          const animalPos = constellationAnimals[animalKey].position;
+          STATE.targetCamPos.set(animalPos.x, animalPos.y + 1.5, animalPos.z + 14);
+          STATE.targetCamLookAt.set(animalPos.x, animalPos.y + 0.5, animalPos.z);
+        }
+      }
+
+      // ========================================================================
+      // 10. USER INPUT & DEVICE CONTROLS (TV Remote, Multi-touch, Keyboard, Gamepad)
+      // ========================================================================
+      function setupInteractions() {
+        // --- 1. TV REMOTE & KEYBOARD MASH LISTENER ---
+        window.addEventListener('keydown', (e) => {
+          if (e.repeat) return; // Prevent key flood
+
+          const code = e.keyCode || e.which;
+          const key = e.key;
+
+          // TV Remote Back / Return handler (Tizen: 10009, webOS: 461, Android: 4, Escape)
+          const isBackButton = key === 'Escape' || key === 'Back' || key === 'GoBack' || key === 'BrowserBack' || code === 10009 || code === 461 || code === 4;
+          if (isBackButton) {
+            e.preventDefault();
+            window.location.href = '../../index.html';
+            return;
+          }
+
+          // If typing in an input slider, ignore
+          if (e.target && e.target.tagName === 'INPUT') return;
+
+          // TV Navigation Keys (D-Pad Left / Right to cycle animals)
+          if (key === 'ArrowRight' || key === 'ArrowDown' || code === 39 || code === 40) {
+            e.preventDefault();
+            const nextIdx = (STATE.animalIndex + 1) % ANIMAL_KEYS.length;
+            setActiveAnimal(ANIMAL_KEYS[nextIdx]);
+            triggerBurstInteraction(window.innerWidth / 2, window.innerHeight / 2, false);
+            return;
+          }
+          if (key === 'ArrowLeft' || key === 'ArrowUp' || code === 37 || code === 38) {
+            e.preventDefault();
+            const prevIdx = (STATE.animalIndex - 1 + ANIMAL_KEYS.length) % ANIMAL_KEYS.length;
+            setActiveAnimal(ANIMAL_KEYS[prevIdx]);
+            triggerBurstInteraction(window.innerWidth / 2, window.innerHeight / 2, false);
+            return;
+          }
+
+          // Prevent default for TV action keys
+          const tvActionKeys = [' ', 'Space', 'Enter', 'Select', 'Accept', 'PageUp', 'PageDown'];
+          if (tvActionKeys.includes(key) || [13, 23, 32, 33, 34].includes(code)) {
+            e.preventDefault();
+          }
+
+          // Blur any focused button so remote OK / keyboard Space doesn't re-trigger button clicks
+          if (document.activeElement && document.activeElement !== document.body) {
+            document.activeElement.blur();
+          }
+
+          // Trigger sensory burst on ANY TV remote button or keypress
+          triggerBurstInteraction(window.innerWidth / 2, window.innerHeight / 2, false);
+        }, false);
+
+        // --- 2. DISABLE CONTEXT MENU ---
+        document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+        // --- 3. MULTI-TOUCH PALM GRAB & TOUCH LISTENER ---
+        container.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          if (document.activeElement && document.activeElement !== document.body) {
+            document.activeElement.blur();
+          }
+
+          const touches = e.touches;
+          if (touches.length >= 2) {
+            // Multi-finger Palm Grab -> Super Constellation Galaxy Burst!
+            for (let i = 0; i < Math.min(touches.length, 5); i++) {
+              const t = touches[i];
+              createScreenRipple(t.clientX, t.clientY);
+            }
+            triggerBurstInteraction(touches[0].clientX, touches[0].clientY, true);
+          } else if (touches.length === 1) {
+            triggerBurstInteraction(touches[0].clientX, touches[0].clientY, false);
+          }
+        }, { passive: false });
+
+        // Pointer fallback for mouse
+        container.addEventListener('pointerdown', (e) => {
+          if (e.pointerType === 'touch') return;
+          e.preventDefault();
+          if (document.activeElement && document.activeElement !== document.body) {
+            document.activeElement.blur();
+          }
+          triggerBurstInteraction(e.clientX, e.clientY, false);
+        }, false);
+
+        // Gentle Parallax Drift on pointer move
+        window.addEventListener('pointermove', (e) => {
+          STATE.pointerX = (e.clientX / window.innerWidth) * 2 - 1;
+          STATE.pointerY = -(e.clientY / window.innerHeight) * 2 + 1;
+        }, { passive: true });
+
+        // --- 4. VISIBILITY CHANGE & BLUR/FOCUS HANDLING ---
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden) {
+            SoundEngine.suspend();
+          } else {
+            SoundEngine.resume();
+            ParticleBurstPool.burst(0, 0, 0, 30);
+          }
+        });
+
+        window.addEventListener('blur', () => SoundEngine.suspend());
+        window.addEventListener('focus', () => SoundEngine.resume());
+
+        // --- 5. UI BUTTON LISTENERS ---
+        // Constellation Tabs
+        document.querySelectorAll('.animal-tab-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            btn.blur();
+            const animal = btn.getAttribute('data-animal');
+            setActiveAnimal(animal);
+            triggerBurstInteraction(window.innerWidth / 2, window.innerHeight / 2, false);
+          });
+        });
+
+        // Sound Toggle
+        const btnSound = document.getElementById('btn-sound');
+        const soundIcon = document.getElementById('sound-icon');
+        btnSound.addEventListener('click', (e) => {
+          e.stopPropagation();
+          btnSound.blur();
+          const isEnabled = SoundEngine.toggleSound();
+          soundIcon.textContent = isEnabled ? '🔊' : '🔇';
+        });
+
+        // Fullscreen Toggle
+        const btnFullscreen = document.getElementById('btn-fullscreen');
+        btnFullscreen.addEventListener('click', (e) => {
+          e.stopPropagation();
+          btnFullscreen.blur();
+          const docEl = document.documentElement;
+          const isFull = document.fullscreenElement || document.webkitFullscreenElement;
+          if (!isFull) {
+            const req = docEl.requestFullscreen || docEl.webkitRequestFullscreen;
+            if (req) req.call(docEl).catch(() => {});
+          } else {
+            const exit = document.exitFullscreen || document.webkitExitFullscreen;
+            if (exit) exit.call(document).catch(() => {});
+          }
+        });
+
+        // Settings Panel Toggle
+        const btnSettings = document.getElementById('btn-settings');
+        const btnCloseSettings = document.getElementById('btn-close-settings');
+        const settingsPanel = document.getElementById('settings-panel');
+
+        btnSettings.addEventListener('click', (e) => {
+          e.stopPropagation();
+          btnSettings.blur();
+          settingsPanel.classList.toggle('collapsed');
+        });
+
+        btnCloseSettings.addEventListener('click', (e) => {
+          e.stopPropagation();
+          btnCloseSettings.blur();
+          settingsPanel.classList.add('collapsed');
+        });
+
+        // Flight Pace buttons
+        document.querySelectorAll('[data-speed]').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            btn.blur();
+            document.querySelectorAll('[data-speed]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const spd = btn.getAttribute('data-speed');
+            if (spd === 'slow') {
+              CONFIG.flightSpeed = 0.12;
+              document.getElementById('speed-display').textContent = 'Soothing';
+            } else if (spd === 'normal') {
+              CONFIG.flightSpeed = 0.25;
+              document.getElementById('speed-display').textContent = 'Dreamy';
+            } else if (spd === 'fast') {
+              CONFIG.flightSpeed = 0.45;
+              document.getElementById('speed-display').textContent = 'Playful';
+            }
+          });
+        });
+
+        // Sky Aura Theme buttons
+        document.querySelectorAll('[data-aura]').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            btn.blur();
+            document.querySelectorAll('[data-aura]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const aura = btn.getAttribute('data-aura');
+            const auroraEl = document.getElementById('aurora-overlay');
+            if (aura === 'indigo') {
+              auroraEl.style.background = 'radial-gradient(circle at 50% 20%, rgba(167, 139, 250, 0.3) 0%, rgba(56, 189, 248, 0.2) 40%, transparent 75%)';
+              document.getElementById('aura-display').textContent = 'Indigo';
+            } else if (aura === 'aurora') {
+              auroraEl.style.background = 'radial-gradient(circle at 50% 20%, rgba(52, 211, 153, 0.35) 0%, rgba(56, 189, 248, 0.3) 40%, transparent 75%)';
+              document.getElementById('aura-display').textContent = 'Aurora';
+            } else if (aura === 'warm') {
+              auroraEl.style.background = 'radial-gradient(circle at 50% 20%, rgba(253, 224, 71, 0.35) 0%, rgba(244, 114, 182, 0.25) 40%, transparent 75%)';
+              document.getElementById('aura-display').textContent = 'Golden';
+            }
+          });
+        });
+
+        // Volume Slider
+        const volumeSlider = document.getElementById('volume-slider');
+        volumeSlider.addEventListener('input', (e) => {
+          const val = parseInt(e.target.value, 10) / 100;
+          SoundEngine.setVolume(val);
+          document.getElementById('volume-display').textContent = e.target.value + '%';
+        });
+
+        // Prompt Banner tap
+        const promptBanner = document.getElementById('prompt-banner');
+        promptBanner.addEventListener('click', () => {
+          triggerBurstInteraction(window.innerWidth / 2, window.innerHeight / 2, true);
+        });
+      }
+
+      // --- 6. GAMEPAD POLLING (TV & Game Controller support) ---
+      function pollGamepads() {
+        const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+        for (let i = 0; i < gamepads.length; i++) {
+          const gp = gamepads[i];
+          if (!gp) continue;
+
+          // Button 1 is Back / Cancel / Circle on standard gamepads
+          if (gp.buttons[1] && gp.buttons[1].pressed) {
+            window.location.href = '../../index.html';
+            return;
+          }
+
+          // D-Pad and Action buttons
+          for (let b = 0; b < gp.buttons.length; b++) {
+            if (gp.buttons[b] && gp.buttons[b].pressed) {
+              if (!gpButtonStates[b]) {
+                gpButtonStates[b] = true;
+                if (b === 12 || b === 14) { // D-pad up or left
+                  const prevIdx = (STATE.animalIndex - 1 + ANIMAL_KEYS.length) % ANIMAL_KEYS.length;
+                  setActiveAnimal(ANIMAL_KEYS[prevIdx]);
+                  triggerBurstInteraction(window.innerWidth / 2, window.innerHeight / 2, false);
+                } else if (b === 13 || b === 15) { // D-pad down or right
+                  const nextIdx = (STATE.animalIndex + 1) % ANIMAL_KEYS.length;
+                  setActiveAnimal(ANIMAL_KEYS[nextIdx]);
+                  triggerBurstInteraction(window.innerWidth / 2, window.innerHeight / 2, false);
+                } else {
+                  triggerBurstInteraction(window.innerWidth / 2, window.innerHeight / 2, false);
+                }
+              }
+            } else {
+              gpButtonStates[b] = false;
+            }
+          }
+        }
+      }
+
+      // ========================================================================
+      // 11. MAIN ANIMATION & RENDER LOOP (60 FPS Performance)
+      // ========================================================================
+      let lastFrameTime = performance.now();
+      let autoShootingStarTimer = 0;
+
+      function animate() {
+        requestAnimationFrame(animate);
+
+        const now = performance.now();
+        const delta = Math.min((now - lastFrameTime) / 1000, 0.1); // Cap delta at 100ms
+        lastFrameTime = now;
+
+        const timeSec = now * 0.001;
+
+        // Poll Gamepads for TV controllers
+        pollGamepads();
+
+        // 1. Gentle Starfield & Nebulae Cosmic Rotation
+        if (starfieldPoints) {
+          starfieldPoints.rotation.y = timeSec * 0.02;
+        }
+        if (nebulaGroup) {
+          nebulaGroup.rotation.y = timeSec * 0.015;
+          nebulaGroup.rotation.z = Math.sin(timeSec * 0.1) * 0.05;
+        }
+
+        // 2. Sleepy Moon & Ringed Planet gentle floating
+        if (sleepyMoonMesh) {
+          sleepyMoonMesh.position.y = 18 + Math.sin(timeSec * 0.6) * 1.2;
+          sleepyMoonMesh.rotation.z = Math.sin(timeSec * 0.4) * 0.05;
+        }
+        if (ringedPlanetGroup) {
+          ringedPlanetGroup.position.y = -12 + Math.cos(timeSec * 0.5) * 0.8;
+          ringedPlanetGroup.rotation.y = timeSec * 0.08;
+        }
+
+        // 3. Constellation Animals Gentle Breathing & Sway
+        animatedObjects.forEach(obj => {
+          const phase = obj.userData.swayPhase || 0;
+          obj.position.y = obj.userData.basePos.y + Math.sin(timeSec * 1.2 + phase) * 0.4;
+          obj.rotation.z = Math.sin(timeSec * 0.8 + phase) * 0.03;
+        });
+
+        // 4. Update Pools
+        ShootingStarPool.update(delta);
+        ParticleBurstPool.update(delta);
+
+        // 5. Periodic Automatic Shooting Star
+        autoShootingStarTimer += delta;
+        if (autoShootingStarTimer > 3.5) {
+          autoShootingStarTimer = 0;
+          ShootingStarPool.spawn();
+        }
+
+        // 6. Smooth Camera Flight & Parallax Lerp
+        const parallaxX = STATE.pointerX * 2.5;
+        const parallaxY = STATE.pointerY * 1.8;
+
+        const targetX = STATE.targetCamPos.x + parallaxX;
+        const targetY = STATE.targetCamPos.y + parallaxY;
+        const targetZ = STATE.targetCamPos.z;
+
+        camera.position.x += (targetX - camera.position.x) * 0.04;
+        camera.position.y += (targetY - camera.position.y) * 0.04;
+        camera.position.z += (targetZ - camera.position.z) * 0.04;
+
+        STATE.currentCamLookAt.lerp(STATE.targetCamLookAt, 0.05);
+        camera.lookAt(STATE.currentCamLookAt);
+
+        // 7. Render 3D Scene
+        renderer.render(scene, camera);
+      }
+
+      // ========================================================================
+      // 12. INITIALIZATION ON DOM READY
+      // ========================================================================
+      window.addEventListener('DOMContentLoaded', () => {
+        initThreeScene();
+        ScreenStarManager.init();
+        setupInteractions();
+        animate();
+      });
+
+    })();
+  </script>
+</body>
+</html>

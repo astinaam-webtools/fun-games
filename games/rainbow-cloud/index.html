@@ -1,0 +1,2294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Rainbow Cloud Meadow - Infant 3D Sensory Experience</title>
+  <style>
+    /* ==========================================================================
+       RESET & ERGONOMIC BASE STYLES
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #88d8b0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      touch-action: none;
+      overscroll-behavior: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #canvas-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      cursor: pointer;
+    }
+
+    /* Ambient soft vignette for cozy glowing lighting */
+    .vignette-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
+      box-shadow: inset 0 0 80px rgba(255, 255, 255, 0.4), inset 0 0 150px rgba(255, 210, 235, 0.2);
+      mix-blend-mode: soft-light;
+    }
+
+    /* Rainbow Super Meadow Bounce Fullscreen Glow Aura */
+    .super-bounce-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 3;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      background: radial-gradient(circle at center, transparent 20%, rgba(255, 182, 193, 0.28) 50%, rgba(168, 230, 207, 0.35) 75%, rgba(255, 218, 121, 0.4) 100%);
+    }
+
+    .super-bounce-overlay.active {
+      opacity: 1;
+      animation: superRainbowGlow 0.5s infinite alternate ease-in-out;
+    }
+
+    @keyframes superRainbowGlow {
+      0% { opacity: 0.7; transform: scale(1.0); }
+      100% { opacity: 1.0; transform: scale(1.02); }
+    }
+
+    /* Top Sensory Session Progress */
+    .session-progress-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.35);
+      z-index: 20;
+    }
+
+    .session-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ff9a9e 0%, #fecfef 25%, #a1c4fd 50%, #a8e6cf 75%, #fed330 100%);
+      transition: width 0.5s linear;
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.9);
+    }
+
+    /* UI Overlay Layer */
+    .ui-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px 24px;
+      transition: opacity 0.5s ease;
+    }
+
+    /* Top Header Bar */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      pointer-events: auto;
+    }
+
+    .brand-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 8px 20px;
+      border-radius: 999px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      border: 2px solid rgba(255, 255, 255, 0.98);
+      animation: floatBadge 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatBadge {
+      0% { transform: translateY(0px); }
+      100% { transform: translateY(-4px); }
+    }
+
+    .brand-icon {
+      font-size: 24px;
+      display: inline-block;
+      animation: wiggle 3s ease-in-out infinite;
+    }
+
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(0deg) scale(1); }
+      25% { transform: rotate(-8deg) scale(1.1); }
+      75% { transform: rotate(8deg) scale(1.1); }
+    }
+
+    .brand-title {
+      font-weight: 800;
+      font-size: 16px;
+      letter-spacing: 0.5px;
+      background: linear-gradient(135deg, #ff6b81 0%, #ff9ff3 50%, #54a0ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .ultrawide-badge {
+      font-size: 11px;
+      background: #e0f2fe;
+      color: #0284c7;
+      padding: 3px 10px;
+      border-radius: 8px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .glass-btn {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 2px solid rgba(255, 255, 255, 0.98);
+      border-radius: 999px;
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #57606f;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: auto;
+      min-width: 48px;
+      min-height: 48px;
+      text-decoration: none;
+      outline: none;
+    }
+
+    .glass-btn:hover, .glass-btn:focus-visible {
+      transform: translateY(-2px) scale(1.05);
+      background: rgba(255, 255, 255, 1.0);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      color: #2f3542;
+    }
+
+    .glass-btn:active {
+      transform: scale(0.95);
+    }
+
+    .icon-btn {
+      width: 48px;
+      height: 48px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 18px;
+    }
+
+    /* Start / Interactive Prompt Banner */
+    .prompt-banner {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      padding: 14px 32px;
+      border-radius: 999px;
+      border: 3px solid #ffffff;
+      box-shadow: 0 12px 38px rgba(255, 159, 243, 0.35);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      pointer-events: auto;
+      cursor: pointer;
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: pulseGlow 2.5s infinite ease-in-out;
+      min-height: 48px;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 8px 30px rgba(255, 159, 243, 0.4); transform: translateX(-50%) scale(1); }
+      50% { box-shadow: 0 16px 45px rgba(112, 161, 255, 0.55); transform: translateX(-50%) scale(1.03); }
+    }
+
+    .prompt-banner.hidden {
+      opacity: 0;
+      transform: translateX(-50%) translateY(40px) scale(0.9);
+      pointer-events: none;
+    }
+
+    .prompt-icon {
+      font-size: 30px;
+      animation: bouncePrompt 1.8s infinite ease-in-out;
+    }
+
+    @keyframes bouncePrompt {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .prompt-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .prompt-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #2f3542;
+    }
+
+    .prompt-subtitle {
+      font-size: 12px;
+      font-weight: 600;
+      color: #747d8c;
+    }
+
+    /* Parent Settings Modal */
+    .settings-modal {
+      position: absolute;
+      top: 75px;
+      right: 24px;
+      width: 320px;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 24px;
+      border: 2px solid rgba(255, 255, 255, 0.98);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+      padding: 20px;
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transform-origin: top right;
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: auto;
+    }
+
+    .settings-modal.collapsed {
+      opacity: 0;
+      transform: scale(0.85) translateY(-20px);
+      pointer-events: none;
+    }
+
+    .settings-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #f1f2f6;
+    }
+
+    .settings-header h3 {
+      font-size: 16px;
+      font-weight: 800;
+      color: #2f3542;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .setting-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .setting-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #57606f;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .setting-control {
+      display: flex;
+      gap: 6px;
+      background: #f1f2f6;
+      padding: 4px;
+      border-radius: 12px;
+    }
+
+    .pill-btn {
+      flex: 1;
+      padding: 8px 4px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      font-size: 12px;
+      font-weight: 700;
+      color: #747d8c;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pill-btn.active {
+      background: #ffffff;
+      color: #ff6b81;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+    }
+
+    .slider-input {
+      width: 100%;
+      accent-color: #ff6b81;
+      cursor: pointer;
+      height: 24px;
+    }
+
+    /* Floating Screen Sensory Sparkle Orbs (Clickable) */
+    .floating-screen-bubble {
+      position: absolute;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.95), rgba(255, 182, 193, 0.6) 60%, rgba(168, 230, 207, 0.7) 100%);
+      box-shadow: 0 8px 22px rgba(255, 159, 243, 0.35), inset 0 0 14px rgba(255, 255, 255, 0.9);
+      border: 2px solid rgba(255, 255, 255, 0.95);
+      cursor: pointer;
+      pointer-events: auto;
+      animation: bubbleFloat 5s infinite ease-in-out alternate;
+      z-index: 8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      transition: transform 0.2s ease;
+    }
+
+    .floating-screen-bubble:hover, .floating-screen-bubble:active {
+      transform: scale(1.2);
+    }
+
+    @keyframes bubbleFloat {
+      0% { transform: translateY(0px) rotate(0deg); }
+      100% { transform: translateY(-16px) rotate(12deg); }
+    }
+
+    /* Mobile Adaptations */
+    @media (max-width: 600px) {
+      .ui-layer {
+        padding: 12px 14px;
+      }
+      .brand-title {
+        font-size: 14px;
+      }
+      .ultrawide-badge {
+        display: none;
+      }
+      .prompt-banner {
+        width: 90%;
+        padding: 12px 18px;
+        bottom: 16px;
+      }
+      .prompt-title {
+        font-size: 13px;
+      }
+      .prompt-subtitle {
+        font-size: 11px;
+      }
+      .settings-modal {
+        top: 65px;
+        right: 12px;
+        left: 12px;
+        width: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Sensory Session Progress -->
+  <div class="session-progress-container">
+    <div class="session-progress-bar" id="session-progress"></div>
+  </div>
+
+  <!-- Three.js Canvas Container -->
+  <div id="canvas-container"></div>
+
+  <!-- Ambient Overlays -->
+  <div class="vignette-overlay"></div>
+  <div class="super-bounce-overlay" id="super-bounce-overlay"></div>
+
+  <!-- Floating Sensory Screen Orbs (Interactive baby taps) -->
+  <div class="floating-screen-bubble" style="top: 18%; left: 4%; animation-delay: 0s;" id="orb-1">🎈</div>
+  <div class="floating-screen-bubble" style="top: 65%; right: 4%; animation-delay: -2s;" id="orb-2">⭐</div>
+  <div class="floating-screen-bubble" style="top: 38%; right: 5%; animation-delay: -3.5s;" id="orb-3">🌈</div>
+  <div class="floating-screen-bubble" style="bottom: 22%; left: 5%; animation-delay: -1.2s;" id="orb-4">🐰</div>
+
+  <!-- UI Overlay Layer -->
+  <div class="ui-layer">
+    <header class="top-bar">
+      <div class="brand-badge">
+        <span class="brand-icon">🌈</span>
+        <span class="brand-title">Rainbow Cloud Meadow</span>
+        <span class="ultrawide-badge" id="aspect-badge">☁️ Puffy Trampolines</span>
+      </div>
+
+      <div class="top-actions">
+        <a href="../../index.html" class="glass-btn" style="text-decoration: none; color: #57606f;" title="Back to Game Hub" id="btn-home">
+          <span>🏠</span> <span>Playroom</span>
+        </a>
+        <button class="glass-btn icon-btn" id="btn-sound" title="Toggle Sound / Accordion & Xylophone" aria-label="Toggle Sound">
+          <span id="sound-icon">🔊</span>
+        </button>
+        <button class="glass-btn icon-btn" id="btn-fullscreen" title="Fullscreen Mode" aria-label="Toggle Fullscreen">
+          <span>⛶</span>
+        </button>
+        <button class="glass-btn icon-btn" id="btn-settings" title="Parent Settings" aria-label="Settings">
+          <span>⚙️</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Bottom Interactive Prompt / Hit Helper -->
+    <div class="prompt-banner" id="prompt-banner">
+      <span class="prompt-icon">🐰</span>
+      <div class="prompt-text">
+        <span class="prompt-title">Tap Clouds to Bounce Friendly Bunnies!</span>
+        <span class="prompt-subtitle">Multi-touch for Rainbow Super Meadow Bounce • TV Remote & Keyboard safe</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Parent Settings Panel -->
+  <div class="settings-modal collapsed" id="settings-panel">
+    <div class="settings-header">
+      <h3><span>🧸</span> Parent Controls</h3>
+      <button class="glass-btn icon-btn" style="width:36px; height:36px; font-size:14px; min-width:36px; min-height:36px;" id="btn-close-settings">✕</button>
+    </div>
+
+    <!-- Meadow Mood & Sky Theme -->
+    <div class="setting-item">
+      <div class="setting-label">
+        <span>Meadow Theme</span>
+        <span id="theme-display">Rainbow Day</span>
+      </div>
+      <div class="setting-control">
+        <button class="pill-btn active" data-theme="rainbow">Rainbow</button>
+        <button class="pill-btn" data-theme="sunset">Sunset</button>
+        <button class="pill-btn" data-theme="starlight">Starry</button>
+        <button class="pill-btn" data-theme="candy">Cotton</button>
+      </div>
+    </div>
+
+    <!-- Meadow Bouncing Energy Pace -->
+    <div class="setting-item">
+      <div class="setting-label">
+        <span>Bounce Pace</span>
+        <span id="pace-display">Playful</span>
+      </div>
+      <div class="setting-control">
+        <button class="pill-btn" data-pace="calm">Lullaby</button>
+        <button class="pill-btn active" data-pace="playful">Playful</button>
+        <button class="pill-btn" data-pace="bubbly">Fiesta</button>
+      </div>
+    </div>
+
+    <!-- Session Duration -->
+    <div class="setting-item">
+      <div class="setting-label">
+        <span>Session Timer</span>
+        <span id="session-display">3 Min</span>
+      </div>
+      <div class="setting-control">
+        <button class="pill-btn" data-timer="120">2 min</button>
+        <button class="pill-btn active" data-timer="180">3 min</button>
+        <button class="pill-btn" data-timer="300">5 min</button>
+        <button class="pill-btn" data-timer="0">Off</button>
+      </div>
+    </div>
+
+    <!-- Audio Volume -->
+    <div class="setting-item">
+      <div class="setting-label">
+        <span>Xylophone Volume</span>
+        <span id="volume-display">70%</span>
+      </div>
+      <input type="range" class="slider-input" id="volume-slider" min="0" max="100" value="70">
+    </div>
+  </div>
+
+  <!-- Three.js CDN (r128) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <script>
+    /* ==========================================================================
+       RAINBOW CLOUD MEADOW - 3D INFANT SENSORY WEB GAME
+       Procedural 3D world, 100% Web Audio API harmonic xylophone & accordion synth,
+       Zero-allocation object pool, multi-touch Rainbow Super Bounce, and TV remote ready.
+       ========================================================================== */
+
+    (function() {
+      'use strict';
+
+      // --- CONFIGURATION & STATE ---
+      const CONFIG = {
+        sessionDuration: 180,       // 3 minutes default session
+        superBounceDuration: 2.4,   // Seconds for multi-touch Rainbow Super Meadow Bounce
+      };
+
+      const STATE = {
+        soundEnabled: true,
+        volume: 0.7,
+        theme: 'rainbow',           // 'rainbow', 'sunset', 'starlight', 'candy'
+        pace: 'playful',            // 'calm', 'playful', 'bubbly'
+        sessionTimer: 0,
+        sessionMaxTimer: 180,
+        sessionEnded: false,
+        superBounceActive: false,
+        superBounceTimer: 0,
+        noteIndex: 0,
+        bunnies: [],
+        cloudTrampolines: [],
+        hotAirBalloons: [],
+        rainbowArches: [],
+        candyProps: [],
+        particles: [],
+        lastTapTime: 0,
+        aspectRatio: window.innerWidth / window.innerHeight,
+      };
+
+      // Pace speed multipliers
+      const PACE_SETTINGS = {
+        calm: { bunnySpeed: 0.7, jumpHeight: 1.0, padRate: 0.05 },
+        playful: { bunnySpeed: 1.1, jumpHeight: 1.4, padRate: 0.08 },
+        bubbly: { bunnySpeed: 1.5, jumpHeight: 1.8, padRate: 0.12 },
+      };
+
+      // --- PROCEDURAL CANVASES & TEXTURE CACHING ---
+      const TextureGenerator = {
+        cache: new Map(),
+
+        createCanvas(w, h) {
+          const c = document.createElement('canvas');
+          c.width = w;
+          c.height = h;
+          return { canvas: c, ctx: c.getContext('2d') };
+        },
+
+        // Helper to turn canvas into a Three.js CanvasTexture with sRGBEncoding
+        toTexture(canvas, key) {
+          const tex = new THREE.CanvasTexture(canvas);
+          tex.encoding = THREE.sRGBEncoding;
+          tex.needsUpdate = true;
+          this.cache.set(key, tex);
+          return tex;
+        },
+
+        // Adorable smiling bunny face with big sparkling eyes centered for sphere projection
+        createCuteBunnyFace(bgColor = '#ffffff', blushColor = '#ffb6c1') {
+          const key = `bunny_face_${bgColor}_${blushColor}`;
+          if (this.cache.has(key)) return this.cache.get(key);
+
+          const { canvas, ctx } = this.createCanvas(256, 256);
+          ctx.fillStyle = bgColor;
+          ctx.fillRect(0, 0, 256, 256);
+
+          // Rosy blushing cheeks centered
+          ctx.fillStyle = blushColor;
+          ctx.beginPath();
+          ctx.ellipse(94, 140, 15, 10, 0, 0, Math.PI * 2);
+          ctx.ellipse(162, 140, 15, 10, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Big glossy cartoon eyes with catchlights
+          [106, 150].forEach(x => {
+            ctx.fillStyle = '#2f3542';
+            ctx.beginPath();
+            ctx.ellipse(x, 114, 14, 18, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Sparkle highlights
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(x - 4, 108, 5, 0, Math.PI * 2);
+            ctx.arc(x + 5, 120, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+          });
+
+          // Soft pink nose
+          ctx.fillStyle = '#ff7675';
+          ctx.beginPath();
+          ctx.moveTo(128, 134);
+          ctx.lineTo(122, 128);
+          ctx.quadraticCurveTo(128, 126, 134, 128);
+          ctx.closePath();
+          ctx.fill();
+
+          // Happy smiling mouth
+          ctx.strokeStyle = '#2f3542';
+          ctx.lineWidth = 3.8;
+          ctx.lineCap = 'round';
+
+          ctx.beginPath();
+          ctx.moveTo(128, 134);
+          ctx.lineTo(128, 142);
+          ctx.moveTo(128, 142);
+          ctx.quadraticCurveTo(120, 152, 110, 145);
+          ctx.moveTo(128, 142);
+          ctx.quadraticCurveTo(136, 152, 146, 145);
+          ctx.stroke();
+
+          // Cute whiskers
+          ctx.strokeStyle = 'rgba(47, 53, 66, 0.4)';
+          ctx.lineWidth = 2.2;
+          ctx.beginPath();
+          ctx.moveTo(94, 130); ctx.lineTo(68, 126);
+          ctx.moveTo(92, 138); ctx.lineTo(66, 140);
+          ctx.moveTo(162, 130); ctx.lineTo(188, 126);
+          ctx.moveTo(164, 138); ctx.lineTo(190, 140);
+          ctx.stroke();
+
+          return this.toTexture(canvas, key);
+        },
+
+        // Happy smiling sun with sparkling eyes and golden cheeks
+        createHappySunFace() {
+          const key = 'sun_face';
+          if (this.cache.has(key)) return this.cache.get(key);
+
+          const { canvas, ctx } = this.createCanvas(256, 256);
+          ctx.fillStyle = '#feca57';
+          ctx.fillRect(0, 0, 256, 256);
+
+          const grad = ctx.createRadialGradient(128, 128, 30, 128, 128, 128);
+          grad.addColorStop(0, '#ffeaa7');
+          grad.addColorStop(1, '#ff9f43');
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, 256, 256);
+
+          // Rosy cheeks
+          ctx.fillStyle = 'rgba(255, 107, 129, 0.65)';
+          ctx.beginPath();
+          ctx.ellipse(94, 138, 15, 10, 0, 0, Math.PI * 2);
+          ctx.ellipse(162, 138, 15, 10, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Cheerful open eyes with sparkles
+          [106, 150].forEach(x => {
+            ctx.fillStyle = '#2f3542';
+            ctx.beginPath();
+            ctx.arc(x, 114, 13, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(x - 4, 108, 4.5, 0, Math.PI * 2);
+            ctx.arc(x + 5, 119, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+          });
+
+          // Open joyful smiling mouth with pink tongue
+          ctx.fillStyle = '#ee5253';
+          ctx.beginPath();
+          ctx.arc(128, 136, 22, 0, Math.PI, false);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.fillStyle = '#ff9ff3';
+          ctx.beginPath();
+          ctx.arc(128, 150, 12, Math.PI, Math.PI * 2, true);
+          ctx.closePath();
+          ctx.fill();
+
+          return this.toTexture(canvas, key);
+        },
+
+        // Happy smiling cloud trampoline face
+        createCloudFace() {
+          const key = 'cloud_trampoline_face';
+          if (this.cache.has(key)) return this.cache.get(key);
+
+          const { canvas, ctx } = this.createCanvas(256, 256);
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, 256, 256);
+
+          // Cute pink cheeks
+          ctx.fillStyle = '#ffccd2';
+          ctx.beginPath();
+          ctx.ellipse(94, 138, 14, 9, 0, 0, Math.PI * 2);
+          ctx.ellipse(162, 138, 14, 9, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Cheerful eyes
+          ctx.fillStyle = '#2f3542';
+          [106, 150].forEach(x => {
+            ctx.beginPath();
+            ctx.ellipse(x, 115, 11, 14, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(x - 3, 110, 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#2f3542';
+          });
+
+          // Soft smile
+          ctx.strokeStyle = '#2f3542';
+          ctx.lineWidth = 3.5;
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.arc(128, 135, 14, 0.15 * Math.PI, 0.85 * Math.PI, false);
+          ctx.stroke();
+
+          return this.toTexture(canvas, key);
+        },
+
+        // Swirling Candy Balloon & Lollipop Texture
+        createCandySwirl(colorA = '#ff6b81', colorB = '#ffffff', numStripes = 8) {
+          const key = `swirl_${colorA}_${colorB}_${numStripes}`;
+          if (this.cache.has(key)) return this.cache.get(key);
+
+          const { canvas, ctx } = this.createCanvas(256, 256);
+          ctx.fillStyle = colorB;
+          ctx.fillRect(0, 0, 256, 256);
+
+          const stripeWidth = 256 / numStripes;
+          ctx.fillStyle = colorA;
+          for (let i = 0; i < numStripes; i += 2) {
+            ctx.fillRect(i * stripeWidth, 0, stripeWidth, 256);
+          }
+
+          return this.toTexture(canvas, key);
+        },
+
+        // Polka Dot Texture for Mushrooms, Candy Hills & Balloons
+        createPolkaDots(bgColor = '#ff7675', dotColor = '#ffffff') {
+          const key = `dots_${bgColor}_${dotColor}`;
+          if (this.cache.has(key)) return this.cache.get(key);
+
+          const { canvas, ctx } = this.createCanvas(256, 256);
+          ctx.fillStyle = bgColor;
+          ctx.fillRect(0, 0, 256, 256);
+
+          ctx.fillStyle = dotColor;
+          const spacing = 48;
+          const radius = 10;
+          for (let y = 0; y < 256; y += spacing) {
+            for (let x = 0; x < 256; x += spacing) {
+              const offsetX = (y / spacing) % 2 === 0 ? 0 : spacing / 2;
+              ctx.beginPath();
+              ctx.arc(x + offsetX, y, radius, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+
+          return this.toTexture(canvas, key);
+        },
+
+        // Glowing Star Particle Texture
+        createStarParticleTexture() {
+          const key = 'star_particle';
+          if (this.cache.has(key)) return this.cache.get(key);
+
+          const { canvas, ctx } = this.createCanvas(64, 64);
+          const cx = 32, cy = 32;
+          const grad = ctx.createRadialGradient(cx, cy, 2, cx, cy, 30);
+          grad.addColorStop(0, '#ffffff');
+          grad.addColorStop(0.35, '#feca57');
+          grad.addColorStop(0.7, 'rgba(255, 107, 129, 0.4)');
+          grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, 64, 64);
+
+          // 4-point star shape
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.moveTo(cx, 4);
+          ctx.quadraticCurveTo(cx, cy, 60, cy);
+          ctx.quadraticCurveTo(cx, cy, cx, 60);
+          ctx.quadraticCurveTo(cx, cy, 4, cy);
+          ctx.quadraticCurveTo(cx, cy, cx, 4);
+          ctx.fill();
+
+          return this.toTexture(canvas, key);
+        }
+      };
+
+      // --- WEB AUDIO API HARMONIC SYNTHESIZER ---
+      const SoundSystem = {
+        ctx: null,
+        masterGain: null,
+        compressor: null,
+        padGain: null,
+        padOscs: [],
+        padFilter: null,
+        activeVoices: 0,
+        maxPolyphony: 12,
+        initialized: false,
+
+        pentatonicScale: [
+          261.63, 293.66, 329.63, 392.00, 440.00, // C4 - A4
+          523.25, 587.33, 659.25, 783.99, 880.00, // C5 - A5
+          1046.50, 1174.66, 1318.51, 1567.98, 1760.00 // C6 - A6
+        ],
+
+        accordionChord: [174.61, 261.63, 329.63, 440.00],
+
+        init() {
+          if (this.initialized) return;
+          try {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            this.ctx = new AudioCtx();
+
+            this.compressor = this.ctx.createDynamicsCompressor();
+            this.compressor.threshold.setValueAtTime(-16, this.ctx.currentTime);
+            this.compressor.knee.setValueAtTime(25, this.ctx.currentTime);
+            this.compressor.ratio.setValueAtTime(14, this.ctx.currentTime);
+            this.compressor.attack.setValueAtTime(0.004, this.ctx.currentTime);
+            this.compressor.release.setValueAtTime(0.2, this.ctx.currentTime);
+
+            this.masterGain = this.ctx.createGain();
+            const initGain = STATE.soundEnabled ? STATE.volume : 0;
+            this.masterGain.gain.setValueAtTime(initGain, this.ctx.currentTime);
+
+            this.compressor.connect(this.masterGain);
+            this.masterGain.connect(this.ctx.destination);
+
+            this.startWarmAccordionPad();
+            this.initialized = true;
+          } catch (e) {
+            console.warn('AudioContext initialization failed:', e);
+          }
+        },
+
+        resume() {
+          if (!this.ctx) this.init();
+          if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume();
+          }
+        },
+
+        suspend() {
+          if (this.ctx && this.ctx.state === 'running') {
+            this.ctx.suspend();
+          }
+        },
+
+        setVolume(val) {
+          STATE.volume = val;
+          if (this.masterGain && this.ctx) {
+            const targetGain = STATE.soundEnabled ? STATE.volume : 0;
+            this.masterGain.gain.setTargetAtTime(targetGain, this.ctx.currentTime, 0.05);
+          }
+        },
+
+        toggleSound() {
+          STATE.soundEnabled = !STATE.soundEnabled;
+          if (this.masterGain && this.ctx) {
+            const targetGain = STATE.soundEnabled ? STATE.volume : 0;
+            this.masterGain.gain.setTargetAtTime(targetGain, this.ctx.currentTime, 0.05);
+          }
+          return STATE.soundEnabled;
+        },
+
+        startWarmAccordionPad() {
+          if (!this.ctx) return;
+          const now = this.ctx.currentTime;
+
+          this.padGain = this.ctx.createGain();
+          this.padGain.gain.setValueAtTime(0.06, now);
+
+          this.padFilter = this.ctx.createBiquadFilter();
+          this.padFilter.type = 'lowpass';
+          this.padFilter.frequency.setValueAtTime(460, now);
+          this.padFilter.Q.setValueAtTime(1.1, now);
+
+          const lfo = this.ctx.createOscillator();
+          const lfoGain = this.ctx.createGain();
+          lfo.frequency.setValueAtTime(4.2, now);
+          lfoGain.gain.setValueAtTime(4.0, now);
+          lfo.connect(lfoGain);
+          lfo.start(now);
+
+          this.accordionChord.forEach((freq, idx) => {
+            const osc = this.ctx.createOscillator();
+            osc.type = idx % 2 === 0 ? 'sawtooth' : 'triangle';
+            osc.frequency.setValueAtTime(freq, now);
+            osc.detune.setValueAtTime((idx - 1.5) * 4.5, now);
+
+            lfoGain.connect(osc.detune);
+
+            const voiceGain = this.ctx.createGain();
+            voiceGain.gain.setValueAtTime(0.18, now);
+
+            osc.connect(voiceGain);
+            voiceGain.connect(this.padFilter);
+            osc.start(now);
+            this.padOscs.push(osc);
+          });
+
+          this.padFilter.connect(this.padGain);
+          this.padGain.connect(this.compressor);
+        },
+
+        playXylophone(freqIndex = null, isSuper = false) {
+          if (!this.ctx || !STATE.soundEnabled) return;
+          this.resume();
+
+          const now = this.ctx.currentTime;
+          let noteIdx = (freqIndex !== null) ? freqIndex : STATE.noteIndex;
+          noteIdx = noteIdx % this.pentatonicScale.length;
+          const freq = this.pentatonicScale[noteIdx];
+          if (freqIndex === null) {
+            STATE.noteIndex = (STATE.noteIndex + 1) % this.pentatonicScale.length;
+          }
+
+          if (this.activeVoices >= this.maxPolyphony) return;
+          this.activeVoices++;
+
+          const osc1 = this.ctx.createOscillator();
+          osc1.type = 'sine';
+          osc1.frequency.setValueAtTime(freq, now);
+
+          const osc2 = this.ctx.createOscillator();
+          osc2.type = 'triangle';
+          osc2.frequency.setValueAtTime(freq * 3.01, now);
+
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(3200, now);
+          filter.frequency.exponentialRampToValueAtTime(450, now + 1.1);
+
+          const gainNode = this.ctx.createGain();
+          const peakGain = isSuper ? 0.26 : 0.18;
+          gainNode.gain.setValueAtTime(0.0001, now);
+          gainNode.gain.linearRampToValueAtTime(peakGain, now + 0.008);
+          gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
+
+          const osc2Gain = this.ctx.createGain();
+          osc2Gain.gain.setValueAtTime(0.35, now);
+
+          osc1.connect(gainNode);
+          osc2.connect(osc2Gain);
+          osc2Gain.connect(gainNode);
+          gainNode.connect(filter);
+          filter.connect(this.compressor);
+
+          osc1.onended = () => {
+            try {
+              osc1.disconnect();
+              osc2.disconnect();
+              osc2Gain.disconnect();
+              gainNode.disconnect();
+              filter.disconnect();
+            } catch (e) {}
+            this.activeVoices = Math.max(0, this.activeVoices - 1);
+          };
+
+          osc1.start(now);
+          osc2.start(now);
+          osc1.stop(now + 1.3);
+          osc2.stop(now + 1.3);
+        },
+
+        playKalimba(freqOffset = 0) {
+          if (!this.ctx || !STATE.soundEnabled) return;
+          this.resume();
+
+          const now = this.ctx.currentTime;
+          const idx = (STATE.noteIndex + freqOffset + this.pentatonicScale.length) % this.pentatonicScale.length;
+          const freq = this.pentatonicScale[idx];
+
+          if (this.activeVoices >= this.maxPolyphony) return;
+          this.activeVoices++;
+
+          const osc = this.ctx.createOscillator();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now);
+
+          const clickOsc = this.ctx.createOscillator();
+          clickOsc.type = 'triangle';
+          clickOsc.frequency.setValueAtTime(freq * 4.5, now);
+
+          const clickGain = this.ctx.createGain();
+          clickGain.gain.setValueAtTime(0.12, now);
+          clickGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.03);
+
+          const gain = this.ctx.createGain();
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.linearRampToValueAtTime(0.2, now + 0.012);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.5);
+
+          osc.connect(gain);
+          clickOsc.connect(clickGain);
+          clickGain.connect(gain);
+          gain.connect(this.compressor);
+
+          osc.onended = () => {
+            try {
+              osc.disconnect();
+              clickOsc.disconnect();
+              clickGain.disconnect();
+              gain.disconnect();
+            } catch (e) {}
+            this.activeVoices = Math.max(0, this.activeVoices - 1);
+          };
+
+          osc.start(now);
+          clickOsc.start(now);
+          osc.stop(now + 1.6);
+          clickOsc.stop(now + 0.05);
+        },
+
+        playTrampolineBounce() {
+          if (!this.ctx || !STATE.soundEnabled) return;
+          this.resume();
+
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          osc.type = 'sine';
+          const startPitch = 220 + Math.random() * 80;
+          osc.frequency.setValueAtTime(startPitch, now);
+          osc.frequency.exponentialRampToValueAtTime(startPitch * 1.8, now + 0.08);
+          osc.frequency.exponentialRampToValueAtTime(startPitch * 1.2, now + 0.25);
+
+          const gain = this.ctx.createGain();
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.linearRampToValueAtTime(0.19, now + 0.015);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+
+          osc.connect(gain);
+          gain.connect(this.compressor);
+
+          osc.onended = () => {
+            try { osc.disconnect(); gain.disconnect(); } catch (e) {}
+          };
+
+          osc.start(now);
+          osc.stop(now + 0.4);
+        },
+
+        playRainbowGlissando() {
+          if (!this.ctx || !STATE.soundEnabled) return;
+          this.resume();
+
+          const now = this.ctx.currentTime;
+          const count = 7;
+          for (let i = 0; i < count; i++) {
+            const scaleIdx = (STATE.noteIndex + i) % this.pentatonicScale.length;
+            const freq = this.pentatonicScale[scaleIdx];
+            const startTime = now + i * 0.065;
+
+            const osc = this.ctx.createOscillator();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, startTime);
+
+            const gain = this.ctx.createGain();
+            gain.gain.setValueAtTime(0.0001, startTime);
+            gain.gain.linearRampToValueAtTime(0.18, startTime + 0.01);
+            gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 1.2);
+
+            osc.connect(gain);
+            gain.connect(this.compressor);
+
+            osc.onended = () => {
+              try { osc.disconnect(); gain.disconnect(); } catch (e) {}
+            };
+
+            osc.start(startTime);
+            osc.stop(startTime + 1.3);
+          }
+
+          STATE.noteIndex = (STATE.noteIndex + 3) % this.pentatonicScale.length;
+        }
+      };
+
+      // --- THREE.JS SCENE, CAMERA, LIGHTS & ZERO-ALLOCATION SETUP ---
+      let scene, camera, renderer;
+      let dirLight, hemiLight, sunGroup, sunMesh, sunRaysGroup, groundPlaneMesh;
+      const raycaster = new THREE.Raycaster();
+      const mouseVec = new THREE.Vector2();
+
+      const _v1 = new THREE.Vector3();
+      const _v2 = new THREE.Vector3();
+
+      function initThree() {
+        const container = document.getElementById('canvas-container');
+
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xa8e6cf);
+        scene.fog = new THREE.FogExp2(0xa8e6cf, 0.008);
+
+        const aspect = window.innerWidth / window.innerHeight;
+        const initialFov = aspect < 1 ? 65 : 48;
+        camera = new THREE.PerspectiveCamera(initialFov, aspect, 0.1, 1000);
+        camera.position.set(0, 18, 48);
+        camera.lookAt(0, 5, -8);
+
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+        container.appendChild(renderer.domElement);
+
+        hemiLight = new THREE.HemisphereLight(0xfff8e7, 0x81ecec, 0.65);
+        hemiLight.position.set(0, 60, 0);
+        scene.add(hemiLight);
+
+        dirLight = new THREE.DirectionalLight(0xfffae6, 0.75);
+        dirLight.position.set(25, 55, 35);
+        dirLight.castShadow = true;
+        dirLight.shadow.mapSize.width = 1024;
+        dirLight.shadow.mapSize.height = 1024;
+        dirLight.shadow.camera.near = 10;
+        dirLight.shadow.camera.far = 160;
+        const d = 55;
+        dirLight.shadow.camera.left = -d;
+        dirLight.shadow.camera.right = d;
+        dirLight.shadow.camera.top = d;
+        dirLight.shadow.camera.bottom = -d;
+        dirLight.shadow.bias = -0.0005;
+        scene.add(dirLight);
+
+        buildMeadowTerrain();
+        buildSmilingSun();
+        buildRainbowArches();
+        buildCloudTrampolines();
+        buildHotAirBalloons();
+        buildCandyMeadowProps();
+        buildBunniesPool();
+        buildParticlePool();
+
+        applyTheme(STATE.theme);
+      }
+
+      function buildMeadowTerrain() {
+        const terrainGeo = new THREE.PlaneGeometry(360, 280, 48, 48);
+        terrainGeo.rotateX(-Math.PI / 2);
+
+        const pos = terrainGeo.attributes.position;
+        for (let i = 0; i < pos.count; i++) {
+          const x = pos.getX(i);
+          const z = pos.getZ(i);
+          const y = (Math.sin(x * 0.04) * 3.5 + Math.cos(z * 0.035) * 3.0 + Math.sin((x + z) * 0.02) * 2.0) - 2.5;
+          pos.setY(i, y);
+        }
+        terrainGeo.computeVertexNormals();
+
+        const terrainMat = new THREE.MeshLambertMaterial({
+          color: 0x85e3b3,
+        });
+
+        groundPlaneMesh = new THREE.Mesh(terrainGeo, terrainMat);
+        groundPlaneMesh.position.set(0, -2, -20);
+        groundPlaneMesh.receiveShadow = true;
+        scene.add(groundPlaneMesh);
+      }
+
+      function buildSmilingSun() {
+        sunGroup = new THREE.Group();
+        sunGroup.position.set(6, 35, -45);
+
+        const sunGeo = new THREE.SphereGeometry(6.5, 24, 24);
+        const sunMat = new THREE.MeshLambertMaterial({
+          color: 0xffd32a,
+          map: TextureGenerator.createHappySunFace()
+        });
+        sunMesh = new THREE.Mesh(sunGeo, sunMat);
+        sunMesh.rotation.y = -Math.PI / 2;
+        sunGroup.add(sunMesh);
+
+        sunRaysGroup = new THREE.Group();
+        const numRays = 12;
+        const rayGeo = new THREE.ConeGeometry(1.5, 5.0, 16);
+        rayGeo.rotateX(Math.PI / 2);
+        const rayMat = new THREE.MeshLambertMaterial({ color: 0xffa502 });
+
+        for (let i = 0; i < numRays; i++) {
+          const angle = (i / numRays) * Math.PI * 2;
+          const ray = new THREE.Mesh(rayGeo, rayMat);
+          ray.position.set(Math.cos(angle) * 8.8, Math.sin(angle) * 8.8, 0);
+          ray.rotation.z = angle - Math.PI / 2;
+          sunRaysGroup.add(ray);
+        }
+        sunGroup.add(sunRaysGroup);
+        scene.add(sunGroup);
+      }
+
+      function buildRainbowArches() {
+        const rainbowColors = [
+          0xff6b81,
+          0xffa502,
+          0xfed330,
+          0x2ed573,
+          0x00d2d3,
+          0x54a0ff,
+          0x9b59b6
+        ];
+
+        const archConfigs = [
+          { baseRadius: 36, tubeRadius: 0.45, x: 0, y: 0, z: -35, rotY: 0.15 },
+          { baseRadius: 48, tubeRadius: 0.55, x: -18, y: -2, z: -65, rotY: -0.25 },
+          { baseRadius: 28, tubeRadius: 0.4, x: 22, y: 0, z: -15, rotY: 0.4 },
+        ];
+
+        archConfigs.forEach((cfg, archIdx) => {
+          const archGroup = new THREE.Group();
+          archGroup.position.set(cfg.x, cfg.y, cfg.z);
+          archGroup.rotation.y = cfg.rotY;
+
+          rainbowColors.forEach((col, bandIdx) => {
+            const r = cfg.baseRadius + (bandIdx - 3) * (cfg.tubeRadius * 1.8);
+            const torusGeo = new THREE.TorusGeometry(r, cfg.tubeRadius, 12, 48, Math.PI);
+            const torusMat = new THREE.MeshLambertMaterial({
+              color: col,
+              side: THREE.DoubleSide
+            });
+            const bandMesh = new THREE.Mesh(torusGeo, torusMat);
+            archGroup.add(bandMesh);
+          });
+
+          archGroup.userData = {
+            baseY: cfg.y,
+            wobbleSpeed: 0.8 + archIdx * 0.3,
+            wobbleOffset: archIdx * 1.5,
+          };
+
+          scene.add(archGroup);
+          STATE.rainbowArches.push(archGroup);
+        });
+      }
+
+      function buildCloudTrampolines() {
+        const cloudConfigs = [
+          { x: -16, y: 3.5, z: 8, scale: 1.3 },
+          { x: 0, y: 2.8, z: 0, scale: 1.5 },
+          { x: 18, y: 3.8, z: 6, scale: 1.25 },
+          { x: -28, y: 5.0, z: -12, scale: 1.4 },
+          { x: 26, y: 5.5, z: -10, scale: 1.35 },
+          { x: -8, y: 6.8, z: -25, scale: 1.6 },
+          { x: 12, y: 7.2, z: -28, scale: 1.5 },
+          { x: 0, y: 9.0, z: -48, scale: 1.8 },
+        ];
+
+        cloudConfigs.forEach((cfg, idx) => {
+          const trampoline = createSingleCloudTrampoline(cfg.scale);
+          trampoline.position.set(cfg.x, cfg.y, cfg.z);
+          trampoline.userData = {
+            baseY: cfg.y,
+            scale: cfg.scale,
+            squish: 1.0,
+            squishVelocity: 0,
+            bobSpeed: 1.0 + Math.random() * 0.6,
+            bobOffset: idx * 0.8,
+            id: idx
+          };
+          scene.add(trampoline);
+          STATE.cloudTrampolines.push(trampoline);
+        });
+      }
+
+      function createSingleCloudTrampoline(scale = 1.0) {
+        const group = new THREE.Group();
+        const cloudMat = new THREE.MeshLambertMaterial({
+          color: 0xffffff,
+          transparent: true,
+          opacity: 0.98
+        });
+
+        const puffSpecs = [
+          { r: 3.2, x: 0, y: 0, z: 0 },
+          { r: 2.6, x: -2.6, y: -0.3, z: 0.3 },
+          { r: 2.6, x: 2.6, y: -0.3, z: -0.3 },
+          { r: 2.2, x: -4.4, y: -0.6, z: 0 },
+          { r: 2.2, x: 4.4, y: -0.6, z: 0 },
+          { r: 2.4, x: 0, y: 1.5, z: 0.2 },
+        ];
+
+        puffSpecs.forEach((p, idx) => {
+          const geo = new THREE.SphereGeometry(p.r, 16, 16);
+          let mat = cloudMat;
+          // Put cute smiling face on front center puff
+          if (idx === 0) {
+            mat = new THREE.MeshLambertMaterial({
+              color: 0xffffff,
+              map: TextureGenerator.createCloudFace(),
+              transparent: true,
+              opacity: 0.98
+            });
+          }
+          const puff = new THREE.Mesh(geo, mat);
+          puff.position.set(p.x, p.y, p.z);
+          if (idx === 0) puff.rotation.y = -Math.PI / 2;
+          puff.castShadow = true;
+          puff.receiveShadow = true;
+          group.add(puff);
+        });
+
+        // Top Bouncy Trampoline Disk
+        const topGeo = new THREE.CylinderGeometry(3.6, 3.8, 0.6, 24);
+        const topMat = new THREE.MeshLambertMaterial({
+          color: 0xffffff,
+          map: TextureGenerator.createPolkaDots('#ffffff', '#ffccd2')
+        });
+        const topDisk = new THREE.Mesh(topGeo, topMat);
+        topDisk.position.y = 1.6;
+        group.add(topDisk);
+
+        group.scale.set(scale, scale * 0.75, scale);
+        return group;
+      }
+
+      function buildHotAirBalloons() {
+        const balloonGroup = new THREE.Group();
+        const colors = [
+          ['#ff7675', '#ffffff'],
+          ['#74b9ff', '#ffffff'],
+          ['#55efc4', '#ffffff'],
+          ['#feca57', '#ff6b81'],
+          ['#a29bfe', '#ffeaa7'],
+        ];
+
+        for (let i = 0; i < 5; i++) {
+          const pair = colors[i % colors.length];
+          const balloon = createSingleBalloon(pair[0], pair[1]);
+          const side = (i % 2 === 0 ? 1 : -1);
+          balloon.position.set(
+            side * (24 + i * 8),
+            20 + i * 4.5,
+            -20 - i * 18
+          );
+          balloon.userData = {
+            baseY: balloon.position.y,
+            bobSpeed: 0.8 + Math.random() * 0.4,
+            bobOffset: i * 1.2,
+            targetExtraY: 0,
+            extraY: 0,
+          };
+          balloonGroup.add(balloon);
+          STATE.hotAirBalloons.push(balloon);
+        }
+
+        scene.add(balloonGroup);
+      }
+
+      function createSingleBalloon(colorA, colorB) {
+        const group = new THREE.Group();
+        const bodyGeo = new THREE.SphereGeometry(3.8, 20, 20);
+        const bodyMat = new THREE.MeshLambertMaterial({
+          map: TextureGenerator.createCandySwirl(colorA, colorB, 8)
+        });
+        const body = new THREE.Mesh(bodyGeo, bodyMat);
+        body.position.y = 5.2;
+        body.scale.set(1, 1.28, 1);
+        body.castShadow = true;
+        group.add(body);
+
+        const flagGeo = new THREE.ConeGeometry(0.5, 1.2, 8);
+        const flagMat = new THREE.MeshLambertMaterial({ color: 0xffd32a });
+        const flag = new THREE.Mesh(flagGeo, flagMat);
+        flag.position.y = 10.2;
+        group.add(flag);
+
+        const basketGeo = new THREE.BoxGeometry(1.5, 1.3, 1.5);
+        const basketMat = new THREE.MeshLambertMaterial({ color: 0xcd853f });
+        const basket = new THREE.Mesh(basketGeo, basketMat);
+        basket.position.y = 1;
+        basket.castShadow = true;
+        group.add(basket);
+
+        const ropeGeo = new THREE.CylinderGeometry(0.05, 0.05, 2.4, 6);
+        const ropeMat = new THREE.MeshBasicMaterial({ color: 0x8b4513 });
+        [[-0.55, -0.55], [0.55, -0.55], [-0.55, 0.55], [0.55, 0.55]].forEach(([rx, rz]) => {
+          const rope = new THREE.Mesh(ropeGeo, ropeMat);
+          rope.position.set(rx, 2.2, rz);
+          group.add(rope);
+        });
+
+        group.scale.setScalar(0.95);
+        return group;
+      }
+
+      function buildCandyMeadowProps() {
+        const propGroup = new THREE.Group();
+        const propCount = 28;
+
+        for (let i = 0; i < propCount; i++) {
+          const prop = spawnRandomMeadowProp();
+          const angle = Math.random() * Math.PI * 2;
+          const dist = 18 + Math.random() * 65;
+          const x = Math.cos(angle) * dist;
+          const z = Math.sin(angle) * (dist * 0.75) - 15;
+          prop.position.set(x, 0, z);
+          propGroup.add(prop);
+          STATE.candyProps.push(prop);
+        }
+
+        scene.add(propGroup);
+      }
+
+      function spawnRandomMeadowProp() {
+        const types = ['pinwheel', 'mushroom', 'lollipop', 'starFlower'];
+        const type = types[Math.floor(Math.random() * types.length)];
+        const group = new THREE.Group();
+
+        if (type === 'pinwheel') {
+          const stemGeo = new THREE.CylinderGeometry(0.18, 0.2, 4.5, 8);
+          const stemMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+          const stem = new THREE.Mesh(stemGeo, stemMat);
+          stem.position.y = 2.25;
+          stem.castShadow = true;
+          group.add(stem);
+
+          const bladePivot = new THREE.Group();
+          bladePivot.position.y = 4.4;
+          const bladeColors = [0xff6b81, 0xfeca57, 0x54a0ff, 0x1dd1a1];
+          for (let b = 0; b < 4; b++) {
+            const bladeGeo = new THREE.ConeGeometry(0.9, 2.4, 4);
+            const bladeMat = new THREE.MeshLambertMaterial({ color: bladeColors[b] });
+            const blade = new THREE.Mesh(bladeGeo, bladeMat);
+            blade.rotation.z = (b * Math.PI) / 2;
+            blade.position.set(
+              Math.cos(blade.rotation.z) * 1.2,
+              Math.sin(blade.rotation.z) * 1.2,
+              0
+            );
+            bladePivot.add(blade);
+          }
+          group.add(bladePivot);
+          group.userData.bladePivot = bladePivot;
+
+        } else if (type === 'mushroom') {
+          const stemGeo = new THREE.CylinderGeometry(0.6, 0.9, 2.2, 14);
+          const stemMat = new THREE.MeshLambertMaterial({ color: 0xfff2cc });
+          const stem = new THREE.Mesh(stemGeo, stemMat);
+          stem.position.y = 1.1;
+          stem.castShadow = true;
+          group.add(stem);
+
+          const capGeo = new THREE.SphereGeometry(1.8, 16, 16, 0, Math.PI * 2, 0, Math.PI * 0.5);
+          const capColors = ['#ff6b81', '#ff9ff3', '#54a0ff', '#feca57'];
+          const capColor = capColors[Math.floor(Math.random() * capColors.length)];
+          const capMat = new THREE.MeshLambertMaterial({
+            color: capColor,
+            map: TextureGenerator.createPolkaDots(capColor, '#ffffff'),
+          });
+          const cap = new THREE.Mesh(capGeo, capMat);
+          cap.position.y = 1.9;
+          cap.castShadow = true;
+          group.add(cap);
+
+        } else if (type === 'lollipop') {
+          const stickGeo = new THREE.CylinderGeometry(0.18, 0.18, 5, 8);
+          const stickMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+          const stick = new THREE.Mesh(stickGeo, stickMat);
+          stick.position.y = 2.5;
+          group.add(stick);
+
+          const headGeo = new THREE.CylinderGeometry(1.8, 1.8, 0.5, 24);
+          headGeo.rotateX(Math.PI / 2);
+          const headMat = new THREE.MeshLambertMaterial({
+            map: TextureGenerator.createCandySwirl('#ff6b81', '#feca57', 6)
+          });
+          const head = new THREE.Mesh(headGeo, headMat);
+          head.position.y = 4.8;
+          head.castShadow = true;
+          group.add(head);
+
+        } else {
+          const stalkGeo = new THREE.CylinderGeometry(0.16, 0.2, 3.5, 8);
+          const stalkMat = new THREE.MeshLambertMaterial({ color: 0x2ed573 });
+          const stalk = new THREE.Mesh(stalkGeo, stalkMat);
+          stalk.position.y = 1.75;
+          group.add(stalk);
+
+          const starHeadGeo = new THREE.SphereGeometry(1.4, 16, 16);
+          const starHeadMat = new THREE.MeshLambertMaterial({
+            color: 0xffd32a,
+            map: TextureGenerator.createHappySunFace()
+          });
+          const starHead = new THREE.Mesh(starHeadGeo, starHeadMat);
+          starHead.position.y = 3.4;
+          starHead.rotation.y = -Math.PI / 2;
+          group.add(starHead);
+        }
+
+        group.userData.propType = type;
+        group.userData.wobbleSpeed = 1.5 + Math.random() * 2;
+        group.userData.wobbleOffset = Math.random() * Math.PI * 2;
+
+        return group;
+      }
+
+      function buildBunniesPool() {
+        const bunnyColors = [
+          { name: 'Snowy', body: '#ffffff', blush: '#ffb6c1' },
+          { name: 'Buttercup', body: '#fff9e6', blush: '#feca57' },
+          { name: 'Lavender', body: '#f3e5f5', blush: '#ba68c8' },
+          { name: 'Strawberry', body: '#ffebee', blush: '#ff7675' },
+          { name: 'Minty', body: '#e8f5e9', blush: '#81c784' },
+          { name: 'Sky', body: '#e1f5fe', blush: '#4fc3f7' },
+        ];
+
+        const numBunnies = 6;
+        for (let i = 0; i < numBunnies; i++) {
+          const cfg = bunnyColors[i % bunnyColors.length];
+          const bunny = createSingleBunny(cfg.body, cfg.blush);
+
+          const startCloud = STATE.cloudTrampolines[i % STATE.cloudTrampolines.length];
+          const targetCloud = STATE.cloudTrampolines[(i + 1) % STATE.cloudTrampolines.length];
+
+          bunny.position.set(startCloud.position.x, startCloud.position.y + 1.8, startCloud.position.z);
+          bunny.userData = {
+            currentCloudIdx: i % STATE.cloudTrampolines.length,
+            targetCloudIdx: (i + 1) % STATE.cloudTrampolines.length,
+            startX: startCloud.position.x,
+            startY: startCloud.position.y + 1.8,
+            startZ: startCloud.position.z,
+            targetX: targetCloud.position.x,
+            targetY: targetCloud.position.y + 1.8,
+            targetZ: targetCloud.position.z,
+            hopProgress: Math.random(),
+            hopSpeed: 0.6 + Math.random() * 0.4,
+            jumpPeakHeight: 7.5 + Math.random() * 4.0,
+            superJumping: false,
+            leftEar: bunny.userData.leftEar,
+            rightEar: bunny.userData.rightEar,
+            bodyMesh: bunny.userData.bodyMesh,
+          };
+
+          scene.add(bunny);
+          STATE.bunnies.push(bunny);
+        }
+      }
+
+      function createSingleBunny(bodyColor = '#ffffff', blushColor = '#ffb6c1') {
+        const bunnyGroup = new THREE.Group();
+        const mainMat = new THREE.MeshLambertMaterial({ color: new THREE.Color(bodyColor) });
+        const pinkInnerMat = new THREE.MeshLambertMaterial({ color: 0xffb6c1 });
+
+        const headGeo = new THREE.SphereGeometry(1.6, 20, 20);
+        const headMat = new THREE.MeshLambertMaterial({
+          color: new THREE.Color(bodyColor),
+          map: TextureGenerator.createCuteBunnyFace(bodyColor, blushColor)
+        });
+        const head = new THREE.Mesh(headGeo, headMat);
+        head.position.set(0, 2.6, 0.4);
+        head.rotation.y = -Math.PI / 2;
+        head.castShadow = true;
+        bunnyGroup.add(head);
+
+        const bodyGeo = new THREE.SphereGeometry(1.9, 20, 20);
+        const body = new THREE.Mesh(bodyGeo, mainMat);
+        body.position.set(0, 1.4, -0.2);
+        body.scale.set(0.9, 1.05, 1.15);
+        body.castShadow = true;
+        bunnyGroup.add(body);
+
+        const earGeo = new THREE.CylinderGeometry(0.32, 0.52, 2.6, 12);
+        const leftEar = new THREE.Mesh(earGeo, mainMat);
+        leftEar.position.set(-0.65, 4.4, 0.1);
+        leftEar.rotation.set(-0.25, 0, -0.2);
+        leftEar.castShadow = true;
+        bunnyGroup.add(leftEar);
+
+        const rightEar = new THREE.Mesh(earGeo, mainMat);
+        rightEar.position.set(0.65, 4.4, 0.1);
+        rightEar.rotation.set(-0.25, 0, 0.2);
+        rightEar.castShadow = true;
+        bunnyGroup.add(rightEar);
+
+        const innerEarGeo = new THREE.CylinderGeometry(0.18, 0.28, 2.2, 8);
+        const leftInner = new THREE.Mesh(innerEarGeo, pinkInnerMat);
+        leftInner.position.set(0, 0, 0.15);
+        leftEar.add(leftInner);
+
+        const rightInner = new THREE.Mesh(innerEarGeo, pinkInnerMat);
+        rightInner.position.set(0, 0, 0.15);
+        rightEar.add(rightInner);
+
+        const tailGeo = new THREE.SphereGeometry(0.7, 14, 14);
+        const tail = new THREE.Mesh(tailGeo, mainMat);
+        tail.position.set(0, 1.2, -1.5);
+        bunnyGroup.add(tail);
+
+        [[-0.75, 0.4, 0.7], [0.75, 0.4, 0.7], [-0.85, 0.3, -0.7], [0.85, 0.3, -0.7]].forEach(([px, py, pz]) => {
+          const pawGeo = new THREE.SphereGeometry(0.5, 12, 12);
+          const paw = new THREE.Mesh(pawGeo, mainMat);
+          paw.position.set(px, py, pz);
+          paw.scale.set(0.8, 0.6, 1.1);
+          bunnyGroup.add(paw);
+        });
+
+        bunnyGroup.userData = {
+          leftEar: leftEar,
+          rightEar: rightEar,
+          bodyMesh: body,
+        };
+
+        bunnyGroup.scale.setScalar(1.05);
+        return bunnyGroup;
+      }
+
+      function buildParticlePool() {
+        const poolSize = 150;
+        const starMat = new THREE.SpriteMaterial({
+          map: TextureGenerator.createStarParticleTexture(),
+          transparent: true,
+          blending: THREE.AdditiveBlending
+        });
+
+        const puffMat = new THREE.MeshLambertMaterial({
+          color: 0xffffff,
+          transparent: true,
+          opacity: 0.85
+        });
+        const puffGeo = new THREE.SphereGeometry(1.0, 10, 10);
+
+        for (let i = 0; i < poolSize; i++) {
+          let mesh;
+          const isSprite = i % 2 === 0;
+          if (isSprite) {
+            mesh = new THREE.Sprite(starMat);
+            mesh.scale.set(2.4, 2.4, 1);
+          } else {
+            mesh = new THREE.Mesh(puffGeo, puffMat.clone());
+          }
+
+          mesh.visible = false;
+          mesh.userData = {
+            active: false,
+            life: 0,
+            maxLife: 1.0,
+            vx: 0,
+            vy: 0,
+            vz: 0,
+            rotSpeed: 0,
+            baseScale: isSprite ? 2.4 : 1.0,
+            isSprite: isSprite
+          };
+
+          scene.add(mesh);
+          STATE.particles.push(mesh);
+        }
+      }
+
+      function spawnBurstParticles(originX, originY, originZ, count = 12, isRainbow = false) {
+        let spawned = 0;
+        const rainbowColors = [0xff6b81, 0xffa502, 0xfed330, 0x2ed573, 0x1e90ff, 0x9b59b6];
+
+        for (let i = 0; i < STATE.particles.length && spawned < count; i++) {
+          const p = STATE.particles[i];
+          if (!p.userData.active) {
+            p.userData.active = true;
+            p.visible = true;
+            p.position.set(
+              originX + (Math.random() - 0.5) * 1.5,
+              originY + (Math.random() - 0.5) * 1.0,
+              originZ + (Math.random() - 0.5) * 1.5
+            );
+
+            const speed = 6 + Math.random() * 10;
+            const angle = Math.random() * Math.PI * 2;
+            const elevation = 0.3 + Math.random() * 0.9;
+
+            p.userData.vx = Math.cos(angle) * speed * (1 - elevation);
+            p.userData.vy = speed * elevation + 2;
+            p.userData.vz = Math.sin(angle) * speed * (1 - elevation);
+            p.userData.life = 0;
+            p.userData.maxLife = 0.8 + Math.random() * 0.8;
+            p.userData.rotSpeed = (Math.random() - 0.5) * 8;
+
+            if (!p.userData.isSprite) {
+              const col = isRainbow ? rainbowColors[spawned % rainbowColors.length] : 0xffffff;
+              p.material.color.setHex(col);
+              p.material.opacity = 0.9;
+            }
+
+            spawned++;
+          }
+        }
+      }
+
+      function applyTheme(themeName) {
+        STATE.theme = themeName;
+        const themeBtn = document.querySelector(`.pill-btn[data-theme="${themeName}"]`);
+        if (themeBtn) {
+          document.querySelectorAll('.pill-btn[data-theme]').forEach(b => b.classList.remove('active'));
+          themeBtn.classList.add('active');
+        }
+
+        const display = document.getElementById('theme-display');
+
+        if (themeName === 'rainbow') {
+          if (display) display.textContent = 'Rainbow Day';
+          scene.background.setHex(0xa8e6cf);
+          scene.fog.color.setHex(0xa8e6cf);
+          hemiLight.color.setHex(0xfff8e7);
+          hemiLight.groundColor.setHex(0x81ecec);
+          dirLight.color.setHex(0xfffae6);
+          if (groundPlaneMesh) groundPlaneMesh.material.color.setHex(0x85e3b3);
+        } else if (themeName === 'sunset') {
+          if (display) display.textContent = 'Sunset Candy';
+          scene.background.setHex(0xffd1dc);
+          scene.fog.color.setHex(0xffd1dc);
+          hemiLight.color.setHex(0xffeaa7);
+          hemiLight.groundColor.setHex(0xfd79a8);
+          dirLight.color.setHex(0xff7675);
+          if (groundPlaneMesh) groundPlaneMesh.material.color.setHex(0xfbc531);
+        } else if (themeName === 'starlight') {
+          if (display) display.textContent = 'Starry Dream';
+          scene.background.setHex(0x1a1548);
+          scene.fog.color.setHex(0x1a1548);
+          hemiLight.color.setHex(0xa29bfe);
+          hemiLight.groundColor.setHex(0x2f3542);
+          dirLight.color.setHex(0x70a1ff);
+          if (groundPlaneMesh) groundPlaneMesh.material.color.setHex(0x341f97);
+        } else if (themeName === 'candy') {
+          if (display) display.textContent = 'Cotton Candy';
+          scene.background.setHex(0xfecfef);
+          scene.fog.color.setHex(0xfecfef);
+          hemiLight.color.setHex(0xffffff);
+          hemiLight.groundColor.setHex(0x81ecec);
+          dirLight.color.setHex(0xff9ff3);
+          if (groundPlaneMesh) groundPlaneMesh.material.color.setHex(0x55efc4);
+        }
+      }
+
+      function triggerRainbowSuperBounce(originX = 0, originY = 8, originZ = 0) {
+        STATE.superBounceActive = true;
+        STATE.superBounceTimer = CONFIG.superBounceDuration;
+
+        const overlay = document.getElementById('super-bounce-overlay');
+        if (overlay) overlay.classList.add('active');
+
+        SoundSystem.playRainbowGlissando();
+        spawnBurstParticles(originX, originY, originZ, 36, true);
+
+        STATE.bunnies.forEach(bunny => {
+          bunny.userData.superJumping = true;
+          bunny.userData.hopProgress = 0;
+          bunny.userData.jumpPeakHeight = 16.0 + Math.random() * 4.0;
+        });
+
+        STATE.cloudTrampolines.forEach(cloud => {
+          cloud.userData.squish = 0.45;
+          cloud.userData.squishVelocity = 4.5;
+        });
+
+        STATE.hotAirBalloons.forEach(balloon => {
+          balloon.userData.targetExtraY = 8.0;
+        });
+      }
+
+      function handleInteraction(clientX, clientY, isMultiTouch = false) {
+        SoundSystem.resume();
+
+        const prompt = document.getElementById('prompt-banner');
+        if (prompt && !prompt.classList.contains('hidden')) {
+          prompt.classList.add('hidden');
+        }
+
+        if (isMultiTouch) {
+          triggerRainbowSuperBounce(0, 10, 0);
+          return;
+        }
+
+        mouseVec.x = (clientX / window.innerWidth) * 2 - 1;
+        mouseVec.y = -(clientY / window.innerHeight) * 2 + 1;
+
+        raycaster.setFromCamera(mouseVec, camera);
+
+        const hitObjects = [];
+        STATE.bunnies.forEach(b => hitObjects.push(b));
+        STATE.cloudTrampolines.forEach(c => hitObjects.push(c));
+        STATE.hotAirBalloons.forEach(b => hitObjects.push(b));
+        if (sunMesh) hitObjects.push(sunMesh);
+
+        const intersects = raycaster.intersectObjects(hitObjects, true);
+
+        if (intersects.length > 0) {
+          const hit = intersects[0];
+          const hitPos = hit.point;
+
+          let hitCloud = null;
+          STATE.cloudTrampolines.forEach(c => {
+            if (c.children.includes(hit.object) || c === hit.object) hitCloud = c;
+          });
+
+          if (hitCloud) {
+            hitCloud.userData.squish = 0.5;
+            hitCloud.userData.squishVelocity = 3.5;
+            SoundSystem.playTrampolineBounce();
+            SoundSystem.playXylophone();
+            spawnBurstParticles(hitPos.x, hitPos.y + 1, hitPos.z, 14, true);
+            return;
+          }
+
+          let hitBunny = null;
+          STATE.bunnies.forEach(b => {
+            if (b.children.includes(hit.object) || b === hit.object) hitBunny = b;
+          });
+
+          if (hitBunny) {
+            hitBunny.userData.superJumping = true;
+            hitBunny.userData.hopProgress = 0;
+            hitBunny.userData.jumpPeakHeight = 14.0;
+            SoundSystem.playKalimba(2);
+            SoundSystem.playXylophone();
+            spawnBurstParticles(hitPos.x, hitPos.y + 2, hitPos.z, 16, true);
+            return;
+          }
+
+          let hitBalloon = null;
+          STATE.hotAirBalloons.forEach(b => {
+            if (b.children.includes(hit.object) || b === hit.object) hitBalloon = b;
+          });
+
+          if (hitBalloon) {
+            hitBalloon.userData.targetExtraY = 6.0;
+            SoundSystem.playKalimba(4);
+            spawnBurstParticles(hitPos.x, hitPos.y + 3, hitPos.z, 12, true);
+            return;
+          }
+
+          SoundSystem.playXylophone();
+          spawnBurstParticles(hitPos.x, hitPos.y + 1, hitPos.z, 12, true);
+        } else {
+          SoundSystem.playXylophone();
+          SoundSystem.playKalimba();
+
+          _v1.set(mouseVec.x, mouseVec.y, 0.5);
+          _v1.unproject(camera);
+          _v1.sub(camera.position).normalize();
+          const dist = 35;
+          _v2.copy(camera.position).add(_v1.multiplyScalar(dist));
+          spawnBurstParticles(_v2.x, _v2.y, _v2.z, 10, true);
+        }
+      }
+
+      function initEventListeners() {
+        const container = document.getElementById('canvas-container');
+
+        document.addEventListener('contextmenu', e => e.preventDefault());
+
+        container.addEventListener('pointerdown', e => {
+          if (e.pointerType === 'mouse' && e.button !== 0) return;
+          handleInteraction(e.clientX, e.clientY, false);
+        });
+
+        window.addEventListener('touchstart', e => {
+          if (e.touches.length >= 2) {
+            e.preventDefault();
+            triggerRainbowSuperBounce(0, 8, 0);
+          }
+        }, { passive: false });
+
+        document.querySelectorAll('.floating-screen-bubble').forEach(bubble => {
+          bubble.addEventListener('click', (e) => {
+            e.stopPropagation();
+            SoundSystem.playKalimba(3);
+            SoundSystem.playXylophone();
+            triggerRainbowSuperBounce(0, 10, 0);
+          });
+        });
+
+        window.addEventListener('keydown', e => {
+          const key = e.key;
+          const code = e.keyCode;
+
+          if (
+            key === 'Escape' ||
+            key === 'Back' ||
+            key === 'GoBack' ||
+            code === 10009 ||
+            code === 461 ||
+            code === 4 ||
+            code === 8
+          ) {
+            e.preventDefault();
+            window.location.href = '../../index.html';
+            return;
+          }
+
+          SoundSystem.resume();
+          const prompt = document.getElementById('prompt-banner');
+          if (prompt && !prompt.classList.contains('hidden')) {
+            prompt.classList.add('hidden');
+          }
+
+          if (key === ' ' || key === 'Enter' || code === 13 || code === 32) {
+            triggerRainbowSuperBounce(0, 10, 0);
+          } else {
+            SoundSystem.playXylophone();
+            const randomBunny = STATE.bunnies[Math.floor(Math.random() * STATE.bunnies.length)];
+            if (randomBunny) {
+              randomBunny.userData.superJumping = true;
+              randomBunny.userData.hopProgress = 0;
+            }
+            spawnBurstParticles((Math.random() - 0.5) * 20, 6, (Math.random() - 0.5) * 20, 12, true);
+          }
+        });
+
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden) {
+            SoundSystem.suspend();
+          } else {
+            SoundSystem.resume();
+            SoundSystem.playKalimba(0);
+          }
+        });
+
+        window.addEventListener('blur', () => SoundSystem.suspend());
+        window.addEventListener('focus', () => SoundSystem.resume());
+
+        window.addEventListener('resize', onWindowResize);
+
+        setupUiControls();
+      }
+
+      function onWindowResize() {
+        if (!camera || !renderer) return;
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const aspect = width / height;
+        STATE.aspectRatio = aspect;
+
+        camera.aspect = aspect;
+        if (aspect < 1.0) {
+          camera.fov = 68;
+          camera.position.set(0, 22, 54);
+        } else if (aspect >= 2.0) {
+          camera.fov = 44;
+          camera.position.set(0, 16, 44);
+        } else {
+          camera.fov = 48;
+          camera.position.set(0, 18, 48);
+        }
+
+        camera.updateProjectionMatrix();
+        renderer.setSize(width, height);
+      }
+
+      function setupUiControls() {
+        const btnSound = document.getElementById('btn-sound');
+        const soundIcon = document.getElementById('sound-icon');
+        if (btnSound) {
+          btnSound.addEventListener('click', () => {
+            const enabled = SoundSystem.toggleSound();
+            if (soundIcon) soundIcon.textContent = enabled ? '🔊' : '🔇';
+            btnSound.blur();
+          });
+        }
+
+        const btnFullscreen = document.getElementById('btn-fullscreen');
+        if (btnFullscreen) {
+          btnFullscreen.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+              document.documentElement.requestFullscreen().catch(() => {});
+            } else {
+              if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+            }
+            btnFullscreen.blur();
+          });
+        }
+
+        const btnSettings = document.getElementById('btn-settings');
+        const btnCloseSettings = document.getElementById('btn-close-settings');
+        const settingsPanel = document.getElementById('settings-panel');
+
+        if (btnSettings && settingsPanel) {
+          btnSettings.addEventListener('click', () => {
+            settingsPanel.classList.toggle('collapsed');
+            btnSettings.blur();
+          });
+        }
+        if (btnCloseSettings && settingsPanel) {
+          btnCloseSettings.addEventListener('click', () => {
+            settingsPanel.classList.add('collapsed');
+            btnCloseSettings.blur();
+          });
+        }
+
+        document.querySelectorAll('.pill-btn[data-theme]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const t = btn.getAttribute('data-theme');
+            applyTheme(t);
+            btn.blur();
+          });
+        });
+
+        document.querySelectorAll('.pill-btn[data-pace]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const p = btn.getAttribute('data-pace');
+            STATE.pace = p;
+            document.querySelectorAll('.pill-btn[data-pace]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const paceDisp = document.getElementById('pace-display');
+            if (paceDisp) paceDisp.textContent = btn.textContent;
+            btn.blur();
+          });
+        });
+
+        document.querySelectorAll('.pill-btn[data-timer]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const sec = parseInt(btn.getAttribute('data-timer'), 10);
+            STATE.sessionMaxTimer = sec;
+            STATE.sessionTimer = 0;
+            STATE.sessionEnded = false;
+            document.querySelectorAll('.pill-btn[data-timer]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const sessionDisp = document.getElementById('session-display');
+            if (sessionDisp) sessionDisp.textContent = btn.textContent;
+            btn.blur();
+          });
+        });
+
+        const volSlider = document.getElementById('volume-slider');
+        const volDisplay = document.getElementById('volume-display');
+        if (volSlider) {
+          volSlider.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value) / 100;
+            SoundSystem.setVolume(val);
+            if (volDisplay) volDisplay.textContent = `${Math.round(val * 100)}%`;
+          });
+        }
+
+        const promptBanner = document.getElementById('prompt-banner');
+        if (promptBanner) {
+          promptBanner.addEventListener('click', () => {
+            triggerRainbowSuperBounce(0, 10, 0);
+            promptBanner.classList.add('hidden');
+          });
+        }
+      }
+
+      // --- ANIMATION LOOP (ZERO ALLOCATION) ---
+      let lastTimestamp = performance.now();
+
+      function animate(now) {
+        requestAnimationFrame(animate);
+
+        const delta = Math.min((now - lastTimestamp) / 1000, 0.1);
+        lastTimestamp = now;
+
+        const paceMultiplier = PACE_SETTINGS[STATE.pace] || PACE_SETTINGS.playful;
+
+        // 1. Sun Rays Rotation & Pulse
+        if (sunRaysGroup) {
+          sunRaysGroup.rotation.z += delta * 0.45;
+        }
+        if (sunMesh) {
+          sunMesh.rotation.y = -Math.PI / 2 + Math.sin(now * 0.001) * 0.15;
+        }
+
+        // 2. Super Bounce Timer
+        if (STATE.superBounceActive) {
+          STATE.superBounceTimer -= delta;
+          if (STATE.superBounceTimer <= 0) {
+            STATE.superBounceActive = false;
+            const overlay = document.getElementById('super-bounce-overlay');
+            if (overlay) overlay.classList.remove('active');
+          }
+        }
+
+        // 3. Cloud Trampoline Bounce & Squish Spring Physics
+        STATE.cloudTrampolines.forEach(cloud => {
+          const u = cloud.userData;
+          const squishForce = (1.0 - u.squish) * 18.0;
+          u.squishVelocity += (squishForce - u.squishVelocity * 4.5) * delta;
+          u.squish += u.squishVelocity * delta;
+
+          const bob = Math.sin(now * 0.0018 * u.bobSpeed + u.bobOffset) * 0.5;
+          cloud.position.y = u.baseY + bob;
+          cloud.scale.set(u.scale, u.scale * 0.75 * u.squish, u.scale);
+        });
+
+        // 4. Friendly Bunny Hopping Physics
+        STATE.bunnies.forEach(bunny => {
+          const u = bunny.userData;
+          const speed = u.hopSpeed * paceMultiplier.bunnySpeed;
+          u.hopProgress += delta * speed;
+
+          if (u.hopProgress >= 1.0) {
+            u.hopProgress = 0;
+            u.superJumping = false;
+
+            u.currentCloudIdx = u.targetCloudIdx;
+            u.targetCloudIdx = (u.targetCloudIdx + 1 + Math.floor(Math.random() * 2)) % STATE.cloudTrampolines.length;
+
+            const cStart = STATE.cloudTrampolines[u.currentCloudIdx];
+            const cTarget = STATE.cloudTrampolines[u.targetCloudIdx];
+
+            u.startX = cStart.position.x;
+            u.startY = cStart.position.y + 1.8;
+            u.startZ = cStart.position.z;
+
+            u.targetX = cTarget.position.x;
+            u.targetY = cTarget.position.y + 1.8;
+            u.targetZ = cTarget.position.z;
+
+            cStart.userData.squish = 0.6;
+            cStart.userData.squishVelocity = 3.2;
+            SoundSystem.playTrampolineBounce();
+            SoundSystem.playXylophone();
+            spawnBurstParticles(u.startX, u.startY, u.startZ, 8, false);
+          }
+
+          const p = u.hopProgress;
+          const arc = Math.sin(p * Math.PI);
+          const currentX = u.startX + (u.targetX - u.startX) * p;
+          const currentZ = u.startZ + (u.targetZ - u.startZ) * p;
+          const baseLerpY = u.startY + (u.targetY - u.startY) * p;
+          const peak = u.superJumping ? u.jumpPeakHeight : (u.jumpPeakHeight * paceMultiplier.jumpHeight);
+          const currentY = baseLerpY + arc * peak;
+
+          bunny.position.set(currentX, currentY, currentZ);
+
+          const dx = u.targetX - u.startX;
+          const dz = u.targetZ - u.startZ;
+          const targetHeading = Math.atan2(dx, dz);
+          bunny.rotation.y = targetHeading;
+
+          if (p < 0.15 || p > 0.85) {
+            bunny.scale.set(1.2, 0.75, 1.2);
+          } else {
+            bunny.scale.set(0.9, 1.3, 0.9);
+          }
+
+          if (u.superJumping) {
+            bunny.rotation.x = p * Math.PI * 2;
+          } else {
+            bunny.rotation.x = Math.sin(p * Math.PI) * 0.4;
+          }
+
+          if (u.leftEar && u.rightEar) {
+            u.leftEar.rotation.x = -0.25 + Math.sin(now * 0.01 + bunny.id) * 0.2;
+            u.rightEar.rotation.x = -0.25 + Math.cos(now * 0.01 + bunny.id) * 0.2;
+          }
+        });
+
+        // 5. Hot-Air Balloons Bobbing & Drifting
+        STATE.hotAirBalloons.forEach(balloon => {
+          const u = balloon.userData;
+          u.extraY += (u.targetExtraY - u.extraY) * delta * 2.0;
+          u.targetExtraY += (0 - u.targetExtraY) * delta * 0.8;
+
+          const bob = Math.sin(now * 0.0014 * u.bobSpeed + u.bobOffset) * 1.5;
+          balloon.position.y = u.baseY + bob + u.extraY;
+          balloon.rotation.y += delta * 0.2;
+        });
+
+        // 6. Rainbow Arches Shimmer
+        STATE.rainbowArches.forEach(arch => {
+          const u = arch.userData;
+          const wobble = Math.sin(now * 0.0012 * u.wobbleSpeed + u.wobbleOffset) * 0.6;
+          arch.position.y = u.baseY + wobble;
+        });
+
+        // 7. Candy Meadow Props (Spinning Pinwheels & Swaying Flowers)
+        STATE.candyProps.forEach(prop => {
+          const u = prop.userData;
+          if (u.bladePivot) {
+            u.bladePivot.rotation.z += delta * 4.0;
+          }
+          const sway = Math.sin(now * 0.0015 * u.wobbleSpeed + u.wobbleOffset) * 0.08;
+          prop.rotation.z = sway;
+        });
+
+        // 8. Particle Pool Updates
+        STATE.particles.forEach(p => {
+          const u = p.userData;
+          if (u.active) {
+            u.life += delta;
+            if (u.life >= u.maxLife) {
+              u.active = false;
+              p.visible = false;
+            } else {
+              const progress = u.life / u.maxLife;
+              p.position.x += u.vx * delta;
+              p.position.y += u.vy * delta;
+              p.position.z += u.vz * delta;
+
+              u.vy -= 12.0 * delta;
+
+              const scale = u.baseScale * (1.0 - progress);
+              p.scale.set(scale, scale, scale);
+
+              if (!u.isSprite && p.material) {
+                p.material.opacity = (1.0 - progress) * 0.9;
+              }
+            }
+          }
+        });
+
+        // 9. Session Timer & Progress Bar
+        if (STATE.sessionMaxTimer > 0 && !STATE.sessionEnded) {
+          STATE.sessionTimer += delta;
+          const progressPct = Math.min((STATE.sessionTimer / STATE.sessionMaxTimer) * 100, 100);
+          const progressBar = document.getElementById('session-progress');
+          if (progressBar) progressBar.style.width = `${progressPct}%`;
+
+          if (STATE.sessionTimer >= STATE.sessionMaxTimer) {
+            STATE.sessionEnded = true;
+            SoundSystem.playKalimba(0);
+            SoundSystem.playKalimba(2);
+            SoundSystem.playKalimba(4);
+          }
+        }
+
+        renderer.render(scene, camera);
+      }
+
+      // --- INITIALIZATION ENTRY POINT ---
+      window.addEventListener('DOMContentLoaded', () => {
+        initThree();
+        initEventListeners();
+        onWindowResize();
+        requestAnimationFrame(animate);
+      });
+
+    })();
+  </script>
+</body>
+</html>

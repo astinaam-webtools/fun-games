@@ -4,14 +4,23 @@ A collection of lightweight, self-contained HTML5 & Three.js 3D sensory web game
 
 ---
 
-## 🌟 Featured Games
+## 🌟 Featured Games (All 4 Live & Playable!)
 
 | Game | Status | Description | Key Features |
 |---|---|---|---|
-| **🚗 Dreamy Highway Explorer** | 🟢 **Playable** | A gentle, continuously moving 3D world where friendly shapes, floating clouds, and cute stylized toys glide past on an infinite pastel highway. | Zero-allocation toy pooling, pentatonic celesta chimes, 21:9 adaptive FOV, baby mash safe. |
-| **🫧 Bubble Aquarium** | 🔮 *In Development* | Bioluminescent crystal reef with tap-to-pop bubbles and soothing ocean harp chords. | Water ripple physics, glowing sea creatures. |
-| **🌙 Starlight Safari** | ✨ *Next Up* | Bedtime constellation voyage with celestial lullabies and glowing star animals. | Night sky soothing transitions, music box pads. |
-| **☁️ Rainbow Cloud Meadow** | 🌈 *Coming Soon* | Puffy cloud trampolines with bouncing bunnies and soft xylophone bells. | Jump physics, rainbow arches. |
+| **🚗 Dreamy Highway** | 🟢 **Playable** | A gentle, continuously moving 3D world where friendly shapes, floating clouds, and cute stylized toys glide past on an infinite pastel highway. | Zero-allocation toy pooling, pentatonic celesta chimes, 21:9 adaptive FOV, baby mash safe. |
+| **🫧 Bubble Aquarium** | 🟢 **Playable** | Bioluminescent crystal reef with swimming clownfish, jumping dolphins, floating sea stars, tap-to-pop bubbles, and soothing ocean harp chords. | Bioluminescent shaders, floating bubble pool, underwater drone pad, multi-grab water bloom. |
+| **🌙 Starlight Safari** | 🟢 **Playable** | Bedtime constellation voyage connecting glowing star animals (Giraffe, Lion, Elephant, Bear, Owl) with music box celesta lullabies and shooting stars. | 5 constellation animal meshes, shooting star pool, sleepy moon halo, soothing bedtime pad. |
+| **☁️ Rainbow Cloud Meadow** | 🟢 **Playable** | Soft puffy cloud trampolines where friendly bunnies bounce along rainbow arches and hot-air balloons float to cheerful xylophone bells. | Cloud spring deformation, bunny jump physics, rainbow arches, multi-grab balloon lift. |
+
+---
+
+## 📱 Mobile & Infant Grab Ergonomics
+
+- **Disabled Context Menu:** Right-click and long-press context menus are disabled across all games (`contextmenu` prevented, `-webkit-touch-callout: none`).
+- **Multi-Touch Palm Grab Detection:** When an infant grabs the screen with multiple fingers or palms (`e.touches.length >= 2`), all games trigger a spectacular **Super Bloom Multi-Burst** animation with cascades of ripples, extra particles, and harmonic chord arpeggios.
+- **Tab Minimize & Notification Pull-down Protection:** Tab visibility changes and blur events cleanly suspend Web Audio API playback to avoid runaway audio, and resume with a welcoming sparkle animation upon return.
+- **Touch Targets & Viewport:** Sized $\ge 48\text{px}$ with `touch-action: none` and `overscroll-behavior: none` to prevent accidental pull-to-refresh or page bounces.
 
 ---
 
