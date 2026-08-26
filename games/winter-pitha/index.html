@@ -1711,7 +1711,7 @@
 
       window.addEventListener('pointerdown', (e) => {
         // If clicking UI glass buttons, let default button click handler run
-        if (e.target.closest('.top-bar') || e.target.closest('.screen-treat')) return;
+        if (e.target && typeof e.target.closest === 'function' && (e.target.closest('.top-bar') || e.target.closest('.screen-treat'))) return;
         triggerSensoryBurst(e.clientX, e.clientY);
       });
 
