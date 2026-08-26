@@ -533,7 +533,7 @@
         Zero loud noises, harmonious pentatonic sound synthesis, and safe for keyboard slaps & remote D-pads.
       </p>
       <div class="tv-hint-bar">
-        <span>🎮 <strong>TV Navigation:</strong> Use <kbd>▲</kbd> <kbd>▼</kbd> <kbd>◄</kbd> <kbd>►</kbd> arrows on remote &amp; press <kbd>ENTER</kbd> or <kbd>SPACE</kbd> to launch</span>
+        <span>🎮 <strong>TV Remote:</strong> Use D-Pad <kbd>▲</kbd> <kbd>▼</kbd> <kbd>◄</kbd> <kbd>►</kbd> arrows &amp; press Center <kbd>OK / SELECT</kbd> to launch</span>
       </div>
     </section>
 
@@ -755,32 +755,44 @@
         focusableCards[0].classList.add('tv-focused');
       }
 
-      // D-Pad / Keyboard Navigation Handler
+      // D-Pad / TV Remote Navigation Handler
       window.addEventListener('keydown', (e) => {
-        if (['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Enter', ' '].includes(e.key)) {
-          initAudio();
-        }
+        const code = e.keyCode || e.which;
+        const key = e.key;
 
-        if (e.key === 'ArrowRight') {
+        initAudio();
+
+        // Right arrow or channel next
+        if (key === 'ArrowRight' || code === 39 || code === 22) {
           e.preventDefault();
           const next = (currentIndex + 1) % focusableCards.length;
           focusCard(next, true);
-        } else if (e.key === 'ArrowLeft') {
+        }
+        // Left arrow or channel prev
+        else if (key === 'ArrowLeft' || code === 37 || code === 21) {
           e.preventDefault();
           const prev = (currentIndex - 1 + focusableCards.length) % focusableCards.length;
           focusCard(prev, true);
-        } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        }
+        // Down / Up arrow (2D grid wrap)
+        else if (key === 'ArrowDown' || key === 'ArrowUp' || code === 40 || code === 38 || code === 20 || code === 19) {
           e.preventDefault();
-          // Smart 2D grid wrap calculation
           const columns = window.innerWidth > 1400 ? 4 : (window.innerWidth > 768 ? 2 : 1);
-          let target = e.key === 'ArrowDown' ? currentIndex + columns : currentIndex - columns;
+          const isDown = key === 'ArrowDown' || code === 40 || code === 20;
+          let target = isDown ? currentIndex + columns : currentIndex - columns;
           if (target >= focusableCards.length) target = target % focusableCards.length;
           if (target < 0) target = focusableCards.length + target;
           focusCard(target, true);
-        } else if (e.key === 'Enter' || e.key === ' ') {
+        }
+        // TV Remote Center Button (OK, Select, Enter, Space, DPAD_CENTER, Play)
+        else if (['Enter', 'Select', 'Accept', 'OK', ' ', 'Space', 'MediaPlay', 'MediaPlayPause'].includes(key) || [13, 23, 32, 415, 10252].includes(code)) {
           const current = focusableCards[currentIndex];
           if (current && current.tagName === 'A') {
+            e.preventDefault();
             playUiChime(659.25, true);
+            setTimeout(() => {
+              window.location.href = current.href;
+            }, 120);
           }
         }
       });
@@ -796,6 +808,43 @@
           }
         });
       });
+
+      // TV Remote & Gamepad Continuous Polling Loop
+      let lastGamepadAction = 0;
+      function pollGamepads() {
+        if (navigator.getGamepads) {
+          const gamepads = navigator.getGamepads();
+          const now = performance.now();
+          for (let i = 0; i < gamepads.length; i++) {
+            const gp = gamepads[i];
+            if (gp && (now - lastGamepadAction > 220)) {
+              // D-Pad Right (button 15 or axes 0 > 0.5)
+              if ((gp.buttons[15] && gp.buttons[15].pressed) || (gp.axes[0] && gp.axes[0] > 0.5)) {
+                lastGamepadAction = now;
+                const next = (currentIndex + 1) % focusableCards.length;
+                focusCard(next, true);
+              }
+              // D-Pad Left (button 14 or axes 0 < -0.5)
+              else if ((gp.buttons[14] && gp.buttons[14].pressed) || (gp.axes[0] && gp.axes[0] < -0.5)) {
+                lastGamepadAction = now;
+                const prev = (currentIndex - 1 + focusableCards.length) % focusableCards.length;
+                focusCard(prev, true);
+              }
+              // Button 0 (A / OK / Select)
+              else if (gp.buttons[0] && gp.buttons[0].pressed) {
+                lastGamepadAction = now;
+                const current = focusableCards[currentIndex];
+                if (current && current.tagName === 'A') {
+                  playUiChime(659.25, true);
+                  setTimeout(() => { window.location.href = current.href; }, 120);
+                }
+              }
+            }
+          }
+        }
+        requestAnimationFrame(pollGamepads);
+      }
+      requestAnimationFrame(pollGamepads);
 
       // UI Buttons
       const btnSound = document.getElementById('btn-sound');

@@ -2038,27 +2038,36 @@
 
       // --- USER EVENT HANDLERS ---
       function setupInteractions() {
-        // Spacebar & Keyboard mash listener
+        // TV Remote & Keyboard mash listener
         window.addEventListener('keydown', (e) => {
           if (e.repeat) return; // Prevent key-repeat flood
-          
-          // If spacebar is pressed, prevent browser default (scrolling or triggering active button)
-          if (e.key === ' ' || e.code === 'Space') {
-            e.preventDefault();
-          }
 
-          // Ignore modifier & navigation keys
-          const ignoredKeys = ['Tab', 'Escape', 'Shift', 'Control', 'Alt', 'Meta', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
-          if (ignoredKeys.includes(e.key)) return;
+          const code = e.keyCode || e.which;
+          const key = e.key;
+
+          // TV Remote Back / Return button handler (Tizen: 10009, webOS: 461, Android: 4, Escape)
+          const isBackButton = key === 'Escape' || key === 'Back' || key === 'GoBack' || key === 'BrowserBack' || code === 10009 || code === 461 || code === 4;
+          if (isBackButton) {
+            e.preventDefault();
+            window.location.href = '../../index.html';
+            return;
+          }
 
           // If typing in an input inside settings modal, don't trigger burst
           if (e.target && e.target.tagName === 'INPUT') return;
 
-          // If a button has focus, blur it so spacebar doesn't trigger its click event
+          // Prevent default for TV navigation/action keys to avoid browser scrolling or unwanted clicks
+          const tvActionKeys = [' ', 'Space', 'Enter', 'Select', 'Accept', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageUp', 'PageDown'];
+          if (tvActionKeys.includes(key) || [13, 23, 32, 33, 34, 37, 38, 39, 40].includes(code)) {
+            e.preventDefault();
+          }
+
+          // If a button has focus, blur it so TV remote OK/Select doesn't trigger unwanted button clicks
           if (document.activeElement && document.activeElement !== document.body) {
             document.activeElement.blur();
           }
 
+          // Trigger in-game sensory burst on ANY TV remote button or keypress
           triggerBurstInteraction();
         }, false);
 
@@ -2396,6 +2405,27 @@
         // 9. Update Day/Night Atmosphere & Session Timer
         updateAtmosphere(delta, elapsedTime);
         updateSessionTimer(delta);
+
+        // 10. TV Remote / Gamepad API Polling
+        if (navigator.getGamepads) {
+          const gamepads = navigator.getGamepads();
+          for (let g = 0; g < gamepads.length; g++) {
+            const gp = gamepads[g];
+            if (gp) {
+              // Any button pressed on TV remote / gamepad triggers sensory burst
+              for (let b = 0; b < gp.buttons.length; b++) {
+                if (gp.buttons[b].pressed) {
+                  if (b === 1) { // B / Back button returns to hub
+                    window.location.href = '../../index.html';
+                  } else {
+                    triggerBurstInteraction();
+                  }
+                  break;
+                }
+              }
+            }
+          }
+        }
 
         // Render Scene
         renderer.render(scene, camera);

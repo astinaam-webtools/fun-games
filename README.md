@@ -15,13 +15,13 @@ A collection of lightweight, self-contained HTML5 & Three.js 3D sensory web game
 
 ---
 
-## 📺 Smart TV & Remote Navigation
+## 📺 Smart TV Remote & Controller Navigation
 
-- **D-Pad Navigation:** Use `ArrowUp`, `ArrowDown`, `ArrowLeft`, `ArrowRight` on TV remote or keyboard to move focus across game cards.
-- **Selection:** Press `Enter` or `Space` (or Gamepad `Button 0`) to launch the selected game.
-- **In-Game Sensory Bursts:** Tap anywhere on screen or press `Spacebar` / any key to explode soft particle fountains, spawn surprise toys, and speed up the cruise.
-- **Return to Hub:** Click or select the `🏠 Playroom` button in the top right of any game.
-- **Fullscreen:** Press `⛶` or `F` for immersive fullscreen.
+- **Dashboard D-Pad Navigation:** Use D-Pad arrows (`▲`, `▼`, `◄`, `►` on TV remote or Gamepad) to move focus across game cards.
+- **Dashboard Selection:** Press the Center **OK / Select** button (or `Enter`, `Space`, Gamepad Button `0`) to launch the focused game.
+- **In-Game Baby Sensory Bursts:** Press **ANY button on the TV remote** (Center OK, D-Pad, Play/Pause, Channel Up/Down, Numbers, Color keys) or tap the screen to explode soft particle fountains, spawn surprise toys, and speed up the cruise.
+- **Return to Hub from Game:** Press the TV Remote **Back / Return** button (Samsung Tizen `Return`, LG webOS `Back`, Android TV `Back`, Gamepad Button `1`, or click the top-right `🏠 Playroom` button).
+- **Fullscreen:** Press `⛶` button or `F` for immersive TV fullscreen.
 
 ---
 
