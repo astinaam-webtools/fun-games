@@ -2042,12 +2042,22 @@
         window.addEventListener('keydown', (e) => {
           if (e.repeat) return; // Prevent key-repeat flood
           
+          // If spacebar is pressed, prevent browser default (scrolling or triggering active button)
+          if (e.key === ' ' || e.code === 'Space') {
+            e.preventDefault();
+          }
+
           // Ignore modifier & navigation keys
           const ignoredKeys = ['Tab', 'Escape', 'Shift', 'Control', 'Alt', 'Meta', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
           if (ignoredKeys.includes(e.key)) return;
 
-          // Ignore if user is interacting with settings inputs
-          if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON')) return;
+          // If typing in an input inside settings modal, don't trigger burst
+          if (e.target && e.target.tagName === 'INPUT') return;
+
+          // If a button has focus, blur it so spacebar doesn't trigger its click event
+          if (document.activeElement && document.activeElement !== document.body) {
+            document.activeElement.blur();
+          }
 
           triggerBurstInteraction();
         }, false);
@@ -2055,6 +2065,9 @@
         // Touch & Pointer listener
         container.addEventListener('pointerdown', (e) => {
           e.preventDefault();
+          if (document.activeElement && document.activeElement !== document.body) {
+            document.activeElement.blur();
+          }
           triggerBurstInteraction(e.clientX, e.clientY);
         }, false);
 
@@ -2063,6 +2076,7 @@
         const soundIcon = document.getElementById('sound-icon');
         btnSound.addEventListener('click', (e) => {
           e.stopPropagation();
+          btnSound.blur();
           const isEnabled = SoundSystem.toggleSound();
           soundIcon.textContent = isEnabled ? '🔊' : '🔇';
         });
@@ -2070,6 +2084,7 @@
         const btnFullscreen = document.getElementById('btn-fullscreen');
         btnFullscreen.addEventListener('click', (e) => {
           e.stopPropagation();
+          btnFullscreen.blur();
           const docEl = document.documentElement;
           const isFull = document.fullscreenElement || document.webkitFullscreenElement;
           if (!isFull) {
@@ -2088,11 +2103,13 @@
 
         btnSettings.addEventListener('click', (e) => {
           e.stopPropagation();
+          btnSettings.blur();
           settingsPanel.classList.toggle('collapsed');
         });
 
         btnCloseSettings.addEventListener('click', (e) => {
           e.stopPropagation();
+          btnCloseSettings.blur();
           settingsPanel.classList.add('collapsed');
         });
 
@@ -2100,6 +2117,7 @@
         document.querySelectorAll('[data-time]').forEach(btn => {
           btn.addEventListener('click', (e) => {
             e.stopPropagation();
+            btn.blur();
             document.querySelectorAll('[data-time]').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             const mode = btn.getAttribute('data-time');
@@ -2126,6 +2144,7 @@
         document.querySelectorAll('[data-speed]').forEach(btn => {
           btn.addEventListener('click', (e) => {
             e.stopPropagation();
+            btn.blur();
             document.querySelectorAll('[data-speed]').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             const spd = btn.getAttribute('data-speed');
@@ -2141,6 +2160,7 @@
         document.querySelectorAll('[data-timer]').forEach(btn => {
           btn.addEventListener('click', (e) => {
             e.stopPropagation();
+            btn.blur();
             document.querySelectorAll('[data-timer]').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             const dur = parseInt(btn.getAttribute('data-timer'), 10);

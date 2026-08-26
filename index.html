@@ -801,6 +801,7 @@
       const btnSound = document.getElementById('btn-sound');
       const soundIcon = document.getElementById('sound-icon');
       btnSound.addEventListener('click', () => {
+        btnSound.blur();
         soundEnabled = !soundEnabled;
         soundIcon.textContent = soundEnabled ? '🔊' : '🔇';
         if (soundEnabled) playUiChime(587.33, true);
@@ -808,6 +809,7 @@
 
       const btnFullscreen = document.getElementById('btn-fullscreen');
       btnFullscreen.addEventListener('click', () => {
+        btnFullscreen.blur();
         const docEl = document.documentElement;
         const isFull = document.fullscreenElement || document.webkitFullscreenElement;
         if (!isFull) {
