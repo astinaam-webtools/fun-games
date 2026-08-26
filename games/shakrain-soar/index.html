@@ -1,0 +1,2002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Shakrain Kite &amp; Lantern Soar - Infant 3D Sensory Horizon Game</title>
+  
+  <!-- Three.js r128 CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <style>
+    /* ==========================================================================
+       RESET & BASE ERGONOMIC STYLES
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    :root {
+      --bg-dusk-indigo: #0a071f;
+      --bg-dusk-purple: #1a0f3d;
+      --sunset-peach: #ff7675;
+      --sunset-magenta: #fd79a8;
+      --lantern-amber: #ff9f43;
+      --lantern-gold: #feca57;
+      --starlight-cyan: #00d2d3;
+      --starlight-gold: #ffeaa7;
+      --card-bg: rgba(26, 15, 61, 0.82);
+      --card-border: rgba(253, 121, 168, 0.35);
+      --text-bright: #ffffff;
+      --text-soft: #f1f2f6;
+      --text-muted: #a29bfe;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--bg-dusk-indigo);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      touch-action: none;
+      overscroll-behavior: none;
+      -webkit-tap-highlight-color: transparent;
+      color: var(--text-bright);
+    }
+
+    #canvas-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      cursor: pointer;
+    }
+
+    #canvas-container:active {
+      cursor: grabbing;
+    }
+
+    /* Ambient Soft Night Vignette for cozy eye comfort */
+    .vignette-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
+      box-shadow: inset 0 0 100px rgba(10, 7, 31, 0.85), inset 0 0 220px rgba(26, 15, 61, 0.5);
+      mix-blend-mode: multiply;
+    }
+
+    /* Sunset Twilight Horizon Glow */
+    .twilight-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 45%;
+      pointer-events: none;
+      z-index: 3;
+      background: linear-gradient(to top, rgba(255, 118, 117, 0.15) 0%, rgba(253, 121, 168, 0.08) 45%, transparent 100%);
+      animation: twilightBreathe 8s ease-in-out infinite alternate;
+    }
+
+    @keyframes twilightBreathe {
+      0% { opacity: 0.7; transform: scaleY(1.0); }
+      100% { opacity: 1.0; transform: scaleY(1.08); }
+    }
+
+    /* Festival Grand Burst Warm Aura Shimmer */
+    .festival-burst-flash {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 4;
+      opacity: 0;
+      background: radial-gradient(circle at 50% 60%, rgba(254, 202, 87, 0.3) 0%, rgba(255, 118, 117, 0.2) 40%, rgba(26, 15, 61, 0.4) 80%, transparent 100%);
+      transition: opacity 0.12s ease-out;
+    }
+
+    .festival-burst-flash.active {
+      opacity: 1;
+      animation: burstFlashFade 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes burstFlashFade {
+      0% { opacity: 0.85; }
+      100% { opacity: 0; }
+    }
+
+    /* Top Sensory Session Progress Bar */
+    .session-progress-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.2);
+      z-index: 20;
+    }
+
+    .session-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ff7675 0%, #fd79a8 30%, #feca57 60%, #00d2d3 100%);
+      transition: width 0.4s linear;
+      box-shadow: 0 0 10px rgba(254, 202, 87, 0.8);
+    }
+
+    /* ==========================================================================
+       UI OVERLAY LAYER
+       ========================================================================== */
+    .ui-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px 24px;
+      transition: opacity 0.5s ease;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      pointer-events: auto;
+    }
+
+    .brand-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(26, 15, 61, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 8px 20px;
+      border-radius: 999px;
+      box-shadow: 0 8px 26px rgba(0, 0, 0, 0.3);
+      border: 2px solid var(--card-border);
+      animation: floatBadge 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatBadge {
+      0% { transform: translateY(0px); }
+      100% { transform: translateY(-4px); }
+    }
+
+    .brand-icon {
+      font-size: 24px;
+      display: inline-block;
+      animation: kiteWiggle 3s ease-in-out infinite;
+    }
+
+    @keyframes kiteWiggle {
+      0%, 100% { transform: rotate(-5deg) scale(1); }
+      50% { transform: rotate(8deg) scale(1.1); }
+    }
+
+    .brand-title {
+      font-weight: 800;
+      font-size: 16px;
+      letter-spacing: 0.5px;
+      background: linear-gradient(135deg, #ff7675 0%, #fd79a8 50%, #feca57 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .ultrawide-badge {
+      font-size: 11px;
+      background: rgba(254, 202, 87, 0.2);
+      color: #feca57;
+      padding: 3px 10px;
+      border-radius: 8px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      border: 1px solid rgba(254, 202, 87, 0.4);
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .glass-btn {
+      background: rgba(26, 15, 61, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 2px solid var(--card-border);
+      border-radius: 999px;
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-soft);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: auto;
+      min-width: 48px;
+      min-height: 48px;
+      text-decoration: none;
+      outline: none;
+    }
+
+    .glass-btn:hover, .glass-btn:focus-visible {
+      transform: translateY(-2px) scale(1.05);
+      background: rgba(45, 27, 95, 0.95);
+      border-color: #feca57;
+      box-shadow: 0 10px 25px rgba(254, 202, 87, 0.3);
+      color: #ffffff;
+    }
+
+    .glass-btn:active {
+      transform: scale(0.95);
+    }
+
+    .icon-btn {
+      width: 48px;
+      height: 48px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 18px;
+    }
+
+    /* Start / Interactive Prompt Banner */
+    .prompt-banner {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(26, 15, 61, 0.92);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      padding: 14px 30px;
+      border-radius: 999px;
+      border: 2px solid rgba(254, 202, 87, 0.6);
+      box-shadow: 0 12px 38px rgba(0, 0, 0, 0.5), 0 0 25px rgba(254, 202, 87, 0.35);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      pointer-events: auto;
+      cursor: pointer;
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: pulseGlow 2.5s infinite ease-in-out;
+      min-height: 48px;
+      white-space: nowrap;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), 0 0 20px rgba(254, 202, 87, 0.3); transform: translateX(-50%) scale(1); }
+      50% { box-shadow: 0 14px 45px rgba(0, 0, 0, 0.6), 0 0 35px rgba(253, 121, 168, 0.5); transform: translateX(-50%) scale(1.03); }
+    }
+
+    .prompt-banner.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-50%) translateY(30px);
+    }
+
+    .prompt-icon {
+      font-size: 26px;
+      animation: bouncePrompt 1.6s infinite ease-in-out;
+    }
+
+    @keyframes bouncePrompt {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    .prompt-text {
+      font-size: 15px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.3px;
+    }
+
+    .prompt-subtext {
+      font-size: 12px;
+      color: #feca57;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* TV Remote / Keyboard Notification Toast */
+    .toast-notification {
+      position: absolute;
+      top: 85px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      background: rgba(26, 15, 61, 0.94);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding: 10px 22px;
+      border-radius: 999px;
+      border: 1.5px solid var(--card-border);
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+      opacity: 0;
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .toast-notification.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Responsive ergonomics */
+    @media (max-width: 768px) {
+      .ui-layer { padding: 14px 16px; }
+      .brand-title { font-size: 14px; }
+      .ultrawide-badge { display: none; }
+      .prompt-banner { padding: 10px 20px; bottom: 20px; }
+      .prompt-text { font-size: 13px; }
+      .prompt-subtext { font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 3D WebGL Canvas Viewport -->
+  <div id="canvas-container" aria-label="Interactive 3D Shakrain Rooftop Sky Canvas"></div>
+
+  <!-- Ambient Vignette & Lighting Overlays -->
+  <div class="vignette-overlay"></div>
+  <div class="twilight-overlay"></div>
+  <div class="festival-burst-flash" id="festival-flash"></div>
+
+  <!-- Top Sensory Session Progress Bar -->
+  <div class="session-progress-container">
+    <div class="session-progress-bar" id="session-progress"></div>
+  </div>
+
+  <!-- UI Overlay Layer -->
+  <div class="ui-layer">
+    <!-- Top Header Navigation -->
+    <header class="top-bar">
+      <div class="brand-badge">
+        <span class="brand-icon">🪁</span>
+        <span class="brand-title">Shakrain Kite Soar</span>
+        <span class="ultrawide-badge">✨ 21:9 Ultrawide</span>
+      </div>
+
+      <div class="top-actions">
+        <!-- Auto Soar / Soothing Mode Toggle -->
+        <button class="glass-btn" id="btn-soothe" title="Toggle Auto Soothe Mode" aria-label="Toggle Auto Soothe">
+          <span id="soothe-icon">🕊️</span>
+          <span id="soothe-label">Soothe</span>
+        </button>
+
+        <!-- Mute / Sound Toggle -->
+        <button class="glass-btn icon-btn" id="btn-sound" title="Toggle Calming Audio" aria-label="Toggle Sound">
+          <span id="sound-icon">🔊</span>
+        </button>
+
+        <!-- Fullscreen Mode Button -->
+        <button class="glass-btn icon-btn" id="btn-fullscreen" title="Toggle Fullscreen" aria-label="Toggle Fullscreen">
+          <span>⛶</span>
+        </button>
+
+        <!-- Playroom Hub Exit -->
+        <a href="../../index.html" class="glass-btn" id="btn-playroom" title="Return to Little Explorers Playroom Hub" aria-label="Return to Playroom Hub">
+          <span>🏠</span>
+          <span>Playroom</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Bottom Interactive Prompt Banner -->
+    <div class="prompt-banner" id="prompt-banner">
+      <span class="prompt-icon">🏮</span>
+      <div>
+        <div class="prompt-text">Tap, Click or Press Any Key to Soar &amp; Launch Fanush!</div>
+        <div class="prompt-subtext">
+          <span>🎮 TV Remote: D-Pad &amp; OK</span>
+          <span>•</span>
+          <span>🖐️ Multi-Touch Grab for Grand Festival</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Feedback -->
+  <div class="toast-notification" id="toast-notify">
+    <span id="toast-icon">✨</span>
+    <span id="toast-text">Soaring into the twilight sky!</span>
+  </div>
+
+  <script>
+    /* ==========================================================================
+       SHAKRAIN KITE & LANTERN SOAR - 3D SENSORY ENGINE FOR INFANTS
+       Old Dhaka Rooftop Dusk Horizon, Chula Kites, Fanush Lanterns & Chimes
+       ========================================================================== */
+    (function() {
+      'use strict';
+
+      // --- CONFIGURATION & CONSTANTS ---
+      const CONFIG = {
+        starCount: 650,
+        maxFanushLanterns: 35,
+        maxStardustParticles: 300,
+        maxSmokePuffs: 25,
+        backgroundKiteCount: 10,
+        fairyLightCount: 45,
+        rooftopBuildingCount: 22,
+        heroZ: 0,
+        baseCamZ: 24,
+        kiteColorPalettes: [
+          { name: 'Chokhdar Crimson Gold', q1: '#ff4757', q2: '#feca57', q3: '#00d2d3', q4: '#ff6b81' },
+          { name: 'Chula Turquoise Amber', q1: '#00d2d3', q2: '#ff9f43', q3: '#ff4757', q4: '#54a0ff' },
+          { name: 'Shakrain Emerald Sunset', q1: '#10ac84', q2: '#ff6b81', q3: '#feca57', q4: '#5f27cd' },
+          { name: 'Royal Twilight Violet', q1: '#5f27cd', q2: '#feca57', q3: '#ff7675', q4: '#48dbfb' }
+        ]
+      };
+
+      // --- WEB AUDIO API INFANT SOUND ENGINE (Consonant Pentatonic Scale) ---
+      let audioCtx = null;
+      let soundEnabled = true;
+      let masterGainNode = null;
+      let compressorNode = null;
+      let noteIndex = 0;
+
+      // Consonant Pentatonic C Major scale frequencies (Hz) - Serene and Uplifting
+      const PENTATONIC_SCALE = [
+        261.63, // C4
+        293.66, // D4
+        329.63, // E4
+        392.00, // G4
+        440.00, // A4
+        523.25, // C5
+        587.33, // D5
+        659.25, // E5
+        783.99, // G5
+        880.00, // A5
+        1046.50 // C6
+      ];
+
+      function initAudioContext() {
+        if (audioCtx) {
+          if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+          }
+          return;
+        }
+
+        try {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          audioCtx = new AudioContextClass();
+
+          // Mandatory Hearing Protection Dynamics Compressor Limiter
+          compressorNode = audioCtx.createDynamicsCompressor();
+          compressorNode.threshold.setValueAtTime(-14, audioCtx.currentTime);
+          compressorNode.knee.setValueAtTime(30, audioCtx.currentTime);
+          compressorNode.ratio.setValueAtTime(12, audioCtx.currentTime);
+          compressorNode.attack.setValueAtTime(0.003, audioCtx.currentTime);
+          compressorNode.release.setValueAtTime(0.25, audioCtx.currentTime);
+
+          // Master Gain Node
+          masterGainNode = audioCtx.createGain();
+          masterGainNode.gain.setValueAtTime(0.65, audioCtx.currentTime);
+
+          compressorNode.connect(masterGainNode);
+          masterGainNode.connect(audioCtx.destination);
+        } catch (err) {
+          console.warn('Web Audio API not supported:', err);
+        }
+      }
+
+      // Synthesize serene music-box bells and warm dusk synth pad notes
+      function playHarmonicChime(freqMultiplier = 1.0, isGrandChord = false) {
+        if (!soundEnabled) return;
+        initAudioContext();
+        if (!audioCtx || audioCtx.state !== 'running') return;
+
+        const now = audioCtx.currentTime;
+        const baseFreq = PENTATONIC_SCALE[noteIndex % PENTATONIC_SCALE.length] * freqMultiplier;
+        noteIndex++;
+
+        // 1. Music Box Bell / Celesta Tone (Sine + gentle triangle overtone)
+        const bellOsc = audioCtx.createOscillator();
+        const bellGain = audioCtx.createGain();
+        bellOsc.type = 'sine';
+        bellOsc.frequency.setValueAtTime(baseFreq, now);
+
+        bellGain.gain.setValueAtTime(0.0001, now);
+        bellGain.gain.exponentialRampToValueAtTime(0.35, now + 0.008);
+        bellGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.8);
+
+        bellOsc.connect(bellGain);
+        bellGain.connect(compressorNode);
+        bellOsc.start(now);
+        bellOsc.stop(now + 1.85);
+
+        bellOsc.onended = () => {
+          bellOsc.disconnect();
+          bellGain.disconnect();
+        };
+
+        // 2. Warm Dusk Synth Pad (Detuned triangle through soothing low-pass filter)
+        const padOsc = audioCtx.createOscillator();
+        const padGain = audioCtx.createGain();
+        const padFilter = audioCtx.createBiquadFilter();
+
+        padOsc.type = 'triangle';
+        padOsc.frequency.setValueAtTime(baseFreq * 0.5, now); // Sub octave for warmth
+
+        padFilter.type = 'lowpass';
+        padFilter.frequency.setValueAtTime(650, now);
+        padFilter.frequency.exponentialRampToValueAtTime(320, now + 2.5);
+
+        padGain.gain.setValueAtTime(0.0001, now);
+        padGain.gain.exponentialRampToValueAtTime(0.22, now + 0.08);
+        padGain.gain.exponentialRampToValueAtTime(0.0001, now + 2.5);
+
+        padOsc.connect(padFilter);
+        padFilter.connect(padGain);
+        padGain.connect(compressorNode);
+        padOsc.start(now);
+        padOsc.stop(now + 2.55);
+
+        padOsc.onended = () => {
+          padOsc.disconnect();
+          padFilter.disconnect();
+          padGain.disconnect();
+        };
+
+        // 3. If Grand Chord: play consonant triad with lush release
+        if (isGrandChord) {
+          const chordFreqs = [baseFreq * 1.25, baseFreq * 1.5]; // Major third & fifth
+          chordFreqs.forEach((cFreq, idx) => {
+            const chordOsc = audioCtx.createOscillator();
+            const chordGain = audioCtx.createGain();
+            chordOsc.type = 'sine';
+            chordOsc.frequency.setValueAtTime(cFreq, now + idx * 0.06);
+
+            chordGain.gain.setValueAtTime(0.0001, now + idx * 0.06);
+            chordGain.gain.exponentialRampToValueAtTime(0.18, now + idx * 0.06 + 0.01);
+            chordGain.gain.exponentialRampToValueAtTime(0.0001, now + 2.4);
+
+            chordOsc.connect(chordGain);
+            chordGain.connect(compressorNode);
+            chordOsc.start(now + idx * 0.06);
+            chordOsc.stop(now + 2.45);
+
+            chordOsc.onended = () => {
+              chordOsc.disconnect();
+              chordGain.disconnect();
+            };
+          });
+        }
+      }
+
+      // High gentle starlight twinkle chime
+      function playTwinkleChime(freq = 880) {
+        if (!soundEnabled) return;
+        initAudioContext();
+        if (!audioCtx || audioCtx.state !== 'running') return;
+
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now);
+        osc.frequency.exponentialRampToValueAtTime(freq * 1.5, now + 0.4);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.12, now + 0.005);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.6);
+
+        osc.connect(gain);
+        gain.connect(compressorNode);
+        osc.start(now);
+        osc.stop(now + 0.65);
+
+        osc.onended = () => {
+          osc.disconnect();
+          gain.disconnect();
+        };
+      }
+
+      // --- PROCEDURAL CANVAS TEXTURE CACHE (sRGBEncoding & Zero External Assets) ---
+      const textureCache = new Map();
+
+      function getProceduralTexture(key, drawFn, width = 256, height = 256) {
+        if (textureCache.has(key)) {
+          return textureCache.get(key);
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+
+        drawFn(ctx, width, height);
+
+        const tex = new THREE.CanvasTexture(canvas);
+        tex.encoding = THREE.sRGBEncoding;
+        tex.wrapS = THREE.ClampToEdgeWrapping;
+        tex.wrapT = THREE.ClampToEdgeWrapping;
+        textureCache.set(key, tex);
+        return tex;
+      }
+
+      // 1. Authentic Shakrain Chokhdar (Quartered) & Chula Kite Textures
+      function createKiteTexture(palette) {
+        return getProceduralTexture(`kite_${palette.name}`, (ctx, w, h) => {
+          ctx.clearRect(0, 0, w, h);
+
+          // Diagonal 4-quadrant geometric pattern
+          const cx = w / 2;
+          const cy = h / 2;
+
+          // Top quadrant
+          ctx.fillStyle = palette.q1;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy);
+          ctx.lineTo(0, 0);
+          ctx.lineTo(w, 0);
+          ctx.closePath();
+          ctx.fill();
+
+          // Right quadrant
+          ctx.fillStyle = palette.q2;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy);
+          ctx.lineTo(w, 0);
+          ctx.lineTo(w, h);
+          ctx.closePath();
+          ctx.fill();
+
+          // Bottom quadrant
+          ctx.fillStyle = palette.q3;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy);
+          ctx.lineTo(w, h);
+          ctx.lineTo(0, h);
+          ctx.closePath();
+          ctx.fill();
+
+          // Left quadrant
+          ctx.fillStyle = palette.q4;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy);
+          ctx.lineTo(0, h);
+          ctx.lineTo(0, 0);
+          ctx.closePath();
+          ctx.fill();
+
+          // Central Folk Mandala / Friendly Smiling Face for infants
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(cx, cy, w * 0.2, 0, Math.PI * 2);
+          ctx.fillStyle = '#ffffff';
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+          ctx.shadowBlur = 10;
+          ctx.fill();
+
+          // Cute sparkling baby eyes
+          ctx.fillStyle = '#2f3542';
+          ctx.beginPath();
+          ctx.arc(cx - 16, cy - 8, 5, 0, Math.PI * 2);
+          ctx.arc(cx + 16, cy - 8, 5, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Eye starlight highlights
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(cx - 18, cy - 10, 2, 0, Math.PI * 2);
+          ctx.arc(cx + 14, cy - 10, 2, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Rosy blushing cheeks
+          ctx.fillStyle = 'rgba(255, 107, 129, 0.45)';
+          ctx.beginPath();
+          ctx.arc(cx - 24, cy + 5, 7, 0, Math.PI * 2);
+          ctx.arc(cx + 24, cy + 5, 7, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Sweet gentle smile
+          ctx.strokeStyle = '#2f3542';
+          ctx.lineWidth = 3.5;
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.arc(cx, cy + 2, 14, 0.15 * Math.PI, 0.85 * Math.PI, false);
+          ctx.stroke();
+
+          ctx.restore();
+
+          // Subtle paper grain border
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+          ctx.lineWidth = 6;
+          ctx.strokeRect(3, 3, w - 6, h - 6);
+        }, 512, 512);
+      }
+
+      // 2. Fanush Sky Lantern Glowing Paper Texture
+      function createFanushTexture() {
+        return getProceduralTexture('fanush_paper', (ctx, w, h) => {
+          ctx.clearRect(0, 0, w, h);
+
+          // Translucent warm amber gradient
+          const grad = ctx.createLinearGradient(0, 0, 0, h);
+          grad.addColorStop(0.0, '#ffbe76');
+          grad.addColorStop(0.4, '#ff7979');
+          grad.addColorStop(0.85, '#f0932b');
+          grad.addColorStop(1.0, '#eb4d4b');
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, w, h);
+
+          // Vertical bamboo ribs
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+          ctx.lineWidth = 2;
+          for (let x = 20; x < w; x += 30) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, h);
+            ctx.stroke();
+          }
+
+          // Inner glowing candle core bloom
+          const candleGrad = ctx.createRadialGradient(w / 2, h * 0.75, 5, w / 2, h * 0.75, w * 0.45);
+          candleGrad.addColorStop(0.0, 'rgba(255, 255, 255, 0.95)');
+          candleGrad.addColorStop(0.3, 'rgba(254, 202, 87, 0.85)');
+          candleGrad.addColorStop(0.7, 'rgba(255, 118, 117, 0.4)');
+          candleGrad.addColorStop(1.0, 'rgba(255, 118, 117, 0.0)');
+          ctx.fillStyle = candleGrad;
+          ctx.fillRect(0, 0, w, h);
+        }, 256, 256);
+      }
+
+      // 3. Golden Stardust & Twinkling Star Sprite Texture
+      function createStardustTexture() {
+        return getProceduralTexture('stardust_particle', (ctx, w, h) => {
+          ctx.clearRect(0, 0, w, h);
+          const cx = w / 2;
+          const cy = h / 2;
+
+          const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, cx);
+          grad.addColorStop(0.0, 'rgba(255, 255, 255, 1.0)');
+          grad.addColorStop(0.25, 'rgba(254, 202, 87, 0.9)');
+          grad.addColorStop(0.6, 'rgba(253, 121, 168, 0.4)');
+          grad.addColorStop(1.0, 'rgba(253, 121, 168, 0.0)');
+
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(cx, cy, cx, 0, Math.PI * 2);
+          ctx.fill();
+
+          // 4-point gentle star cross
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+          ctx.beginPath();
+          ctx.moveTo(cx, 4);
+          ctx.quadraticCurveTo(cx, cy, w - 4, cy);
+          ctx.quadraticCurveTo(cx, cy, cx, h - 4);
+          ctx.quadraticCurveTo(cx, cy, 4, cy);
+          ctx.quadraticCurveTo(cx, cy, cx, 4);
+          ctx.fill();
+        }, 128, 128);
+      }
+
+      // 4. Crescent Moon Texture with Soft Glow Halo
+      function createMoonTexture() {
+        return getProceduralTexture('crescent_moon', (ctx, w, h) => {
+          ctx.clearRect(0, 0, w, h);
+          const cx = w / 2;
+          const cy = h / 2;
+          const r = w * 0.38;
+
+          // Outer soothing halo
+          const halo = ctx.createRadialGradient(cx, cy, r * 0.5, cx, cy, w * 0.48);
+          halo.addColorStop(0.0, 'rgba(254, 202, 87, 0.35)');
+          halo.addColorStop(0.6, 'rgba(253, 121, 168, 0.15)');
+          halo.addColorStop(1.0, 'rgba(26, 15, 61, 0.0)');
+          ctx.fillStyle = halo;
+          ctx.beginPath();
+          ctx.arc(cx, cy, w * 0.48, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Crescent shape
+          ctx.save();
+          ctx.fillStyle = '#fffdf0';
+          ctx.shadowColor = 'rgba(254, 202, 87, 0.8)';
+          ctx.shadowBlur = 18;
+
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, -0.4 * Math.PI, 0.8 * Math.PI, false);
+          ctx.arc(cx + r * 0.5, cy - r * 0.2, r * 0.85, 0.8 * Math.PI, -0.4 * Math.PI, true);
+          ctx.closePath();
+          ctx.fill();
+          ctx.restore();
+
+          // Friendly smiling face on the moon
+          ctx.fillStyle = '#feca57';
+          ctx.beginPath();
+          ctx.arc(cx - 8, cy - 8, 3, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.strokeStyle = '#feca57';
+          ctx.lineWidth = 2.5;
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.arc(cx - 4, cy + 2, 8, 0.2 * Math.PI, 0.8 * Math.PI, false);
+          ctx.stroke();
+        }, 256, 256);
+      }
+
+      // 5. Old Dhaka Rooftop Brick & Arched Window Texture
+      function createRooftopBrickTexture(buildingColor, hasWindows = true) {
+        return getProceduralTexture(`brick_${buildingColor}_${hasWindows}`, (ctx, w, h) => {
+          ctx.fillStyle = buildingColor;
+          ctx.fillRect(0, 0, w, h);
+
+          // Subtle horizontal brick mortar lines
+          ctx.strokeStyle = 'rgba(0, 0, 0, 0.12)';
+          ctx.lineWidth = 2;
+          for (let y = 16; y < h; y += 24) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(w, y);
+            ctx.stroke();
+          }
+
+          // Arched windows with warm interior yellow light
+          if (hasWindows) {
+            ctx.fillStyle = '#feca57';
+            ctx.shadowColor = 'rgba(254, 202, 87, 0.8)';
+            ctx.shadowBlur = 14;
+
+            const winWidth = 28;
+            const winHeight = 44;
+            for (let wx = 35; wx < w - 35; wx += 65) {
+              for (let wy = 30; wy < h - 50; wy += 75) {
+                ctx.beginPath();
+                ctx.arc(wx + winWidth / 2, wy + winWidth / 2, winWidth / 2, Math.PI, 0, false);
+                ctx.lineTo(wx + winWidth, wy + winHeight);
+                ctx.lineTo(wx, wy + winHeight);
+                ctx.closePath();
+                ctx.fill();
+
+                // Window pane frame
+                ctx.strokeStyle = 'rgba(50, 20, 30, 0.6)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+              }
+            }
+          }
+        }, 256, 256);
+      }
+
+      // --- THREE.JS SCENE SETUP ---
+      let scene, camera, renderer;
+      let heroKiteGroup, heroKiteMesh, heroTailRibbon;
+      const tailSegmentCount = 20;
+      const tailPoints = [];
+
+      // Object Pools for Zero Runtime Garbage Collection
+      const fanushPool = [];
+      const stardustPool = [];
+      const smokePuffPool = [];
+      const bgKitesPool = [];
+      const fairyLights = [];
+
+      // Scratch Math Objects (Never allocate in animate loop)
+      const scratchVec3A = new THREE.Vector3();
+      const scratchVec3B = new THREE.Vector3();
+
+      // Game & State Management
+      let currentPaletteIndex = 0;
+      let isActionBursting = false;
+      let burstProgress = 0;
+      let sootheMode = true;
+      let sessionStartTime = Date.now();
+      let lastInteractionTime = Date.now();
+      let kiteTargetPos = new THREE.Vector3(0, 1.5, 0);
+      let kiteVelocity = new THREE.Vector3(0, 0, 0);
+      let kiteIdleTimer = 0;
+
+      function initThreeScene() {
+        const container = document.getElementById('canvas-container');
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        // Scene
+        scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x0a071f, 0.016);
+
+        // Camera with 21:9 Ultrawide Adaptive FOV
+        camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+        updateCameraAspect();
+
+        // WebGL Renderer
+        renderer = new THREE.WebGLRenderer({
+          antialias: true,
+          powerPreference: 'high-performance'
+        });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+        renderer.setSize(width, height);
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.setClearColor(0x0a071f, 1);
+        container.appendChild(renderer.domElement);
+
+        // Atmospheric Lights
+        const ambientLight = new THREE.HemisphereLight(0x4834d4, 0x130f40, 1.2);
+        scene.add(ambientLight);
+
+        const sunsetDirLight = new THREE.DirectionalLight(0xff7675, 1.4);
+        sunsetDirLight.position.set(15, 20, 18);
+        scene.add(sunsetDirLight);
+
+        const warmHorizonLight = new THREE.PointLight(0xff9f43, 1.5, 60);
+        warmHorizonLight.position.set(0, -5, 5);
+        scene.add(warmHorizonLight);
+
+        // Build Scene Layers
+        buildStarfield();
+        buildCrescentMoon();
+        buildRooftopSkyline();
+        buildHeroKite();
+        buildBackgroundKites();
+        buildFanushLanternPool();
+        buildStardustParticlePool();
+        buildRooftopSmokePuffPool();
+
+        // Event Listeners
+        window.addEventListener('resize', onWindowResize, false);
+      }
+
+      function updateCameraAspect() {
+        const aspect = window.innerWidth / window.innerHeight;
+        camera.aspect = aspect;
+
+        // Ultrawide 21:9 (aspect >= 2.1) & Mobile Portrait Adjustments
+        if (aspect >= 2.1) {
+          camera.fov = 38;
+          camera.position.set(0, 1.5, CONFIG.baseCamZ * 0.95);
+        } else if (aspect < 1.0) {
+          camera.fov = 58;
+          camera.position.set(0, 1.8, CONFIG.baseCamZ * 1.35);
+        } else {
+          camera.fov = 45;
+          camera.position.set(0, 1.5, CONFIG.baseCamZ);
+        }
+        camera.lookAt(0, 1.0, 0);
+        camera.updateProjectionMatrix();
+      }
+
+      function onWindowResize() {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        renderer.setSize(width, height);
+        updateCameraAspect();
+      }
+
+      // --- SCENE BUILDERS ---
+
+      // 1. Procedural Twinkling Starfield
+      function buildStarfield() {
+        const starGeo = new THREE.BufferGeometry();
+        const positions = new Float32Array(CONFIG.starCount * 3);
+        const colors = new Float32Array(CONFIG.starCount * 3);
+        const sizes = new Float32Array(CONFIG.starCount);
+
+        const starColors = [
+          new THREE.Color(0xffffff),
+          new THREE.Color(0xfeca57),
+          new THREE.Color(0x00d2d3),
+          new THREE.Color(0xfd79a8),
+          new THREE.Color(0xff9ff3)
+        ];
+
+        for (let i = 0; i < CONFIG.starCount; i++) {
+          // Spread across wide 21:9 sky horizon
+          positions[i * 3 + 0] = (Math.random() - 0.5) * 110;
+          positions[i * 3 + 1] = Math.random() * 45 - 2;
+          positions[i * 3 + 2] = -15 - Math.random() * 45;
+
+          const col = starColors[Math.floor(Math.random() * starColors.length)];
+          colors[i * 3 + 0] = col.r;
+          colors[i * 3 + 1] = col.g;
+          colors[i * 3 + 2] = col.b;
+
+          sizes[i] = 1.2 + Math.random() * 2.4;
+        }
+
+        starGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        starGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        starGeo.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+        const starMat = new THREE.PointsMaterial({
+          size: 1.6,
+          vertexColors: true,
+          map: createStardustTexture(),
+          transparent: true,
+          opacity: 0.9,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false
+        });
+
+        const starPoints = new THREE.Points(starGeo, starMat);
+        scene.add(starPoints);
+      }
+
+      // 2. Crescent Moon in Upper Twilight Sky
+      function buildCrescentMoon() {
+        const moonGeo = new THREE.PlaneGeometry(6.5, 6.5);
+        const moonMat = new THREE.MeshBasicMaterial({
+          map: createMoonTexture(),
+          transparent: true,
+          depthWrite: false,
+          side: THREE.DoubleSide
+        });
+        const moonMesh = new THREE.Mesh(moonGeo, moonMat);
+        moonMesh.position.set(16, 12, -22);
+        scene.add(moonMesh);
+      }
+
+      // 3. Old Dhaka Rooftop Skyline Silhouette Horizon
+      function buildRooftopSkyline() {
+        const rooftopGroup = new THREE.Group();
+        const buildingColors = ['#2c1a4d', '#3b1c32', '#1f1641', '#441d3b', '#24143a'];
+
+        // Generate modular silhouette buildings across the bottom edge
+        const startX = -45;
+        const endX = 45;
+        const stepX = (endX - startX) / CONFIG.rooftopBuildingCount;
+
+        for (let i = 0; i < CONFIG.rooftopBuildingCount; i++) {
+          const bx = startX + i * stepX + (Math.random() - 0.5) * 1.5;
+          const bz = -8 - Math.random() * 10;
+          const bWidth = 3.5 + Math.random() * 2.8;
+          const bHeight = 4.5 + Math.random() * 5.5;
+          const bDepth = 3.0 + Math.random() * 2.0;
+
+          const col = buildingColors[i % buildingColors.length];
+          const brickTex = createRooftopBrickTexture(col, Math.random() > 0.3);
+
+          const bGeo = new THREE.BoxGeometry(bWidth, bHeight, bDepth);
+          const bMat = new THREE.MeshStandardMaterial({
+            map: brickTex,
+            roughness: 0.85,
+            metalness: 0.1
+          });
+
+          const building = new THREE.Mesh(bGeo, bMat);
+          building.position.set(bx, -8 + bHeight / 2, bz);
+          rooftopGroup.add(building);
+
+          // Parapets / Rooftop Railings
+          const parapetGeo = new THREE.BoxGeometry(bWidth + 0.2, 0.4, bDepth + 0.2);
+          const parapetMat = new THREE.MeshStandardMaterial({ color: 0x1f143a, roughness: 0.9 });
+          const parapet = new THREE.Mesh(parapetGeo, parapetMat);
+          parapet.position.set(bx, -8 + bHeight + 0.2, bz);
+          rooftopGroup.add(parapet);
+
+          // Decorative Chimney or Water Tank
+          if (Math.random() > 0.4) {
+            const isTank = Math.random() > 0.5;
+            if (isTank) {
+              // Cylindrical water tank
+              const tankGeo = new THREE.CylinderGeometry(0.7, 0.7, 1.2, 12);
+              const tankMat = new THREE.MeshStandardMaterial({ color: 0x10ac84, roughness: 0.6 });
+              const tank = new THREE.Mesh(tankGeo, tankMat);
+              tank.position.set(bx + (Math.random() - 0.5) * 1.2, -8 + bHeight + 0.8, bz);
+              rooftopGroup.add(tank);
+            } else {
+              // Vintage brick chimney
+              const chimGeo = new THREE.BoxGeometry(0.6, 1.4, 0.6);
+              const chimMat = new THREE.MeshStandardMaterial({ color: 0x5f27cd, roughness: 0.8 });
+              const chim = new THREE.Mesh(chimGeo, chimMat);
+              chim.position.set(bx + (Math.random() - 0.5) * 1.2, -8 + bHeight + 0.9, bz);
+              rooftopGroup.add(chim);
+            }
+          }
+
+          // TV Antenna / Bamboo Pole for flying kites
+          if (Math.random() > 0.6) {
+            const poleGeo = new THREE.CylinderGeometry(0.04, 0.04, 2.5, 6);
+            const poleMat = new THREE.MeshBasicMaterial({ color: 0xfeca57 });
+            const pole = new THREE.Mesh(poleGeo, poleMat);
+            pole.position.set(bx + 0.8, -8 + bHeight + 1.4, bz);
+            rooftopGroup.add(pole);
+          }
+        }
+
+        // Hanging Rooftop Fairy String Lights (Chili lights)
+        const fairyGeo = new THREE.SphereGeometry(0.12, 8, 8);
+        const lightColors = [0xff4757, 0xfeca57, 0x00d2d3, 0xff9ff3, 0x2ed573];
+
+        for (let j = 0; j < CONFIG.fairyLightCount; j++) {
+          const col = lightColors[j % lightColors.length];
+          const fairyMat = new THREE.MeshBasicMaterial({ color: col });
+          const lightMesh = new THREE.Mesh(fairyGeo, fairyMat);
+
+          const lx = -36 + (j / CONFIG.fairyLightCount) * 72;
+          const ly = -4.5 + Math.sin(j * 0.8) * 0.6;
+          const lz = -6.5;
+
+          lightMesh.position.set(lx, ly, lz);
+          lightMesh.userData = {
+            baseColor: col,
+            pulsePhase: Math.random() * Math.PI * 2,
+            pulseSpeed: 1.5 + Math.random() * 2.0
+          };
+
+          rooftopGroup.add(lightMesh);
+          fairyLights.push(lightMesh);
+        }
+
+        scene.add(rooftopGroup);
+      }
+
+      // 4. Hero Shakrain Diamond Kite (Chula / Chokhdar) with Dynamic Tail
+      function buildHeroKite() {
+        heroKiteGroup = new THREE.Group();
+
+        // Diamond Kite Paper Sail Geometry
+        const kiteWidth = 2.4;
+        const kiteHeight = 2.4;
+        const kiteShape = new THREE.Shape();
+        kiteShape.moveTo(0, kiteHeight * 0.55);   // Top tip
+        kiteShape.lineTo(kiteWidth * 0.5, 0);     // Right corner
+        kiteShape.lineTo(0, -kiteHeight * 0.45);  // Bottom tip
+        kiteShape.lineTo(-kiteWidth * 0.5, 0);    // Left corner
+        kiteShape.closePath();
+
+        const kiteGeo = new THREE.ShapeGeometry(kiteShape);
+        // Adjust UVs for square canvas texture mapping
+        const pos = kiteGeo.attributes.position;
+        const uvs = [];
+        for (let i = 0; i < pos.count; i++) {
+          const ux = (pos.getX(i) + kiteWidth * 0.5) / kiteWidth;
+          const uy = (pos.getY(i) + kiteHeight * 0.45) / kiteHeight;
+          uvs.push(ux, uy);
+        }
+        kiteGeo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+
+        const kiteMat = new THREE.MeshStandardMaterial({
+          map: createKiteTexture(CONFIG.kiteColorPalettes[currentPaletteIndex]),
+          side: THREE.DoubleSide,
+          roughness: 0.4,
+          metalness: 0.1,
+          emissive: 0x221133,
+          emissiveIntensity: 0.3
+        });
+
+        heroKiteMesh = new THREE.Mesh(kiteGeo, kiteMat);
+        heroKiteGroup.add(heroKiteMesh);
+
+        // Bamboo Cross Struts (Spine & Bow)
+        const spineGeo = new THREE.CylinderGeometry(0.025, 0.025, kiteHeight, 8);
+        const bowGeo = new THREE.CylinderGeometry(0.02, 0.02, kiteWidth * 1.05, 8);
+        const bambooMat = new THREE.MeshStandardMaterial({ color: 0xdfe6e9, roughness: 0.7 });
+
+        const spine = new THREE.Mesh(spineGeo, bambooMat);
+        spine.position.set(0, 0.05, 0.02);
+        heroKiteGroup.add(spine);
+
+        const bow = new THREE.Mesh(bowGeo, bambooMat);
+        bow.rotation.z = Math.PI / 2;
+        bow.position.set(0, 0, 0.02);
+        heroKiteGroup.add(bow);
+
+        // Dynamic Ribbon Tail (Pre-allocated BufferGeometry for Zero Runtime GC)
+        const tailPositions = new Float32Array(tailSegmentCount * 2 * 3);
+        const tailUvs = new Float32Array(tailSegmentCount * 2 * 2);
+        const tailIndices = new Uint16Array((tailSegmentCount - 1) * 6);
+
+        for (let i = 0; i < tailSegmentCount; i++) {
+          tailPoints.push(new THREE.Vector3(0, -kiteHeight * 0.45 - i * 0.35, 0));
+
+          const v = i / (tailSegmentCount - 1);
+          tailUvs[i * 4 + 0] = 0;
+          tailUvs[i * 4 + 1] = v;
+          tailUvs[i * 4 + 2] = 1;
+          tailUvs[i * 4 + 3] = v;
+
+          if (i < tailSegmentCount - 1) {
+            const i2 = i * 2;
+            const idx = i * 6;
+            tailIndices[idx + 0] = i2;
+            tailIndices[idx + 1] = i2 + 1;
+            tailIndices[idx + 2] = i2 + 2;
+
+            tailIndices[idx + 3] = i2 + 1;
+            tailIndices[idx + 4] = i2 + 3;
+            tailIndices[idx + 5] = i2 + 2;
+          }
+        }
+
+        const tailGeo = new THREE.BufferGeometry();
+        tailGeo.setAttribute('position', new THREE.BufferAttribute(tailPositions, 3));
+        tailGeo.setAttribute('uv', new THREE.BufferAttribute(tailUvs, 2));
+        tailGeo.setIndex(new THREE.BufferAttribute(tailIndices, 1));
+
+        const tailMat = new THREE.MeshStandardMaterial({
+          color: 0xfeca57,
+          roughness: 0.3,
+          metalness: 0.2,
+          emissive: 0xff7675,
+          emissiveIntensity: 0.4,
+          side: THREE.DoubleSide
+        });
+
+        heroTailRibbon = new THREE.Mesh(tailGeo, tailMat);
+        scene.add(heroTailRibbon);
+
+        heroKiteGroup.position.set(0, 1.5, CONFIG.heroZ);
+        scene.add(heroKiteGroup);
+      }
+
+      // 5. Background Floating Kites Flotilla
+      function buildBackgroundKites() {
+        const kiteWidth = 1.2;
+        const kiteHeight = 1.2;
+        const kiteShape = new THREE.Shape();
+        kiteShape.moveTo(0, kiteHeight * 0.55);
+        kiteShape.lineTo(kiteWidth * 0.5, 0);
+        kiteShape.lineTo(0, -kiteHeight * 0.45);
+        kiteShape.lineTo(-kiteWidth * 0.5, 0);
+        kiteShape.closePath();
+
+        const bgKiteGeo = new THREE.ShapeGeometry(kiteShape);
+
+        for (let i = 0; i < CONFIG.backgroundKiteCount; i++) {
+          const pal = CONFIG.kiteColorPalettes[i % CONFIG.kiteColorPalettes.length];
+          const bgMat = new THREE.MeshBasicMaterial({
+            map: createKiteTexture(pal),
+            side: THREE.DoubleSide
+          });
+
+          const bgKite = new THREE.Mesh(bgKiteGeo, bgMat);
+          const bx = -22 + (i / CONFIG.backgroundKiteCount) * 44 + (Math.random() - 0.5) * 4;
+          const by = 2 + Math.random() * 8;
+          const bz = -12 - Math.random() * 15;
+
+          bgKite.position.set(bx, by, bz);
+          bgKite.userData = {
+            baseX: bx,
+            baseY: by,
+            baseZ: bz,
+            swayPhase: Math.random() * Math.PI * 2,
+            swaySpeed: 0.8 + Math.random() * 1.2,
+            amplitudeX: 1.2 + Math.random() * 1.5,
+            amplitudeY: 0.8 + Math.random() * 0.8
+          };
+
+          scene.add(bgKite);
+          bgKitesPool.push(bgKite);
+        }
+      }
+
+      // 6. Fanush Sky Lanterns Object Pool
+      function buildFanushLanternPool() {
+        const lanternGeo = new THREE.CylinderGeometry(0.45, 0.35, 1.1, 10, 1, false);
+        const lanternMat = new THREE.MeshStandardMaterial({
+          map: createFanushTexture(),
+          roughness: 0.3,
+          metalness: 0.1,
+          emissive: 0xff9f43,
+          emissiveIntensity: 0.8,
+          transparent: true,
+          opacity: 0.95
+        });
+
+        for (let i = 0; i < CONFIG.maxFanushLanterns; i++) {
+          const lantern = new THREE.Mesh(lanternGeo, lanternMat.clone());
+          lantern.visible = false;
+          lantern.userData = {
+            active: false,
+            velocity: new THREE.Vector3(),
+            wobbleSpeed: 1.0,
+            wobblePhase: 0,
+            life: 0,
+            maxLife: 8.0,
+            scale: 1.0
+          };
+
+          scene.add(lantern);
+          fanushPool.push(lantern);
+        }
+      }
+
+      // 7. Golden Stardust / Firework Embers Particle Pool
+      function buildStardustParticlePool() {
+        const dustGeo = new THREE.BufferGeometry();
+        const dustPos = new Float32Array(CONFIG.maxStardustParticles * 3);
+        const dustColors = new Float32Array(CONFIG.maxStardustParticles * 3);
+
+        for (let i = 0; i < CONFIG.maxStardustParticles; i++) {
+          dustPos[i * 3 + 0] = 0;
+          dustPos[i * 3 + 1] = -100;
+          dustPos[i * 3 + 2] = 0;
+
+          dustColors[i * 3 + 0] = 1.0;
+          dustColors[i * 3 + 1] = 0.85;
+          dustColors[i * 3 + 2] = 0.4;
+
+          stardustPool.push({
+            active: false,
+            position: new THREE.Vector3(0, -100, 0),
+            velocity: new THREE.Vector3(),
+            life: 0,
+            maxLife: 1.5,
+            index: i
+          });
+        }
+
+        dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
+        dustGeo.setAttribute('color', new THREE.BufferAttribute(dustColors, 3));
+
+        const dustMat = new THREE.PointsMaterial({
+          size: 1.8,
+          map: createStardustTexture(),
+          vertexColors: true,
+          transparent: true,
+          opacity: 0.9,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false
+        });
+
+        const dustPoints = new THREE.Points(dustGeo, dustMat);
+        dustPoints.name = 'stardustPoints';
+        scene.add(dustPoints);
+      }
+
+      // 8. Soft Rooftop Chimney Smoke Puffs Pool
+      function buildRooftopSmokePuffPool() {
+        const puffGeo = new THREE.SphereGeometry(0.3, 8, 8);
+        const puffMat = new THREE.MeshBasicMaterial({
+          color: 0xa29bfe,
+          transparent: true,
+          opacity: 0.25,
+          depthWrite: false
+        });
+
+        for (let i = 0; i < CONFIG.maxSmokePuffs; i++) {
+          const puff = new THREE.Mesh(puffGeo, puffMat.clone());
+          puff.visible = false;
+          puff.userData = {
+            active: false,
+            velocity: new THREE.Vector3(),
+            life: 0,
+            maxLife: 4.0
+          };
+          scene.add(puff);
+          smokePuffPool.push(puff);
+        }
+      }
+
+      // --- SPAWNING DYNAMICS & BURSTS ---
+
+      // Spawn a warm glowing Fanush Sky Lantern
+      function spawnFanushLantern(originX, originY, originZ, speedMultiplier = 1.0) {
+        for (let i = 0; i < fanushPool.length; i++) {
+          const lantern = fanushPool[i];
+          if (!lantern.userData.active) {
+            lantern.userData.active = true;
+            lantern.visible = true;
+            lantern.position.set(
+              originX + (Math.random() - 0.5) * 1.5,
+              originY,
+              originZ + (Math.random() - 0.5) * 1.5
+            );
+            lantern.userData.velocity.set(
+              (Math.random() - 0.5) * 0.4 * speedMultiplier,
+              (1.2 + Math.random() * 0.8) * speedMultiplier,
+              (Math.random() - 0.5) * 0.3 * speedMultiplier
+            );
+            lantern.userData.wobbleSpeed = 1.5 + Math.random() * 1.5;
+            lantern.userData.wobblePhase = Math.random() * Math.PI * 2;
+            lantern.userData.life = 0;
+            lantern.userData.maxLife = 7.0 + Math.random() * 3.0;
+
+            const scale = 0.8 + Math.random() * 0.5;
+            lantern.scale.set(scale, scale, scale);
+            lantern.material.opacity = 0.95;
+            return lantern;
+          }
+        }
+        return null;
+      }
+
+      // Spawn Golden Stardust firework embers
+      function spawnStardustShower(originX, originY, originZ, count = 25, speed = 2.5) {
+        let spawned = 0;
+        for (let i = 0; i < stardustPool.length && spawned < count; i++) {
+          const p = stardustPool[i];
+          if (!p.active) {
+            p.active = true;
+            p.position.set(originX, originY, originZ);
+
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.random() * Math.PI;
+            const vSpeed = speed * (0.5 + Math.random() * 0.8);
+
+            p.velocity.set(
+              Math.sin(phi) * Math.cos(theta) * vSpeed,
+              Math.cos(phi) * vSpeed * 0.8,
+              Math.sin(phi) * Math.sin(theta) * vSpeed
+            );
+
+            p.life = 0;
+            p.maxLife = 1.2 + Math.random() * 0.8;
+            spawned++;
+          }
+        }
+      }
+
+      // Spawn chimney smoke puff
+      function spawnSmokePuff(originX, originY, originZ) {
+        for (let i = 0; i < smokePuffPool.length; i++) {
+          const puff = smokePuffPool[i];
+          if (!puff.userData.active) {
+            puff.userData.active = true;
+            puff.visible = true;
+            puff.position.set(originX, originY, originZ);
+            puff.userData.velocity.set((Math.random() - 0.2) * 0.2, 0.4 + Math.random() * 0.3, 0);
+            puff.userData.life = 0;
+            puff.userData.maxLife = 3.5 + Math.random() * 1.5;
+            puff.scale.set(0.6, 0.6, 0.6);
+            puff.material.opacity = 0.28;
+            break;
+          }
+        }
+      }
+
+      // Show temporary screen toast notification
+      let toastTimer = null;
+      function showToast(text, icon = '✨') {
+        const toast = document.getElementById('toast-notify');
+        const tText = document.getElementById('toast-text');
+        const tIcon = document.getElementById('toast-icon');
+        if (!toast || !tText || !tIcon) return;
+
+        tText.textContent = text;
+        tIcon.textContent = icon;
+        toast.classList.add('show');
+
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          toast.classList.remove('show');
+        }, 2200);
+      }
+
+      // Hide start prompt banner once interactive
+      function dismissPrompt() {
+        const banner = document.getElementById('prompt-banner');
+        if (banner && !banner.classList.contains('hidden')) {
+          banner.classList.add('hidden');
+        }
+      }
+
+      // --- SENSORY BURST ACTIONS ---
+
+      // 1. Single Action Burst (Spacebar / Tap / OK button / Gamepad button)
+      function triggerActionBurst() {
+        dismissPrompt();
+        initAudioContext();
+        lastInteractionTime = Date.now();
+
+        // Cycle kite color palette on action burst
+        currentPaletteIndex = (currentPaletteIndex + 1) % CONFIG.kiteColorPalettes.length;
+        const newPalette = CONFIG.kiteColorPalettes[currentPaletteIndex];
+        heroKiteMesh.material.map = createKiteTexture(newPalette);
+        heroKiteMesh.material.needsUpdate = true;
+
+        // Kite acrobatic soar loop trigger
+        isActionBursting = true;
+        burstProgress = 0;
+
+        // Release cluster of 3-5 Fanush lanterns
+        const lanternCount = 3 + Math.floor(Math.random() * 3);
+        for (let i = 0; i < lanternCount; i++) {
+          const spawnX = heroKiteGroup.position.x + (Math.random() - 0.5) * 3.5;
+          const spawnY = Math.min(heroKiteGroup.position.y - 1.5, -2);
+          spawnFanushLantern(spawnX, spawnY, heroKiteGroup.position.z, 1.0);
+        }
+
+        // Shower of golden firework stardust embers
+        spawnStardustShower(heroKiteGroup.position.x, heroKiteGroup.position.y, heroKiteGroup.position.z, 30, 3.2);
+
+        // Harmonic music box chime + warm dusk pad
+        playHarmonicChime(1.0, false);
+        playTwinkleChime(880);
+
+        // Screen warm twilight shimmer flash
+        const flash = document.getElementById('festival-flash');
+        if (flash) {
+          flash.classList.remove('active');
+          void flash.offsetWidth; // Reflow
+          flash.classList.add('active');
+        }
+
+        showToast(`Soaring with ${newPalette.name}!`, '🪁');
+      }
+
+      // 2. Super Palm Grab Grand Shakrain Burst (Multi-Touch touches.length >= 2)
+      function triggerGrandFestivalBurst() {
+        dismissPrompt();
+        initAudioContext();
+        lastInteractionTime = Date.now();
+
+        // Launch 12 Fanush lanterns across wide 21:9 horizon
+        for (let i = 0; i < 12; i++) {
+          const fx = -18 + (i / 12) * 36 + (Math.random() - 0.5) * 2;
+          spawnFanushLantern(fx, -5.5, -2 - Math.random() * 6, 1.3);
+        }
+
+        // Grand cascade of stardust
+        spawnStardustShower(heroKiteGroup.position.x, heroKiteGroup.position.y + 2, heroKiteGroup.position.z, 60, 4.5);
+
+        // Full harmonic chord arpeggio
+        playHarmonicChime(1.0, true);
+        playTwinkleChime(1046.5);
+
+        // Full screen warm aura
+        const flash = document.getElementById('festival-flash');
+        if (flash) {
+          flash.classList.remove('active');
+          void flash.offsetWidth;
+          flash.classList.add('active');
+        }
+
+        showToast('🌟 Maha Shakrain Grand Festival Burst! 🏮', '🏮');
+      }
+
+      // Direct steer kite toward screen coordinates
+      function steerKiteToScreen(clientX, clientY) {
+        scratchVec3A.set(
+          (clientX / window.innerWidth) * 2 - 1,
+          -(clientY / window.innerHeight) * 2 + 1,
+          0.5
+        );
+        scratchVec3A.unproject(camera);
+        scratchVec3A.sub(camera.position).normalize();
+
+        const distance = (CONFIG.heroZ - camera.position.z) / scratchVec3A.z;
+        scratchVec3B.copy(camera.position).add(scratchVec3A.multiplyScalar(distance));
+
+        // Clamp inside visible screen margins
+        kiteTargetPos.x = Math.max(-14, Math.min(14, scratchVec3B.x));
+        kiteTargetPos.y = Math.max(-1, Math.min(8, scratchVec3B.y));
+      }
+
+      // --- USER INPUT & TV REMOTE EVENT HANDLING ---
+
+      // 1. Keyboard & TV Remote D-Pad / OK / Back mapping
+      window.addEventListener('keydown', (e) => {
+        const key = e.key;
+        const code = e.keyCode;
+
+        // TV Remote Back Keys (10009: Samsung Tizen, 461: LG webOS, 4: Android TV, Escape)
+        if (key === 'Escape' || key === 'Back' || key === 'GoBack' || key === 'BrowserBack' ||
+            code === 10009 || code === 461 || code === 4 || code === 27) {
+          e.preventDefault();
+          window.location.href = '../../index.html';
+          return;
+        }
+
+        // TV Remote D-Pad Navigation
+        if (key === 'ArrowLeft' || code === 37) {
+          kiteTargetPos.x = Math.max(-14, kiteTargetPos.x - 2.5);
+          playHarmonicChime(0.9, false);
+          return;
+        }
+        if (key === 'ArrowRight' || code === 39) {
+          kiteTargetPos.x = Math.min(14, kiteTargetPos.x + 2.5);
+          playHarmonicChime(1.1, false);
+          return;
+        }
+        if (key === 'ArrowUp' || code === 38) {
+          kiteTargetPos.y = Math.min(8, kiteTargetPos.y + 2.0);
+          playHarmonicChime(1.2, false);
+          return;
+        }
+        if (key === 'ArrowDown' || code === 40) {
+          kiteTargetPos.y = Math.max(-1, kiteTargetPos.y - 2.0);
+          playHarmonicChime(0.8, false);
+          return;
+        }
+
+        // ANY other key, Spacebar, Enter, TV OK / Select button (code 13, 23, DPAD_CENTER)
+        if (!e.repeat) {
+          triggerActionBurst();
+        }
+      }, { passive: false });
+
+      // 2. Gamepad API for Smart TV & Console Controllers
+      let lastGamepadButtonState = false;
+      function checkGamepadState() {
+        const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+        if (!gamepads) return;
+
+        for (let i = 0; i < gamepads.length; i++) {
+          const gp = gamepads[i];
+          if (!gp) continue;
+
+          // Gamepad Button 0 (A / Cross / OK)
+          const btn0Pressed = gp.buttons[0] && gp.buttons[0].pressed;
+          if (btn0Pressed && !lastGamepadButtonState) {
+            triggerActionBurst();
+          }
+          lastGamepadButtonState = btn0Pressed;
+
+          // Gamepad Button 1 (B / Circle / Back)
+          if (gp.buttons[1] && gp.buttons[1].pressed) {
+            window.location.href = '../../index.html';
+          }
+
+          // D-Pad / Analog Sticks
+          const stickX = gp.axes[0] || (gp.buttons[14] && gp.buttons[14].pressed ? -1 : (gp.buttons[15] && gp.buttons[15].pressed ? 1 : 0));
+          const stickY = gp.axes[1] || (gp.buttons[12] && gp.buttons[12].pressed ? -1 : (gp.buttons[13] && gp.buttons[13].pressed ? 1 : 0));
+
+          if (Math.abs(stickX) > 0.2) {
+            kiteTargetPos.x = Math.max(-14, Math.min(14, kiteTargetPos.x + stickX * 0.3));
+          }
+          if (Math.abs(stickY) > 0.2) {
+            kiteTargetPos.y = Math.max(-1, Math.min(8, kiteTargetPos.y - stickY * 0.3));
+          }
+        }
+      }
+
+      // 3. Pointer, Touch & Multi-Touch Palm Grab Handling
+      const canvasContainer = document.getElementById('canvas-container');
+
+      canvasContainer.addEventListener('pointerdown', (e) => {
+        steerKiteToScreen(e.clientX, e.clientY);
+        triggerActionBurst();
+      });
+
+      canvasContainer.addEventListener('pointermove', (e) => {
+        if (e.buttons > 0) {
+          steerKiteToScreen(e.clientX, e.clientY);
+        }
+      });
+
+      // Mobile Multi-Touch Palm Grab Detection
+      window.addEventListener('touchstart', (e) => {
+        if (e.touches.length >= 2) {
+          e.preventDefault();
+          triggerGrandFestivalBurst();
+        }
+      }, { passive: false });
+
+      // Mandatory Infant Ergonomics: Prevent right-click / context menu
+      document.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        return false;
+      });
+
+      // 4. UI Buttons (Auto-blur to prevent focus capture on Spacebar)
+      const btnSound = document.getElementById('btn-sound');
+      const soundIcon = document.getElementById('sound-icon');
+      btnSound.addEventListener('click', (e) => {
+        e.stopPropagation();
+        btnSound.blur();
+        soundEnabled = !soundEnabled;
+        soundIcon.textContent = soundEnabled ? '🔊' : '🔇';
+        if (soundEnabled) {
+          initAudioContext();
+          playHarmonicChime(1.0);
+        }
+      });
+
+      const btnSoothe = document.getElementById('btn-soothe');
+      const sootheIcon = document.getElementById('soothe-icon');
+      const sootheLabel = document.getElementById('soothe-label');
+      btnSoothe.addEventListener('click', (e) => {
+        e.stopPropagation();
+        btnSoothe.blur();
+        sootheMode = !sootheMode;
+        sootheIcon.textContent = sootheMode ? '🕊️' : '⚡';
+        sootheLabel.textContent = sootheMode ? 'Soothe' : 'Manual';
+        showToast(sootheMode ? 'Auto Soothe Mode Active' : 'Manual Flight Mode', '🕊️');
+      });
+
+      const btnFullscreen = document.getElementById('btn-fullscreen');
+      btnFullscreen.addEventListener('click', (e) => {
+        e.stopPropagation();
+        btnFullscreen.blur();
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          document.exitFullscreen().catch(() => {});
+        }
+      });
+
+      // Tab Minimize & Visibility Change Audio State Handling
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          if (audioCtx && audioCtx.state === 'running') {
+            audioCtx.suspend();
+          }
+        } else {
+          if (audioCtx && audioCtx.state === 'suspended' && soundEnabled) {
+            audioCtx.resume();
+          }
+        }
+      });
+
+      // --- MAIN ANIMATION & PHYSICS LOOP (Zero Garbage Collection) ---
+      let lastTime = performance.now();
+
+      function animate() {
+        requestAnimationFrame(animate);
+
+        const now = performance.now();
+        const delta = Math.min((now - lastTime) / 1000, 0.1);
+        lastTime = now;
+
+        const timeSec = now * 0.001;
+
+        // Check Gamepad state for TV / controller input
+        checkGamepadState();
+
+        // 1. Session Progress Bar Update
+        const sessionElapsed = (Date.now() - sessionStartTime) / 1000;
+        const progressPercent = (sessionElapsed % 120) / 1.2; // 2-minute calming cycle
+        const progressBar = document.getElementById('session-progress');
+        if (progressBar) {
+          progressBar.style.width = `${progressPercent}%`;
+        }
+
+        // 2. Idle Soothing Mode (Auto-float & periodical Fanush launches)
+        kiteIdleTimer += delta;
+        if (sootheMode || Date.now() - lastInteractionTime > 4500) {
+          // Serene figure-8 infinite drift
+          kiteTargetPos.x = Math.sin(timeSec * 0.6) * 7.5;
+          kiteTargetPos.y = 1.8 + Math.sin(timeSec * 1.2) * 2.2;
+
+          if (kiteIdleTimer > 4.0) {
+            kiteIdleTimer = 0;
+            // Spawn gentle background Fanush
+            spawnFanushLantern(
+              (Math.random() - 0.5) * 20,
+              -6,
+              -4 - Math.random() * 8,
+              0.8
+            );
+            playHarmonicChime(1.0);
+          }
+        }
+
+        // 3. Hero Kite Aerodynamic Motion & Spring Physics
+        const springK = 2.5;
+        const damping = 0.88;
+
+        const dx = kiteTargetPos.x - heroKiteGroup.position.x;
+        const dy = kiteTargetPos.y - heroKiteGroup.position.y;
+
+        kiteVelocity.x = (kiteVelocity.x + dx * springK * delta) * damping;
+        kiteVelocity.y = (kiteVelocity.y + dy * springK * delta) * damping;
+
+        heroKiteGroup.position.x += kiteVelocity.x * delta;
+        heroKiteGroup.position.y += kiteVelocity.y * delta;
+
+        // Aerodynamic Tilt & Roll
+        const targetRotZ = -kiteVelocity.x * 0.12 + Math.sin(timeSec * 2.0) * 0.08;
+        const targetRotX = Math.sin(timeSec * 1.5) * 0.1;
+        const targetRotY = kiteVelocity.x * 0.08;
+
+        if (isActionBursting) {
+          burstProgress += delta * 2.8;
+          // Smooth acrobatic loop-de-loop with sine easing
+          const loopAngle = Math.sin(burstProgress * Math.PI) * Math.PI * 2;
+          heroKiteGroup.rotation.z = targetRotZ + loopAngle * 0.8;
+          heroKiteGroup.rotation.x = targetRotX + Math.sin(loopAngle) * 0.5;
+          heroKiteGroup.position.y += Math.sin(burstProgress * Math.PI) * 0.08;
+
+          if (burstProgress >= 1.0) {
+            isActionBursting = false;
+          }
+        } else {
+          heroKiteGroup.rotation.z += (targetRotZ - heroKiteGroup.rotation.z) * 0.1;
+          heroKiteGroup.rotation.x += (targetRotX - heroKiteGroup.rotation.x) * 0.1;
+          heroKiteGroup.rotation.y += (targetRotY - heroKiteGroup.rotation.y) * 0.1;
+        }
+
+        // 4. Dynamic Ribbon Tail Simulation
+        // Lead point follows bottom tip of kite
+        scratchVec3A.set(0, -1.08, 0).applyQuaternion(heroKiteGroup.quaternion).add(heroKiteGroup.position);
+        tailPoints[0].copy(scratchVec3A);
+
+        for (let i = 1; i < tailPoints.length; i++) {
+          const prev = tailPoints[i - 1];
+          const curr = tailPoints[i];
+
+          // Sine wave wind flutter delay
+          const windFlutterX = Math.sin(timeSec * 4.0 - i * 0.4) * 0.15;
+          const windFlutterZ = Math.cos(timeSec * 3.5 - i * 0.3) * 0.08;
+
+          scratchVec3B.copy(curr).sub(prev);
+          const dist = scratchVec3B.length();
+          if (dist > 0.001) {
+            scratchVec3B.normalize().multiplyScalar(0.32);
+            curr.copy(prev).add(scratchVec3B);
+          }
+          curr.x += windFlutterX * delta * 2.5;
+          curr.z += windFlutterZ * delta * 2.5;
+          curr.y -= 0.6 * delta; // Gentle gravitational lag
+        }
+
+        // In-place Ribbon Mesh Buffer Update (Zero Runtime GC)
+        const posArr = heroTailRibbon.geometry.attributes.position.array;
+        const totalPts = tailPoints.length;
+        for (let i = 0; i < totalPts; i++) {
+          const curr = tailPoints[i];
+          if (i < totalPts - 1) {
+            scratchVec3A.copy(tailPoints[i + 1]).sub(curr).normalize();
+          } else {
+            scratchVec3A.copy(curr).sub(tailPoints[i - 1]).normalize();
+          }
+          // Perpendicular vector for ribbon width
+          scratchVec3B.set(-scratchVec3A.y, scratchVec3A.x, 0).normalize();
+          const halfW = 0.09 * (1.0 - (i / totalPts) * 0.45);
+
+          // Left vertex
+          posArr[i * 6 + 0] = curr.x - scratchVec3B.x * halfW;
+          posArr[i * 6 + 1] = curr.y - scratchVec3B.y * halfW;
+          posArr[i * 6 + 2] = curr.z;
+
+          // Right vertex
+          posArr[i * 6 + 3] = curr.x + scratchVec3B.x * halfW;
+          posArr[i * 6 + 4] = curr.y + scratchVec3B.y * halfW;
+          posArr[i * 6 + 5] = curr.z;
+        }
+        heroTailRibbon.geometry.attributes.position.needsUpdate = true;
+
+        // 5. Background Kites Soaring
+        for (let i = 0; i < bgKitesPool.length; i++) {
+          const bgk = bgKitesPool[i];
+          const ud = bgk.userData;
+          const kTime = timeSec * ud.swaySpeed + ud.swayPhase;
+
+          bgk.position.x = ud.baseX + Math.sin(kTime) * ud.amplitudeX;
+          bgk.position.y = ud.baseY + Math.cos(kTime * 1.3) * ud.amplitudeY;
+          bgk.rotation.z = Math.sin(kTime * 0.9) * 0.2;
+          bgk.rotation.x = Math.cos(kTime * 1.1) * 0.1;
+        }
+
+        // 6. Fanush Lanterns Physics & Upward Buoyancy
+        for (let i = 0; i < fanushPool.length; i++) {
+          const lan = fanushPool[i];
+          if (lan.userData.active) {
+            lan.userData.life += delta;
+            const progress = lan.userData.life / lan.userData.maxLife;
+
+            if (progress >= 1.0 || lan.position.y > 22) {
+              lan.userData.active = false;
+              lan.visible = false;
+            } else {
+              lan.position.addScaledVector(lan.userData.velocity, delta);
+              lan.userData.wobblePhase += delta * lan.userData.wobbleSpeed;
+
+              // Gentle floating pendulum wobble
+              lan.rotation.z = Math.sin(lan.userData.wobblePhase) * 0.12;
+              lan.rotation.x = Math.cos(lan.userData.wobblePhase * 0.8) * 0.08;
+
+              // Candle light flicker & smooth fade near top
+              const flicker = 0.8 + Math.sin(timeSec * 8.0 + i) * 0.2;
+              lan.material.emissiveIntensity = flicker;
+
+              if (progress > 0.75) {
+                lan.material.opacity = (1.0 - (progress - 0.75) / 0.25) * 0.95;
+              }
+            }
+          }
+        }
+
+        // 7. Golden Stardust / Firework Particles Physics
+        const dustPointsMesh = scene.getObjectByName('stardustPoints');
+        if (dustPointsMesh) {
+          const posAttr = dustPointsMesh.geometry.attributes.position;
+          let hasActiveDust = false;
+
+          for (let i = 0; i < stardustPool.length; i++) {
+            const p = stardustPool[i];
+            if (p.active) {
+              p.life += delta;
+              if (p.life >= p.maxLife) {
+                p.active = false;
+                posAttr.setY(p.index, -100);
+              } else {
+                p.position.addScaledVector(p.velocity, delta);
+                p.velocity.y -= 2.2 * delta; // Soft gravity
+                p.velocity.multiplyScalar(0.96); // Air resistance
+
+                posAttr.setXYZ(p.index, p.position.x, p.position.y, p.position.z);
+                hasActiveDust = true;
+              }
+            }
+          }
+          if (hasActiveDust) {
+            posAttr.needsUpdate = true;
+          }
+        }
+
+        // 8. Rooftop Chimney Smoke Puffs Physics
+        if (Math.random() < 0.08) {
+          // Random chimney spawn
+          const spawnX = -30 + Math.random() * 60;
+          spawnSmokePuff(spawnX, -4.5, -9);
+        }
+
+        for (let i = 0; i < smokePuffPool.length; i++) {
+          const puff = smokePuffPool[i];
+          if (puff.userData.active) {
+            puff.userData.life += delta;
+            const p = puff.userData.life / puff.userData.maxLife;
+            if (p >= 1.0) {
+              puff.userData.active = false;
+              puff.visible = false;
+            } else {
+              puff.position.addScaledVector(puff.userData.velocity, delta);
+              const scale = 0.6 + p * 1.8;
+              puff.scale.set(scale, scale, scale);
+              puff.material.opacity = (1.0 - p) * 0.28;
+            }
+          }
+        }
+
+        // 9. Fairy Lights Twinkle Pulse
+        for (let j = 0; j < fairyLights.length; j++) {
+          const fl = fairyLights[j];
+          const pulse = 0.6 + Math.sin(timeSec * fl.userData.pulseSpeed + fl.userData.pulsePhase) * 0.4;
+          fl.scale.set(pulse, pulse, pulse);
+        }
+
+        // Render Scene
+        renderer.render(scene, camera);
+      }
+
+      // Initialize on DOM ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          initThreeScene();
+          animate();
+        });
+      } else {
+        initThreeScene();
+        animate();
+      }
+
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,2237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Boishakhi Mela Celebration - Infant 3D Sensory Experience</title>
+  <style>
+    /* ==========================================================================
+       RESET & BASE ERGONOMIC STYLES
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #fffae6;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      touch-action: none;
+      overscroll-behavior: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #canvas-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      cursor: pointer;
+    }
+
+    /* Ambient Warm Festive Vignette */
+    .vignette-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
+      box-shadow: inset 0 0 90px rgba(255, 209, 102, 0.45), inset 0 0 160px rgba(235, 94, 40, 0.22);
+      mix-blend-mode: multiply;
+    }
+
+    /* Super Bloom Utsab Glow Aura */
+    .super-bloom-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 3;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      background: radial-gradient(circle at center, transparent 20%, rgba(255, 215, 0, 0.32) 50%, rgba(255, 107, 107, 0.38) 75%, rgba(255, 159, 67, 0.42) 100%);
+    }
+
+    .super-bloom-overlay.active {
+      opacity: 1;
+      animation: superBloomGlow 0.5s infinite alternate ease-in-out;
+    }
+
+    @keyframes superBloomGlow {
+      0% { opacity: 0.7; transform: scale(1.0); }
+      100% { opacity: 1.0; transform: scale(1.02); }
+    }
+
+    /* Top Sensory Session Progress */
+    .session-progress-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.35);
+      z-index: 20;
+    }
+
+    .session-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ff4757 0%, #ffa502 25%, #ffd124 50%, #2ed573 75%, #ff6b81 100%);
+      transition: width 0.3s linear;
+      box-shadow: 0 0 12px rgba(255, 209, 102, 0.9);
+    }
+
+    /* UI Overlay Layer */
+    .ui-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px 24px;
+      transition: opacity 0.5s ease;
+    }
+
+    /* Top Header Bar */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      pointer-events: auto;
+    }
+
+    .brand-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 8px 20px;
+      border-radius: 999px;
+      box-shadow: 0 8px 24px rgba(235, 94, 40, 0.12);
+      border: 2px solid rgba(255, 255, 255, 0.98);
+      animation: floatBadge 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatBadge {
+      0% { transform: translateY(0px); }
+      100% { transform: translateY(-4px); }
+    }
+
+    .brand-icon {
+      font-size: 24px;
+      display: inline-block;
+      animation: wiggle 3s ease-in-out infinite;
+    }
+
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(0deg) scale(1); }
+      25% { transform: rotate(-8deg) scale(1.1); }
+      75% { transform: rotate(8deg) scale(1.1); }
+    }
+
+    .brand-title {
+      font-weight: 800;
+      font-size: 16px;
+      letter-spacing: 0.5px;
+      background: linear-gradient(135deg, #e84118 0%, #ff7f0e 50%, #2ed573 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .ultrawide-badge {
+      font-size: 11px;
+      background: #fef3c7;
+      color: #b45309;
+      padding: 3px 10px;
+      border-radius: 8px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .glass-btn {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 2px solid rgba(255, 255, 255, 0.98);
+      border-radius: 999px;
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #57606f;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: auto;
+      min-width: 48px;
+      min-height: 48px;
+      text-decoration: none;
+      outline: none;
+    }
+
+    .glass-btn:hover, .glass-btn:focus-visible {
+      transform: translateY(-2px) scale(1.05);
+      background: rgba(255, 255, 255, 1.0);
+      box-shadow: 0 10px 25px rgba(255, 127, 14, 0.25);
+      color: #2f3542;
+    }
+
+    .glass-btn:active {
+      transform: scale(0.95);
+    }
+
+    .icon-btn {
+      width: 48px;
+      height: 48px;
+      min-width: 48px;
+      min-height: 48px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 18px;
+    }
+
+    /* Start / Interactive Prompt Banner */
+    .prompt-banner {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      padding: 14px 32px;
+      border-radius: 999px;
+      border: 3px solid #ffffff;
+      box-shadow: 0 12px 38px rgba(255, 127, 14, 0.32);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      pointer-events: auto;
+      cursor: pointer;
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: pulseGlow 2.5s infinite ease-in-out;
+      min-height: 48px;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 8px 30px rgba(255, 165, 2, 0.35); transform: translateX(-50%) scale(1); }
+      50% { box-shadow: 0 16px 45px rgba(232, 65, 24, 0.45); transform: translateX(-50%) scale(1.03); }
+    }
+
+    .prompt-banner.hidden {
+      opacity: 0;
+      transform: translateX(-50%) translateY(40px) scale(0.9);
+      pointer-events: none;
+    }
+
+    .prompt-icon {
+      font-size: 30px;
+      animation: bouncePrompt 1.8s infinite ease-in-out;
+    }
+
+    @keyframes bouncePrompt {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .prompt-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .prompt-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #2f3542;
+    }
+
+    .prompt-subtitle {
+      font-size: 12px;
+      font-weight: 600;
+      color: #747d8c;
+    }
+
+    /* Parent Settings Modal */
+    .settings-modal {
+      position: absolute;
+      top: 75px;
+      right: 24px;
+      width: 320px;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 24px;
+      border: 2px solid rgba(255, 255, 255, 0.98);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+      padding: 20px;
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transform-origin: top right;
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: auto;
+    }
+
+    .settings-modal.collapsed {
+      opacity: 0;
+      transform: scale(0.85) translateY(-20px);
+      pointer-events: none;
+    }
+
+    .settings-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #f1f2f6;
+    }
+
+    .settings-header h3 {
+      font-size: 16px;
+      font-weight: 800;
+      color: #2f3542;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .setting-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .setting-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #57606f;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .setting-control {
+      display: flex;
+      gap: 6px;
+      background: #f1f2f6;
+      padding: 4px;
+      border-radius: 12px;
+    }
+
+    .pill-btn {
+      flex: 1;
+      padding: 8px 4px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      font-size: 12px;
+      font-weight: 700;
+      color: #747d8c;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pill-btn.active {
+      background: #ffffff;
+      color: #e84118;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+    }
+
+    .slider-input {
+      width: 100%;
+      accent-color: #e84118;
+      cursor: pointer;
+      height: 24px;
+    }
+
+    /* Floating Screen Sensory Sparkle Orbs (Clickable) */
+    .floating-screen-bubble {
+      position: absolute;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.95), rgba(255, 215, 0, 0.65) 60%, rgba(255, 107, 107, 0.75) 100%);
+      box-shadow: 0 8px 22px rgba(255, 127, 14, 0.35), inset 0 0 14px rgba(255, 255, 255, 0.9);
+      border: 2px solid rgba(255, 255, 255, 0.95);
+      cursor: pointer;
+      pointer-events: auto;
+      animation: bubbleFloat 5s infinite ease-in-out alternate;
+      z-index: 8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      transition: transform 0.2s ease;
+    }
+
+    .floating-screen-bubble:hover, .floating-screen-bubble:active {
+      transform: scale(1.2);
+    }
+
+    @keyframes bubbleFloat {
+      0% { transform: translateY(0px) rotate(0deg); }
+      100% { transform: translateY(-16px) rotate(12deg); }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+      .ui-layer {
+        padding: 12px 14px;
+      }
+      .brand-title {
+        font-size: 14px;
+      }
+      .ultrawide-badge {
+        display: none;
+      }
+      .prompt-banner {
+        width: 90%;
+        padding: 12px 18px;
+        bottom: 16px;
+      }
+      .prompt-title {
+        font-size: 13px;
+      }
+      .prompt-subtitle {
+        font-size: 11px;
+      }
+      .settings-modal {
+        top: 65px;
+        right: 12px;
+        left: 12px;
+        width: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Sensory Session Progress -->
+  <div class="session-progress-container">
+    <div class="session-progress-bar" id="session-progress"></div>
+  </div>
+
+  <!-- Three.js Canvas Container -->
+  <div id="canvas-container"></div>
+
+  <!-- Ambient Overlays -->
+  <div class="vignette-overlay"></div>
+  <div class="super-bloom-overlay" id="super-bloom-overlay"></div>
+
+  <!-- Floating Sensory Screen Orbs (Interactive baby taps) -->
+  <div class="floating-screen-bubble" style="top: 18%; left: 4%; animation-delay: 0s;" id="orb-1">🪅</div>
+  <div class="floating-screen-bubble" style="top: 65%; right: 4%; animation-delay: -2s;" id="orb-2">🪕</div>
+  <div class="floating-screen-bubble" style="top: 38%; right: 5%; animation-delay: -3.5s;" id="orb-3">🦉</div>
+  <div class="floating-screen-bubble" style="bottom: 22%; left: 5%; animation-delay: -1.2s;" id="orb-4">🌸</div>
+
+  <!-- UI Overlay Layer -->
+  <div class="ui-layer">
+    <header class="top-bar">
+      <div class="brand-badge">
+        <span class="brand-icon">🏮</span>
+        <span class="brand-title">Boishakhi Mela</span>
+        <span class="ultrawide-badge" id="aspect-badge">🎪 Alpona Carousel</span>
+      </div>
+
+      <div class="top-actions">
+        <a href="../../index.html" class="glass-btn" style="text-decoration: none; color: #57606f;" title="Back to Game Hub" id="btn-home">
+          <span>🏠</span> <span>Playroom</span>
+        </a>
+        <button class="glass-btn icon-btn" id="btn-sound" title="Toggle Sound / Bansuri Flute & Temple Bells" aria-label="Toggle Sound">
+          <span id="sound-icon">🔊</span>
+        </button>
+        <button class="glass-btn icon-btn" id="btn-fullscreen" title="Fullscreen Mode" aria-label="Toggle Fullscreen">
+          <span>⛶</span>
+        </button>
+        <button class="glass-btn icon-btn" id="btn-settings" title="Parent Settings" aria-label="Settings">
+          <span>⚙️</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Bottom Interactive Prompt -->
+    <div class="prompt-banner" id="prompt-banner">
+      <span class="prompt-icon">🪅</span>
+      <div class="prompt-text">
+        <span class="prompt-title">Tap or Press Any Key to Celebrate Boishakh!</span>
+        <span class="prompt-subtitle">Multi-touch for Super Utsab Bloom • TV Remote &amp; Keyboard safe</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Parent Settings Panel -->
+  <div class="settings-modal collapsed" id="settings-panel">
+    <div class="settings-header">
+      <h3><span>🧸</span> Parent Controls</h3>
+      <button class="glass-btn icon-btn" style="width:48px; height:48px; font-size:18px; min-width:48px; min-height:48px;" id="btn-close-settings" aria-label="Close Settings">✕</button>
+    </div>
+
+    <!-- Sky Theme -->
+    <div class="setting-item">
+      <div class="setting-label">
+        <span>Mela Theme</span>
+        <span id="theme-display">Sunny Morning</span>
+      </div>
+      <div class="setting-control">
+        <button class="pill-btn active" data-theme="morning">Morning</button>
+        <button class="pill-btn" data-theme="sunset">Sunset</button>
+        <button class="pill-btn" data-theme="starlight">Starry</button>
+        <button class="pill-btn" data-theme="garden">Garden</button>
+      </div>
+    </div>
+
+    <!-- Carousel Pace -->
+    <div class="setting-item">
+      <div class="setting-label">
+        <span>Celebration Pace</span>
+        <span id="pace-display">Playful</span>
+      </div>
+      <div class="setting-control">
+        <button class="pill-btn" data-pace="calm">Lullaby</button>
+        <button class="pill-btn active" data-pace="playful">Playful</button>
+        <button class="pill-btn" data-pace="utsab">Utsab</button>
+      </div>
+    </div>
+
+    <!-- Session Duration -->
+    <div class="setting-item">
+      <div class="setting-label">
+        <span>Session Timer</span>
+        <span id="session-display">3 Min</span>
+      </div>
+      <div class="setting-control">
+        <button class="pill-btn" data-timer="120">2 min</button>
+        <button class="pill-btn active" data-timer="180">3 min</button>
+        <button class="pill-btn" data-timer="300">5 min</button>
+        <button class="pill-btn" data-timer="0">Off</button>
+      </div>
+    </div>
+
+    <!-- Audio Volume -->
+    <div class="setting-item">
+      <div class="setting-label">
+        <span>Bansuri &amp; Bells Volume</span>
+        <span id="volume-display">70%</span>
+      </div>
+      <input type="range" class="slider-input" id="volume-slider" min="0" max="100" value="70">
+    </div>
+  </div>
+
+  <!-- Three.js CDN (r128) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <script>
+    /* ==========================================================================
+       BOISHAKHI MELA CELEBRATION - 3D INFANT SENSORY WEB GAME
+       Procedural 3D world, Alpona geometric stage, traditional clay toys,
+       spinning paper pinwheels (chorki), Ektara, marigold flower fountains,
+       harmonic Bansuri flute & temple-bell Web Audio synth, and TV remote ready.
+       ========================================================================== */
+
+    (function() {
+      'use strict';
+
+      // --- CONFIGURATION & STATE ---
+      const CONFIG = {
+        sessionDuration: 180,
+        superBloomDuration: 2.5,
+        maxPetals: 160,
+        maxSparks: 60,
+      };
+
+      const STATE = {
+        soundEnabled: true,
+        volume: 0.7,
+        theme: 'morning',        // 'morning', 'sunset', 'starlight', 'garden'
+        pace: 'playful',         // 'calm', 'playful', 'utsab'
+        sessionTimer: 0,
+        sessionMaxTimer: 180,
+        sessionEnded: false,
+        superBloomActive: false,
+        superBloomTimer: 0,
+        noteIndex: 0,
+        pinwheelSpeedMultiplier: 1.0,
+        dollJump: { active: false, progress: 0, startY: 0, peakY: 2.8, rotY: 0 },
+        ringWave: { active: false, scale: 0.1, opacity: 0 },
+        lastTapTime: 0,
+        aspectRatio: window.innerWidth / window.innerHeight,
+      };
+
+      const PACE_SETTINGS = {
+        calm: { stageSpeed: 0.002, pinwheelBaseSpeed: 0.03, dollBounceSpeed: 0.02, petaldrift: 0.6 },
+        playful: { stageSpeed: 0.005, pinwheelBaseSpeed: 0.06, dollBounceSpeed: 0.04, petaldrift: 1.0 },
+        utsab: { stageSpeed: 0.009, pinwheelBaseSpeed: 0.10, dollBounceSpeed: 0.06, petaldrift: 1.4 },
+      };
+
+      const THEME_PRESETS = {
+        morning: {
+          bgTop: '#ffeaa7', bgBottom: '#fab1a0',
+          ambient: 0xfff0d6, ambientInt: 0.75,
+          sun: 0xfffae6, sunInt: 1.1,
+          fog: '#ffeaa7',
+        },
+        sunset: {
+          bgTop: '#ff7675', bgBottom: '#fdcb6e',
+          ambient: 0xffeaa7, ambientInt: 0.8,
+          sun: 0xff7675, sunInt: 1.2,
+          fog: '#fdcb6e',
+        },
+        starlight: {
+          bgTop: '#2d3436', bgBottom: '#6c5ce7',
+          ambient: 0xa29bfe, ambientInt: 0.7,
+          sun: 0xfdcb6e, sunInt: 1.0,
+          fog: '#2d3436',
+        },
+        garden: {
+          bgTop: '#55efc4', bgBottom: '#ffeaa7',
+          ambient: 0xffffff, ambientInt: 0.75,
+          sun: 0xfffa65, sunInt: 1.1,
+          fog: '#55efc4',
+        }
+      };
+
+      // --- PROCEDURAL TEXTURE CACHE ---
+      const TextureCache = new Map();
+
+      function getCachedTexture(key, generatorFn) {
+        if (TextureCache.has(key)) return TextureCache.get(key);
+        const tex = generatorFn();
+        tex.encoding = THREE.sRGBEncoding;
+        if (typeof renderer !== 'undefined' && renderer.capabilities) {
+          tex.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 4);
+        }
+        TextureCache.set(key, tex);
+        return tex;
+      }
+
+      // 1. Procedural Alpona Circular Floor Pattern Texture
+      function generateAlponaTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 1024;
+        canvas.height = 1024;
+        const ctx = canvas.getContext('2d');
+        const cx = 512, cy = 512;
+
+        // Base warm terracotta & cream gradient
+        const bgGrad = ctx.createRadialGradient(cx, cy, 40, cx, cy, 510);
+        bgGrad.addColorStop(0, '#f9ca24');
+        bgGrad.addColorStop(0.35, '#eb4d4b');
+        bgGrad.addColorStop(0.7, '#d35400');
+        bgGrad.addColorStop(1, '#b33939');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, 1024, 1024);
+
+        // Outer white scalloped lace border
+        ctx.strokeStyle = '#ffffff';
+        ctx.fillStyle = '#ffffff';
+        ctx.lineWidth = 6;
+
+        // Ring 1: Outer scalloped flower petal garland
+        const numOuterPetals = 36;
+        for (let i = 0; i < numOuterPetals; i++) {
+          const angle = (i / numOuterPetals) * Math.PI * 2;
+          const r = 470;
+          const x = cx + Math.cos(angle) * r;
+          const y = cy + Math.sin(angle) * r;
+          ctx.beginPath();
+          ctx.arc(x, y, 22, 0, Math.PI * 2);
+          ctx.fillStyle = (i % 2 === 0) ? 'rgba(255, 255, 255, 0.95)' : 'rgba(249, 202, 36, 0.9)';
+          ctx.fill();
+          ctx.strokeStyle = '#ffffff';
+          ctx.stroke();
+        }
+
+        // Concentric decorative white rings
+        [440, 390, 310, 240, 160, 80].forEach((r, idx) => {
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.strokeStyle = (idx % 2 === 0) ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 234, 167, 0.85)';
+          ctx.lineWidth = (idx === 0 || idx === 2) ? 7 : 4;
+          ctx.stroke();
+        });
+
+        // Ring 2: Traditional Bengali Kalka (Paisley / Mango) Motifs
+        const numKalkas = 16;
+        for (let i = 0; i < numKalkas; i++) {
+          const angle = (i / numKalkas) * Math.PI * 2;
+          ctx.save();
+          ctx.translate(cx, cy);
+          ctx.rotate(angle);
+          ctx.translate(350, 0);
+
+          // Draw Paisley / Kalka curve
+          ctx.beginPath();
+          ctx.moveTo(0, -35);
+          ctx.bezierCurveTo(40, -25, 45, 25, 0, 35);
+          ctx.bezierCurveTo(-25, 25, -25, -15, 0, -35);
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+          ctx.fill();
+          ctx.lineWidth = 3;
+          ctx.strokeStyle = '#eb4d4b';
+          ctx.stroke();
+
+          // Small interior dot
+          ctx.beginPath();
+          ctx.arc(10, 0, 8, 0, Math.PI * 2);
+          ctx.fillStyle = '#f9ca24';
+          ctx.fill();
+
+          ctx.restore();
+        }
+
+        // Ring 3: 8-Petal Blooming Sacred Lotus (Padma) Mandala
+        const numLotus = 12;
+        for (let i = 0; i < numLotus; i++) {
+          const angle = (i / numLotus) * Math.PI * 2;
+          ctx.save();
+          ctx.translate(cx, cy);
+          ctx.rotate(angle);
+          ctx.translate(200, 0);
+
+          ctx.beginPath();
+          ctx.moveTo(0, -25);
+          ctx.quadraticCurveTo(35, 0, 0, 25);
+          ctx.quadraticCurveTo(-35, 0, 0, -25);
+          ctx.fillStyle = (i % 2 === 0) ? 'rgba(255, 255, 255, 0.98)' : 'rgba(46, 213, 115, 0.9)';
+          ctx.fill();
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 3;
+          ctx.stroke();
+
+          ctx.restore();
+        }
+
+        // Center Sunburst Mandala
+        ctx.beginPath();
+        ctx.arc(cx, cy, 70, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffd124';
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 6;
+        ctx.stroke();
+
+        for (let i = 0; i < 16; i++) {
+          const angle = (i / 16) * Math.PI * 2;
+          const x1 = cx + Math.cos(angle) * 70;
+          const y1 = cy + Math.sin(angle) * 70;
+          const x2 = cx + Math.cos(angle) * 115;
+          const y2 = cy + Math.sin(angle) * 115;
+          ctx.beginPath();
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
+          ctx.lineWidth = 4;
+          ctx.stroke();
+        }
+
+        return new THREE.CanvasTexture(canvas);
+      }
+
+      // 2. Procedural Bengali Smiling Clay Doll (Tepa Putul) Face Texture
+      function generateDollFaceTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 512;
+        canvas.height = 512;
+        const ctx = canvas.getContext('2d');
+
+        // Warm Terracotta / Sandalwood Face Base
+        const bgGrad = ctx.createRadialGradient(256, 256, 30, 256, 256, 250);
+        bgGrad.addColorStop(0, '#ffeaa7');
+        bgGrad.addColorStop(0.7, '#fdcb6e');
+        bgGrad.addColorStop(1, '#e17055');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, 512, 512);
+
+        // Forehead Red Bindi (Kumkum Tip) & Alpona white dots
+        ctx.beginPath();
+        ctx.arc(256, 150, 22, 0, Math.PI * 2);
+        ctx.fillStyle = '#d63031';
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 4;
+        ctx.stroke();
+
+        // White decorative Alpona forehead dots
+        for (let i = -3; i <= 3; i++) {
+          if (i === 0) continue;
+          ctx.beginPath();
+          ctx.arc(256 + i * 22, 125, 6, 0, Math.PI * 2);
+          ctx.fillStyle = '#ffffff';
+          ctx.fill();
+        }
+
+        // Happy, Large Twinkling Eyes (Infant friendly)
+        [-75, 75].forEach(offsetX => {
+          const ex = 256 + offsetX;
+          const ey = 230;
+
+          // Eye whites
+          ctx.beginPath();
+          ctx.ellipse(ex, ey, 38, 46, 0, 0, Math.PI * 2);
+          ctx.fillStyle = '#ffffff';
+          ctx.fill();
+          ctx.strokeStyle = '#2d3436';
+          ctx.lineWidth = 5;
+          ctx.stroke();
+
+          // Black iris
+          ctx.beginPath();
+          ctx.arc(ex, ey + 4, 24, 0, Math.PI * 2);
+          ctx.fillStyle = '#2d3436';
+          ctx.fill();
+
+          // White catchlights (sparkles in the eyes)
+          ctx.beginPath();
+          ctx.arc(ex - 8, ey - 6, 9, 0, Math.PI * 2);
+          ctx.fillStyle = '#ffffff';
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.arc(ex + 8, ey + 8, 4, 0, Math.PI * 2);
+          ctx.fillStyle = '#ffffff';
+          ctx.fill();
+
+          // Cute curved arched eyebrows
+          ctx.beginPath();
+          ctx.arc(ex, ey - 45, 30, Math.PI * 1.15, Math.PI * 1.85);
+          ctx.strokeStyle = '#2d3436';
+          ctx.lineWidth = 6;
+          ctx.lineCap = 'round';
+          ctx.stroke();
+        });
+
+        // Rosy Cheeks
+        [-115, 115].forEach(offsetX => {
+          ctx.beginPath();
+          ctx.arc(256 + offsetX, 310, 32, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(255, 118, 117, 0.45)';
+          ctx.fill();
+        });
+
+        // Cute smiling mouth with red lips
+        ctx.beginPath();
+        ctx.arc(256, 310, 52, 0.15 * Math.PI, 0.85 * Math.PI, false);
+        ctx.lineWidth = 14;
+        ctx.strokeStyle = '#d63031';
+        ctx.lineCap = 'round';
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(256, 312, 38, 0.15 * Math.PI, 0.85 * Math.PI, false);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+
+        return new THREE.CanvasTexture(canvas);
+      }
+
+      // 3. Procedural Terracotta Owl (Tepa Putul Pecha) Face Texture
+      function generateOwlFaceTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 512;
+        canvas.height = 512;
+        const ctx = canvas.getContext('2d');
+
+        // Warm Terracotta Clay Base
+        ctx.fillStyle = '#d35400';
+        ctx.fillRect(0, 0, 512, 512);
+
+        // Folk feather scalloped pattern
+        ctx.strokeStyle = 'rgba(255, 234, 167, 0.7)';
+        ctx.lineWidth = 6;
+        for (let y = 320; y <= 480; y += 45) {
+          for (let x = 40; x <= 480; x += 55) {
+            ctx.beginPath();
+            ctx.arc(x, y, 24, 0, Math.PI);
+            ctx.stroke();
+          }
+        }
+
+        // Concentric Owl Eyes (Traditional Boishakhi Folk Pecha)
+        [-90, 90].forEach(offsetX => {
+          const ex = 256 + offsetX;
+          const ey = 180;
+
+          // Outer yellow ring
+          ctx.beginPath();
+          ctx.arc(ex, ey, 72, 0, Math.PI * 2);
+          ctx.fillStyle = '#f9ca24';
+          ctx.fill();
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 7;
+          ctx.stroke();
+
+          // Red ring
+          ctx.beginPath();
+          ctx.arc(ex, ey, 52, 0, Math.PI * 2);
+          ctx.fillStyle = '#eb4d4b';
+          ctx.fill();
+
+          // White ring
+          ctx.beginPath();
+          ctx.arc(ex, ey, 36, 0, Math.PI * 2);
+          ctx.fillStyle = '#ffffff';
+          ctx.fill();
+
+          // Black center pupil
+          ctx.beginPath();
+          ctx.arc(ex, ey, 20, 0, Math.PI * 2);
+          ctx.fillStyle = '#2d3436';
+          ctx.fill();
+
+          // Catchlight
+          ctx.beginPath();
+          ctx.arc(ex - 6, ey - 6, 7, 0, Math.PI * 2);
+          ctx.fillStyle = '#ffffff';
+          ctx.fill();
+        });
+
+        // Owl Sharp Cute Beak (Yellow & White triangle)
+        ctx.beginPath();
+        ctx.moveTo(256, 230);
+        ctx.lineTo(285, 290);
+        ctx.lineTo(227, 290);
+        ctx.closePath();
+        ctx.fillStyle = '#f1c40f';
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 5;
+        ctx.stroke();
+
+        return new THREE.CanvasTexture(canvas);
+      }
+
+      // 4. Procedural Pinwheel (Chorki) 4-Quadrant Texture
+      function generatePinwheelTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 256;
+        canvas.height = 256;
+        const ctx = canvas.getContext('2d');
+
+        const colors = ['#eb4d4b', '#f9ca24', '#2ed573', '#ff9f43'];
+        for (let i = 0; i < 4; i++) {
+          ctx.save();
+          ctx.translate(128, 128);
+          ctx.rotate((i * Math.PI) / 2);
+
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(128, -128);
+          ctx.lineTo(128, 0);
+          ctx.closePath();
+          ctx.fillStyle = colors[i];
+          ctx.fill();
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 3;
+          ctx.stroke();
+
+          // Decorative white polka dots on each blade
+          ctx.beginPath();
+          ctx.arc(70, -40, 8, 0, Math.PI * 2);
+          ctx.fillStyle = '#ffffff';
+          ctx.fill();
+
+          ctx.restore();
+        }
+
+        return new THREE.CanvasTexture(canvas);
+      }
+
+      // 5. Procedural Marigold / Krishnachura Flower Petal Texture
+      function generatePetalTexture(isKrishnachura = false) {
+        const canvas = document.createElement('canvas');
+        canvas.width = 128;
+        canvas.height = 128;
+        const ctx = canvas.getContext('2d');
+
+        const grad = ctx.createRadialGradient(64, 64, 5, 64, 64, 60);
+        if (isKrishnachura) {
+          grad.addColorStop(0, '#ffffff');
+          grad.addColorStop(0.2, '#ff4757');
+          grad.addColorStop(0.7, '#e84118');
+          grad.addColorStop(1, 'rgba(194, 24, 91, 0)');
+        } else {
+          grad.addColorStop(0, '#ffffff');
+          grad.addColorStop(0.25, '#ffd124');
+          grad.addColorStop(0.75, '#ff7f0e');
+          grad.addColorStop(1, 'rgba(235, 94, 40, 0)');
+        }
+
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.ellipse(64, 64, 56, 32, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        return new THREE.CanvasTexture(canvas);
+      }
+
+      // --- WEB AUDIO API HARMONIC BANSURI & BELL SYNTHESIZER ---
+      let audioCtx = null;
+      let masterGain = null;
+      let masterLimiter = null;
+      let lastNoteAudioTime = 0;
+
+      // Raag Bhupali / Pentatonic Consonant Scale
+      const BANSURI_SCALE = [
+        261.63, // C4
+        293.66, // D4
+        329.63, // E4
+        392.00, // G4
+        440.00, // A4
+        523.25, // C5
+        587.33, // D5
+        659.25, // E5
+        783.99, // G5
+        880.00, // A5
+        1046.50 // C6
+      ];
+
+      function initAudio() {
+        if (audioCtx) {
+          if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+          }
+          return;
+        }
+
+        try {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          audioCtx = new AudioContextClass();
+
+          // Mandatory dynamics compressor limiter for infant hearing safety
+          masterLimiter = audioCtx.createDynamicsCompressor();
+          masterLimiter.threshold.setValueAtTime(-14, audioCtx.currentTime);
+          masterLimiter.knee.setValueAtTime(20, audioCtx.currentTime);
+          masterLimiter.ratio.setValueAtTime(12, audioCtx.currentTime);
+          masterLimiter.attack.setValueAtTime(0.003, audioCtx.currentTime);
+          masterLimiter.release.setValueAtTime(0.25, audioCtx.currentTime);
+
+          // Master Gain Node
+          masterGain = audioCtx.createGain();
+          masterGain.gain.setValueAtTime(STATE.soundEnabled ? STATE.volume : 0.0001, audioCtx.currentTime);
+
+          // Connect Limiter -> Master Gain -> Destination
+          masterLimiter.connect(masterGain);
+          masterGain.connect(audioCtx.destination);
+        } catch (err) {
+          console.warn('Web Audio API not supported:', err);
+        }
+      }
+
+      // Play Melodic Bansuri Flute Note
+      function playBansuriNote(pitchIndex, duration = 0.85) {
+        if (!STATE.soundEnabled || !audioCtx) return;
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const now = audioCtx.currentTime;
+        const freq = BANSURI_SCALE[pitchIndex % BANSURI_SCALE.length];
+
+        // 1. Primary Flute Oscillator (Sine for warmth)
+        const osc1 = audioCtx.createOscillator();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(freq, now);
+
+        // 2. Harmonic Triangle Oscillator (Soft breath overtone)
+        const osc2 = audioCtx.createOscillator();
+        osc2.type = 'triangle';
+        osc2.frequency.setValueAtTime(freq * 2, now);
+
+        // 3. Vibrato LFO
+        const lfo = audioCtx.createOscillator();
+        lfo.type = 'sine';
+        lfo.frequency.setValueAtTime(5.2, now); // 5.2 Hz gentle vibrato
+
+        const lfoGain = audioCtx.createGain();
+        lfoGain.gain.setValueAtTime(freq * 0.018, now); // subtle pitch vibrato
+        lfo.connect(lfoGain);
+        lfoGain.connect(osc1.frequency);
+
+        // 4. Lowpass Breath Filter
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(1800, now);
+        filter.Q.setValueAtTime(1.5, now);
+
+        // 5. Volume Envelope (Gentle flute attack and smooth decay)
+        const noteGain = audioCtx.createGain();
+        noteGain.gain.setValueAtTime(0.0001, now);
+        noteGain.gain.exponentialRampToValueAtTime(0.35, now + 0.06);
+        noteGain.gain.linearRampToValueAtTime(0.25, now + 0.25);
+        noteGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+        const osc2Gain = audioCtx.createGain();
+        osc2Gain.gain.setValueAtTime(0.08, now);
+
+        // Graph connections
+        osc1.connect(filter);
+        osc2.connect(osc2Gain);
+        osc2Gain.connect(filter);
+        filter.connect(noteGain);
+        noteGain.connect(masterLimiter);
+
+        // Start oscillators
+        osc1.start(now);
+        osc2.start(now);
+        lfo.start(now);
+
+        osc1.stop(now + duration);
+        osc2.stop(now + duration);
+        lfo.stop(now + duration);
+
+        // Cleanup on finish
+        osc1.onended = () => {
+          try {
+            osc1.disconnect();
+            osc2.disconnect();
+            lfo.disconnect();
+            lfoGain.disconnect();
+            filter.disconnect();
+            noteGain.disconnect();
+            osc2Gain.disconnect();
+          } catch (e) {}
+        };
+      }
+
+      // Play Temple-Bell / Ghonta Chime
+      function playTempleBell(freqMultiplier = 1.0) {
+        if (!STATE.soundEnabled || !audioCtx) return;
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const now = audioCtx.currentTime;
+        const baseFreq = 880 * freqMultiplier;
+
+        // Inharmonic bell ratios
+        const ratios = [1.0, 2.76, 5.4, 8.9];
+        const gains = [0.25, 0.12, 0.06, 0.02];
+
+        ratios.forEach((ratio, idx) => {
+          const bellOsc = audioCtx.createOscillator();
+          bellOsc.type = 'sine';
+          bellOsc.frequency.setValueAtTime(baseFreq * ratio, now);
+
+          const bellGain = audioCtx.createGain();
+          bellGain.gain.setValueAtTime(0.0001, now);
+          bellGain.gain.linearRampToValueAtTime(gains[idx], now + 0.003);
+          bellGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.2 / (idx + 1));
+
+          bellOsc.connect(bellGain);
+          bellGain.connect(masterLimiter);
+
+          bellOsc.start(now);
+          bellOsc.stop(now + 1.2);
+
+          bellOsc.onended = () => {
+            try {
+              bellOsc.disconnect();
+              bellGain.disconnect();
+            } catch (e) {}
+          };
+        });
+      }
+
+      // Play Festive Dhaak / Drum Tap
+      function playDhaakPulse() {
+        if (!STATE.soundEnabled || !audioCtx) return;
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(140, now);
+        osc.frequency.exponentialRampToValueAtTime(45, now + 0.12);
+
+        const drumGain = audioCtx.createGain();
+        drumGain.gain.setValueAtTime(0.0001, now);
+        drumGain.gain.linearRampToValueAtTime(0.35, now + 0.005);
+        drumGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.15);
+
+        osc.connect(drumGain);
+        drumGain.connect(masterLimiter);
+
+        osc.start(now);
+        osc.stop(now + 0.16);
+
+        osc.onended = () => {
+          try {
+            osc.disconnect();
+            drumGain.disconnect();
+          } catch (e) {}
+        };
+      }
+
+      // --- THREE.JS SCENE SETUP ---
+      const container = document.getElementById('canvas-container');
+      const scene = new THREE.Scene();
+
+      // Camera with Dynamic FOV for 21:9 Ultrawide, 16:9 TV, and Mobile
+      const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+      camera.position.set(0, 5.2, 11.5);
+      camera.lookAt(0, 1.2, 0);
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.outputEncoding = THREE.sRGBEncoding;
+      container.appendChild(renderer.domElement);
+
+      renderer.domElement.addEventListener('webglcontextlost', (e) => {
+        e.preventDefault();
+      }, false);
+
+      // --- SCENE LIGHTS & AMBIENCE ---
+      const ambientLight = new THREE.AmbientLight(0xfff0d6, 0.8);
+      scene.add(ambientLight);
+
+      const sunLight = new THREE.DirectionalLight(0xfffae6, 1.1);
+      sunLight.position.set(8, 14, 8);
+      sunLight.castShadow = true;
+      sunLight.shadow.mapSize.width = 1024;
+      sunLight.shadow.mapSize.height = 1024;
+      sunLight.shadow.camera.near = 0.5;
+      sunLight.shadow.camera.far = 30;
+      sunLight.shadow.camera.left = -8;
+      sunLight.shadow.camera.right = 8;
+      sunLight.shadow.camera.top = 8;
+      sunLight.shadow.camera.bottom = -8;
+      sunLight.shadow.bias = -0.001;
+      scene.add(sunLight);
+
+      const hemisphereLight = new THREE.HemisphereLight(0xffeaa7, 0xdfe6e9, 0.45);
+      scene.add(hemisphereLight);
+
+      // Soft ground fill light
+      const groundFill = new THREE.PointLight(0xff9f43, 0.6, 15);
+      groundFill.position.set(0, 2, 4);
+      scene.add(groundFill);
+
+      // --- 3D GEOMETRY BUILDERS ---
+
+      // 1. Carousel Stage with Alpona Floor
+      const stageGroup = new THREE.Group();
+      scene.add(stageGroup);
+
+      const alponaTex = getCachedTexture('alpona_floor', generateAlponaTexture);
+      const stageGeo = new THREE.CylinderGeometry(5.2, 5.5, 0.6, 64);
+      const stageMatSides = new THREE.MeshStandardMaterial({ color: '#d35400', roughness: 0.5, metalness: 0.1 });
+      const stageMatTop = new THREE.MeshStandardMaterial({
+        map: alponaTex,
+        roughness: 0.4,
+        metalness: 0.05
+      });
+      const stageMesh = new THREE.Mesh(stageGeo, [stageMatSides, stageMatTop, stageMatSides]);
+      stageMesh.position.y = -0.3;
+      stageMesh.receiveShadow = true;
+      stageGroup.add(stageMesh);
+
+      // Carousel Center Pedestal
+      const pedestalGeo = new THREE.CylinderGeometry(1.4, 1.6, 0.5, 32);
+      const pedestalMat = new THREE.MeshStandardMaterial({
+        color: '#f9ca24',
+        roughness: 0.35,
+        metalness: 0.15
+      });
+      const pedestalMesh = new THREE.Mesh(pedestalGeo, pedestalMat);
+      pedestalMesh.position.y = 0.25;
+      pedestalMesh.castShadow = true;
+      pedestalMesh.receiveShadow = true;
+      stageGroup.add(pedestalMesh);
+
+      // Center Lotus Petal Ring on Pedestal (Shared geometries & materials)
+      const sharedPetalConeGeo = new THREE.ConeGeometry(0.28, 0.65, 4);
+      const sharedPetalRedMat = new THREE.MeshStandardMaterial({ color: '#eb4d4b', roughness: 0.4 });
+      const sharedPetalWhiteMat = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.4 });
+
+      for (let i = 0; i < 12; i++) {
+        const petalMesh = new THREE.Mesh(sharedPetalConeGeo, (i % 2 === 0) ? sharedPetalRedMat : sharedPetalWhiteMat);
+        const angle = (i / 12) * Math.PI * 2;
+        petalMesh.position.set(Math.cos(angle) * 1.35, 0.4, Math.sin(angle) * 1.35);
+        petalMesh.rotation.x = Math.PI / 3;
+        petalMesh.rotation.y = angle - Math.PI / 2;
+        stageGroup.add(petalMesh);
+      }
+
+      // 2. Central Smiling Clay Doll (Tepa Putul)
+      const dollGroup = new THREE.Group();
+      dollGroup.position.set(0, 0.5, 0);
+      scene.add(dollGroup);
+
+      const dollFaceTex = getCachedTexture('doll_face', generateDollFaceTexture);
+
+      // Doll Lower Body / Terracotta Skirt
+      const dollSkirtGeo = new THREE.ConeGeometry(0.75, 1.2, 32);
+      const dollSkirtMat = new THREE.MeshStandardMaterial({ color: '#e84118', roughness: 0.45 });
+      const dollSkirtMesh = new THREE.Mesh(dollSkirtGeo, dollSkirtMat);
+      dollSkirtMesh.position.y = 0.6;
+      dollSkirtMesh.castShadow = true;
+      dollGroup.add(dollSkirtMesh);
+
+      // Saree Pallu Ribbon wrap (Sunny Yellow)
+      const dollSashGeo = new THREE.TorusGeometry(0.55, 0.12, 16, 32);
+      const dollSashMat = new THREE.MeshStandardMaterial({ color: '#f1c40f', roughness: 0.3 });
+      const dollSashMesh = new THREE.Mesh(dollSashGeo, dollSashMat);
+      dollSashMesh.position.y = 0.85;
+      dollSashMesh.rotation.x = Math.PI / 3;
+      dollGroup.add(dollSashMesh);
+
+      // Doll Torso
+      const dollTorsoGeo = new THREE.CylinderGeometry(0.38, 0.45, 0.6, 24);
+      const dollTorsoMat = new THREE.MeshStandardMaterial({ color: '#f9ca24', roughness: 0.4 });
+      const dollTorsoMesh = new THREE.Mesh(dollTorsoGeo, dollTorsoMat);
+      dollTorsoMesh.position.y = 1.3;
+      dollTorsoMesh.castShadow = true;
+      dollGroup.add(dollTorsoMesh);
+
+      // Doll Head with Smiling Face
+      const dollHeadGeo = new THREE.SphereGeometry(0.52, 32, 32);
+      const dollHeadMat = new THREE.MeshStandardMaterial({
+        map: dollFaceTex,
+        roughness: 0.35,
+        metalness: 0.05
+      });
+      const dollHeadMesh = new THREE.Mesh(dollHeadGeo, dollHeadMat);
+      dollHeadMesh.position.y = 1.95;
+      dollHeadMesh.rotation.y = -Math.PI / 2; // Face forward
+      dollHeadMesh.castShadow = true;
+      dollGroup.add(dollHeadMesh);
+
+      // Doll Topknot Bun (Juti Hair Bun with Golden Cap)
+      const dollBunGeo = new THREE.SphereGeometry(0.22, 16, 16);
+      const dollBunMat = new THREE.MeshStandardMaterial({ color: '#2d3436', roughness: 0.8 });
+      const dollBunMesh = new THREE.Mesh(dollBunGeo, dollBunMat);
+      dollBunMesh.position.set(0, 2.5, -0.1);
+      dollGroup.add(dollBunMesh);
+
+      // Flower in Hair Bun
+      const hairFlowerGeo = new THREE.TorusGeometry(0.18, 0.06, 8, 16);
+      const hairFlowerMat = new THREE.MeshStandardMaterial({ color: '#ff4757', roughness: 0.3 });
+      const hairFlowerMesh = new THREE.Mesh(hairFlowerGeo, hairFlowerMat);
+      hairFlowerMesh.position.set(0, 2.48, -0.1);
+      hairFlowerMesh.rotation.x = Math.PI / 2;
+      dollGroup.add(hairFlowerMesh);
+
+      // Cute Little Arms
+      const armGeo = new THREE.CylinderGeometry(0.1, 0.09, 0.45, 12);
+      const armMat = new THREE.MeshStandardMaterial({ color: '#fdcb6e', roughness: 0.5 });
+      const flowerHandGeo = new THREE.SphereGeometry(0.12, 12, 12);
+      const flowerHandMat1 = new THREE.MeshStandardMaterial({ color: '#ff9f43', roughness: 0.3 });
+      const flowerHandMat2 = new THREE.MeshStandardMaterial({ color: '#e84118', roughness: 0.3 });
+
+      [-0.45, 0.45].forEach((armX, idx) => {
+        const armMesh = new THREE.Mesh(armGeo, armMat);
+        armMesh.position.set(armX, 1.3, 0.15);
+        armMesh.rotation.z = (idx === 0) ? Math.PI / 4 : -Math.PI / 4;
+        armMesh.rotation.x = Math.PI / 6;
+        dollGroup.add(armMesh);
+
+        const flowerMesh = new THREE.Mesh(flowerHandGeo, (idx === 0) ? flowerHandMat1 : flowerHandMat2);
+        flowerMesh.position.set(armX * 1.3, 1.15, 0.3);
+        dollGroup.add(flowerMesh);
+      });
+
+      // 3. Spinning Paper Pinwheels (Chorki) on Poles
+      const pinwheelGroup = new THREE.Group();
+      stageGroup.add(pinwheelGroup);
+
+      const pinwheels = [];
+      const pinwheelTex = getCachedTexture('pinwheel_4color', generatePinwheelTexture);
+
+      const pinwheelPositions = [
+        { angle: 0, r: 3.8, h: 2.6 },
+        { angle: (Math.PI * 2) / 5, r: 3.7, h: 2.3 },
+        { angle: ((Math.PI * 2) * 2) / 5, r: 3.9, h: 2.8 },
+        { angle: ((Math.PI * 2) * 3) / 5, r: 3.6, h: 2.4 },
+        { angle: ((Math.PI * 2) * 4) / 5, r: 3.8, h: 2.7 }
+      ];
+
+      const sharedPoleMat = new THREE.MeshStandardMaterial({ color: '#7bed9f', roughness: 0.6 });
+      const sharedBladeGeo = new THREE.PlaneGeometry(0.9, 0.9);
+      const sharedBladeMat = new THREE.MeshStandardMaterial({
+        map: pinwheelTex,
+        side: THREE.DoubleSide,
+        transparent: true,
+        roughness: 0.3
+      });
+      const sharedPinGeo = new THREE.SphereGeometry(0.08, 12, 12);
+      const sharedPinMat = new THREE.MeshStandardMaterial({ color: '#ffd124', metalness: 0.8, roughness: 0.2 });
+
+      pinwheelPositions.forEach((pos, idx) => {
+        const poleGroup = new THREE.Group();
+        const px = Math.cos(pos.angle) * pos.r;
+        const pz = Math.sin(pos.angle) * pos.r;
+        poleGroup.position.set(px, 0, pz);
+
+        const poleGeo = new THREE.CylinderGeometry(0.04, 0.05, pos.h, 12);
+        const poleMesh = new THREE.Mesh(poleGeo, sharedPoleMat);
+        poleMesh.position.y = pos.h / 2;
+        poleMesh.castShadow = true;
+        poleGroup.add(poleMesh);
+
+        const rotorGroup = new THREE.Group();
+        rotorGroup.position.set(0, pos.h, 0.06);
+
+        const bladeMesh = new THREE.Mesh(sharedBladeGeo, sharedBladeMat);
+        bladeMesh.castShadow = true;
+        rotorGroup.add(bladeMesh);
+
+        const pinMesh = new THREE.Mesh(sharedPinGeo, sharedPinMat);
+        pinMesh.position.z = 0.04;
+        rotorGroup.add(pinMesh);
+
+        poleGroup.add(rotorGroup);
+        pinwheelGroup.add(poleGroup);
+
+        pinwheels.push({
+          rotor: rotorGroup,
+          speed: (idx % 2 === 0) ? 1.0 : -1.0,
+          rotation: Math.random() * Math.PI * 2
+        });
+      });
+
+      // 4. Miniature Terracotta Owls (Tepa Putul Pecha)
+      const owlGroup = new THREE.Group();
+      stageGroup.add(owlGroup);
+
+      const owlFaceTex = getCachedTexture('owl_face', generateOwlFaceTexture);
+      const owls = [];
+
+      const owlPositions = [
+        { angle: Math.PI / 4, r: 2.8, scale: 0.8 },
+        { angle: (5 * Math.PI) / 4, r: 2.9, scale: 0.85 },
+        { angle: (7 * Math.PI) / 4, r: 2.7, scale: 0.75 }
+      ];
+
+      const sharedPerchGeo = new THREE.CylinderGeometry(0.35, 0.45, 0.4, 16);
+      const sharedPerchMat = new THREE.MeshStandardMaterial({ color: '#f39c12', roughness: 0.5 });
+      const sharedOwlBodyGeo = new THREE.SphereGeometry(0.48, 24, 24);
+      const sharedOwlBodyMat = new THREE.MeshStandardMaterial({
+        map: owlFaceTex,
+        roughness: 0.45,
+        metalness: 0.05
+      });
+      const sharedOwlEarGeo = new THREE.ConeGeometry(0.12, 0.28, 8);
+      const sharedOwlEarMat = new THREE.MeshStandardMaterial({ color: '#d35400', roughness: 0.5 });
+
+      owlPositions.forEach((pos, idx) => {
+        const singleOwl = new THREE.Group();
+        const ox = Math.cos(pos.angle) * pos.r;
+        const oz = Math.sin(pos.angle) * pos.r;
+        singleOwl.position.set(ox, 0, oz);
+        singleOwl.scale.set(pos.scale, pos.scale, pos.scale);
+
+        const perchMesh = new THREE.Mesh(sharedPerchGeo, sharedPerchMat);
+        perchMesh.position.y = 0.2;
+        singleOwl.add(perchMesh);
+
+        const bodyMesh = new THREE.Mesh(sharedOwlBodyGeo, sharedOwlBodyMat);
+        bodyMesh.position.y = 0.75;
+        bodyMesh.rotation.y = -Math.PI / 2 + pos.angle;
+        bodyMesh.castShadow = true;
+        singleOwl.add(bodyMesh);
+
+        [-0.22, 0.22].forEach(ex => {
+          const earMesh = new THREE.Mesh(sharedOwlEarGeo, sharedOwlEarMat);
+          earMesh.position.set(ex, 1.22, 0);
+          earMesh.rotation.z = (ex < 0) ? 0.25 : -0.25;
+          singleOwl.add(earMesh);
+        });
+
+        owlGroup.add(singleOwl);
+        owls.push({
+          mesh: singleOwl,
+          baseY: 0,
+          wobbleOffset: idx * 1.5
+        });
+      });
+
+      // 5. Traditional Bengali Ektara Folk Instrument
+      const ektaraGroup = new THREE.Group();
+      stageGroup.add(ektaraGroup);
+
+      const ektaras = [];
+      const ektaraPositions = [
+        { angle: (3 * Math.PI) / 4, r: 3.1 },
+        { angle: (6 * Math.PI) / 4, r: 3.3 }
+      ];
+
+      const sharedGourdGeo = new THREE.SphereGeometry(0.42, 20, 20);
+      const sharedGourdMat = new THREE.MeshStandardMaterial({ color: '#d35400', roughness: 0.35 });
+      const sharedRingGeo = new THREE.TorusGeometry(0.35, 0.08, 12, 24);
+      const sharedRingMat = new THREE.MeshStandardMaterial({ color: '#f1c40f', roughness: 0.3 });
+      const sharedBambooArmGeo = new THREE.CylinderGeometry(0.03, 0.03, 1.4, 8);
+      const sharedBambooArmMat = new THREE.MeshStandardMaterial({ color: '#7bed9f', roughness: 0.5 });
+      const sharedPegGeo = new THREE.CylinderGeometry(0.06, 0.06, 0.45, 12);
+      const sharedPegMat = new THREE.MeshStandardMaterial({ color: '#ffd124', metalness: 0.7, roughness: 0.2 });
+      const sharedStringGeo = new THREE.CylinderGeometry(0.008, 0.008, 1.5, 6);
+      const sharedStringMat = new THREE.MeshStandardMaterial({ color: '#ffffff', metalness: 0.9, roughness: 0.1 });
+      const sharedTasselGeo = new THREE.ConeGeometry(0.1, 0.3, 8);
+      const sharedTasselMat = new THREE.MeshStandardMaterial({ color: '#ff4757', roughness: 0.4 });
+
+      ektaraPositions.forEach((pos, idx) => {
+        const instGroup = new THREE.Group();
+        const ex = Math.cos(pos.angle) * pos.r;
+        const ez = Math.sin(pos.angle) * pos.r;
+        instGroup.position.set(ex, 0, ez);
+
+        const gourdMesh = new THREE.Mesh(sharedGourdGeo, sharedGourdMat);
+        gourdMesh.position.y = 0.45;
+        gourdMesh.castShadow = true;
+        instGroup.add(gourdMesh);
+
+        const ringMesh = new THREE.Mesh(sharedRingGeo, sharedRingMat);
+        ringMesh.position.y = 0.45;
+        ringMesh.rotation.x = Math.PI / 2;
+        instGroup.add(ringMesh);
+
+        [-0.15, 0.15].forEach(armX => {
+          const armMesh = new THREE.Mesh(sharedBambooArmGeo, sharedBambooArmMat);
+          armMesh.position.set(armX, 1.25, 0);
+          instGroup.add(armMesh);
+        });
+
+        const pegMesh = new THREE.Mesh(sharedPegGeo, sharedPegMat);
+        pegMesh.position.set(0, 1.95, 0);
+        pegMesh.rotation.z = Math.PI / 2;
+        instGroup.add(pegMesh);
+
+        const stringMesh = new THREE.Mesh(sharedStringGeo, sharedStringMat);
+        stringMesh.position.set(0, 1.2, 0);
+        instGroup.add(stringMesh);
+
+        const tasselMesh = new THREE.Mesh(sharedTasselGeo, sharedTasselMat);
+        tasselMesh.position.set(0.2, 1.95, 0);
+        tasselMesh.rotation.z = Math.PI;
+        instGroup.add(tasselMesh);
+
+        ektaraGroup.add(instGroup);
+        ektaras.push({
+          mesh: instGroup,
+          baseRot: idx * 1.8
+        });
+      });
+
+      // 6. Festive Dhaak Drums on Stage Rim
+      const dhaakGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.8, 20);
+      const dhaakMat = new THREE.MeshStandardMaterial({ color: '#eb4d4b', roughness: 0.4 });
+      const dhaakRimMat = new THREE.MeshStandardMaterial({ color: '#f1c40f', roughness: 0.3 });
+
+      const dhaak1 = new THREE.Mesh(dhaakGeo, [dhaakMat, dhaakRimMat, dhaakRimMat]);
+      dhaak1.position.set(-2.2, 0.4, 2.8);
+      dhaak1.rotation.z = Math.PI / 12;
+      dhaak1.castShadow = true;
+      stageGroup.add(dhaak1);
+
+      // 7. Ground Alpona Expanding Ring Wave
+      const ringWaveGeo = new THREE.RingGeometry(0.5, 0.9, 32);
+      const ringWaveMat = new THREE.MeshBasicMaterial({
+        color: 0xffd124,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0
+      });
+      const ringWaveMesh = new THREE.Mesh(ringWaveGeo, ringWaveMat);
+      ringWaveMesh.rotation.x = -Math.PI / 2;
+      ringWaveMesh.position.y = 0.05;
+      stageGroup.add(ringWaveMesh);
+
+      // --- OBJECT POOLS (ZERO GC ALLOCATIONS) ---
+
+      // A. Flower Petals Fountain Pool (Marigold & Krishnachura)
+      const petalPool = [];
+      const petalGeo = new THREE.PlaneGeometry(0.4, 0.25);
+      const marigoldTex = getCachedTexture('petal_marigold', () => generatePetalTexture(false));
+      const krishnachuraTex = getCachedTexture('petal_krishnachura', () => generatePetalTexture(true));
+
+      const marigoldMat = new THREE.MeshStandardMaterial({
+        map: marigoldTex,
+        transparent: true,
+        side: THREE.DoubleSide,
+        roughness: 0.3,
+        depthWrite: false
+      });
+
+      const krishnachuraMat = new THREE.MeshStandardMaterial({
+        map: krishnachuraTex,
+        transparent: true,
+        side: THREE.DoubleSide,
+        roughness: 0.3,
+        depthWrite: false
+      });
+
+      for (let i = 0; i < CONFIG.maxPetals; i++) {
+        const isKrishnachura = (i % 2 === 0);
+        const mesh = new THREE.Mesh(petalGeo, isKrishnachura ? krishnachuraMat : marigoldMat);
+        mesh.visible = false;
+        scene.add(mesh);
+
+        petalPool.push({
+          mesh: mesh,
+          active: false,
+          pos: new THREE.Vector3(),
+          vel: new THREE.Vector3(),
+          rotSpeed: new THREE.Vector3(),
+          rot: new THREE.Euler(),
+          life: 0,
+          maxLife: 1.0,
+          scale: 1.0
+        });
+      }
+
+      // B. Golden Star Sparkle Pool
+      const sparkPool = [];
+      const sparkGeo = new THREE.SphereGeometry(0.08, 8, 8);
+      const sparkMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+
+      for (let i = 0; i < CONFIG.maxSparks; i++) {
+        const mesh = new THREE.Mesh(sparkGeo, sparkMat);
+        mesh.visible = false;
+        scene.add(mesh);
+
+        sparkPool.push({
+          mesh: mesh,
+          active: false,
+          pos: new THREE.Vector3(),
+          vel: new THREE.Vector3(),
+          life: 0,
+          maxLife: 1.0
+        });
+      }
+
+      // --- SENSORY BURST SPAWNERS ---
+
+      function triggerSensoryBurst(originX = 0, originZ = 0, count = 35) {
+        initAudio();
+
+        const nowSec = performance.now() / 1000;
+        if (nowSec - lastNoteAudioTime > 0.055) {
+          lastNoteAudioTime = nowSec;
+          STATE.noteIndex = (STATE.noteIndex + 1) % BANSURI_SCALE.length;
+          playBansuriNote(STATE.noteIndex, 0.95);
+          playTempleBell(1.0 + (STATE.noteIndex % 4) * 0.15);
+          playDhaakPulse();
+        }
+
+        // 2. Trigger Clay Doll Jump & Flip
+        STATE.dollJump.active = true;
+        STATE.dollJump.progress = 0;
+        STATE.dollJump.startY = 0.5;
+
+        // 3. Accelerate pinwheel spin
+        STATE.pinwheelSpeedMultiplier = 6.5;
+
+        // 4. Trigger Alpona Ring Pulse
+        STATE.ringWave.active = true;
+        STATE.ringWave.scale = 0.2;
+        STATE.ringWave.opacity = 0.9;
+
+        // 5. Spawn Petal Fountain from pool
+        let spawned = 0;
+        for (let i = 0, len = petalPool.length; i < len && spawned < count; i++) {
+          const p = petalPool[i];
+          if (!p.active) {
+            p.active = true;
+            p.mesh.visible = true;
+            p.life = 0;
+            p.maxLife = 2.2 + Math.random() * 1.2;
+            p.scale = 0.7 + Math.random() * 0.6;
+            p.mesh.scale.set(p.scale, p.scale, p.scale);
+
+            const angle = Math.random() * Math.PI * 2;
+            const horizontalSpeed = 1.2 + Math.random() * 2.8;
+            p.pos.set(originX + (Math.random() - 0.5) * 0.8, 1.2, originZ + (Math.random() - 0.5) * 0.8);
+            p.vel.set(
+              Math.cos(angle) * horizontalSpeed,
+              3.5 + Math.random() * 3.8,
+              Math.sin(angle) * horizontalSpeed + 1.2
+            );
+
+            p.rotSpeed.set(
+              (Math.random() - 0.5) * 6,
+              (Math.random() - 0.5) * 6,
+              (Math.random() - 0.5) * 6
+            );
+
+            p.mesh.position.copy(p.pos);
+            spawned++;
+          }
+        }
+
+        // 6. Spawn Golden Sparks
+        let sparksSpawned = 0;
+        for (let i = 0, len = sparkPool.length; i < len && sparksSpawned < 15; i++) {
+          const s = sparkPool[i];
+          if (!s.active) {
+            s.active = true;
+            s.mesh.visible = true;
+            s.life = 0;
+            s.maxLife = 0.8 + Math.random() * 0.5;
+
+            const angle = Math.random() * Math.PI * 2;
+            const spd = 2.0 + Math.random() * 3.0;
+            s.pos.set(originX, 1.8, originZ);
+            s.vel.set(
+              Math.cos(angle) * spd,
+              1.5 + Math.random() * 2.5,
+              Math.sin(angle) * spd
+            );
+
+            s.mesh.position.copy(s.pos);
+            sparksSpawned++;
+          }
+        }
+
+        // Hide prompt banner after first interaction
+        const banner = document.getElementById('prompt-banner');
+        if (banner && !banner.classList.contains('hidden')) {
+          banner.classList.add('hidden');
+        }
+      }
+
+      // Multi-Touch Super Bloom Utsab Burst
+      function triggerSuperBloom() {
+        STATE.superBloomActive = true;
+        STATE.superBloomTimer = CONFIG.superBloomDuration;
+
+        const overlay = document.getElementById('super-bloom-overlay');
+        if (overlay) overlay.classList.add('active');
+
+        // Play chord flourish
+        playBansuriNote(STATE.noteIndex, 1.4);
+        playBansuriNote(STATE.noteIndex + 2, 1.4);
+        playBansuriNote(STATE.noteIndex + 4, 1.4);
+        playTempleBell(1.5);
+        playDhaakPulse();
+
+        // Big burst from multiple points
+        triggerSensoryBurst(-1.5, 0, 45);
+        triggerSensoryBurst(1.5, 0, 45);
+        triggerSensoryBurst(0, 1.5, 45);
+      }
+
+      // --- THEME & ATMOSPHERE UPDATER ---
+      function applyTheme(themeName) {
+        STATE.theme = themeName;
+        const t = THEME_PRESETS[themeName] || THEME_PRESETS.morning;
+
+        document.body.style.background = `linear-gradient(180deg, ${t.bgTop} 0%, ${t.bgBottom} 100%)`;
+        ambientLight.color.set(t.ambient);
+        ambientLight.intensity = t.ambientInt;
+        sunLight.color.set(t.sun);
+        sunLight.intensity = t.sunInt;
+
+        const themeDisplay = document.getElementById('theme-display');
+        if (themeDisplay) {
+          const names = { morning: 'Sunny Morning', sunset: 'Crimson Sunset', starlight: 'Starry Indigo', garden: 'Spring Garden' };
+          themeDisplay.textContent = names[themeName] || themeName;
+        }
+      }
+
+      // --- SMART TV GAMEPAD POLLING ---
+      let lastGamepadBurst = 0;
+      function pollGamepad() {
+        if (!navigator.getGamepads) return;
+        const gamepads = navigator.getGamepads();
+        const now = performance.now();
+
+        for (let i = 0; i < gamepads.length; i++) {
+          const gp = gamepads[i];
+          if (!gp) continue;
+
+          // Button 1 (B / Circle / Back) -> Return to Hub
+          if (gp.buttons[1] && gp.buttons[1].pressed) {
+            window.location.href = '../../index.html';
+            return;
+          }
+
+          // Any other button -> Trigger burst (debounced)
+          if (now - lastGamepadBurst > 180) {
+            for (let b = 0; b < gp.buttons.length; b++) {
+              if (gp.buttons[b] && gp.buttons[b].pressed) {
+                lastGamepadBurst = now;
+                triggerSensoryBurst((Math.random() - 0.5) * 2, (Math.random() - 0.5) * 2, 40);
+                break;
+              }
+            }
+          }
+        }
+      }
+
+      // --- ANIMATION LOOP ---
+      let lastTimestamp = performance.now();
+      let lastRenderedPct = -1;
+
+      function animate(timestamp) {
+        requestAnimationFrame(animate);
+
+        const dt = Math.min((timestamp - lastTimestamp) / 1000, 0.1);
+        lastTimestamp = timestamp;
+
+        pollGamepad();
+
+        const pace = PACE_SETTINGS[STATE.pace] || PACE_SETTINGS.playful;
+
+        // 1. Gentle Carousel Stage Rotation
+        stageGroup.rotation.y += pace.stageSpeed;
+
+        // 2. Spinning Pinwheels (Chorki)
+        if (STATE.pinwheelSpeedMultiplier > 1.0) {
+          STATE.pinwheelSpeedMultiplier = Math.max(1.0, STATE.pinwheelSpeedMultiplier - dt * 2.2);
+        }
+
+        for (let i = 0, len = pinwheels.length; i < len; i++) {
+          const pw = pinwheels[i];
+          pw.rotation += pace.pinwheelBaseSpeed * pw.speed * STATE.pinwheelSpeedMultiplier;
+          pw.rotor.rotation.z = pw.rotation;
+        }
+
+        // 3. Miniature Clay Owls Idle Wobble
+        for (let i = 0, len = owls.length; i < len; i++) {
+          const owl = owls[i];
+          const time = timestamp * 0.002 + owl.wobbleOffset;
+          owl.mesh.position.y = Math.sin(time) * 0.06;
+          owl.mesh.rotation.y = Math.sin(time * 0.8) * 0.15;
+        }
+
+        // 4. Ektara Idle Sway
+        for (let i = 0, len = ektaras.length; i < len; i++) {
+          const ektara = ektaras[i];
+          const time = timestamp * 0.0015 + ektara.baseRot;
+          ektara.mesh.rotation.z = Math.sin(time) * 0.08;
+          ektara.mesh.rotation.x = Math.cos(time * 0.7) * 0.05;
+        }
+
+        // 5. Central Smiling Clay Doll Jumping & Flipping
+        if (STATE.dollJump.active) {
+          STATE.dollJump.progress += dt * 1.8;
+          if (STATE.dollJump.progress >= 1.0) {
+            STATE.dollJump.active = false;
+            STATE.dollJump.progress = 0;
+            dollGroup.position.y = STATE.dollJump.startY;
+            dollGroup.rotation.y = 0;
+            dollGroup.scale.set(1, 1, 1);
+          } else {
+            const p = STATE.dollJump.progress;
+            const jumpHeight = Math.sin(p * Math.PI) * 2.4;
+            dollGroup.position.y = STATE.dollJump.startY + jumpHeight;
+            dollGroup.rotation.y = p * Math.PI * 2;
+
+            if (p < 0.2) {
+              dollGroup.scale.set(1.15, 0.85, 1.15);
+            } else if (p < 0.6) {
+              dollGroup.scale.set(0.9, 1.15, 0.9);
+            } else {
+              dollGroup.scale.set(1.0, 1.0, 1.0);
+            }
+          }
+        } else {
+          // Gentle idle bobbing
+          dollGroup.position.y = 0.5 + Math.sin(timestamp * 0.003) * 0.08;
+          dollGroup.rotation.y = Math.sin(timestamp * 0.0015) * 0.15;
+        }
+
+        // 6. Alpona Ring Pulse Wave
+        if (STATE.ringWave.active) {
+          STATE.ringWave.scale += dt * 2.2;
+          STATE.ringWave.opacity -= dt * 0.6;
+          if (STATE.ringWave.opacity <= 0) {
+            STATE.ringWave.active = false;
+            ringWaveMesh.visible = false;
+          } else {
+            ringWaveMesh.visible = true;
+            ringWaveMesh.scale.set(STATE.ringWave.scale, STATE.ringWave.scale, 1);
+            ringWaveMat.opacity = STATE.ringWave.opacity;
+          }
+        }
+
+        // 7. Update Petal Pool Particles
+        for (let i = 0, len = petalPool.length; i < len; i++) {
+          const p = petalPool[i];
+          if (p.active) {
+            p.life += dt;
+            if (p.life >= p.maxLife) {
+              p.active = false;
+              p.mesh.visible = false;
+            } else {
+              p.vel.y -= 3.8 * dt;
+              p.vel.x *= (1.0 - 0.4 * dt);
+              p.vel.z *= (1.0 - 0.4 * dt);
+
+              p.pos.addScaledVector(p.vel, dt);
+              p.mesh.position.copy(p.pos);
+
+              p.rot.x += p.rotSpeed.x * dt;
+              p.rot.y += p.rotSpeed.y * dt;
+              p.rot.z += p.rotSpeed.z * dt;
+              p.mesh.rotation.copy(p.rot);
+
+              const remaining = 1.0 - (p.life / p.maxLife);
+              if (remaining < 0.3) {
+                p.mesh.scale.setScalar(p.scale * (remaining / 0.3));
+              }
+            }
+          }
+        }
+
+        // 8. Update Sparkle Pool Particles
+        for (let i = 0, len = sparkPool.length; i < len; i++) {
+          const s = sparkPool[i];
+          if (s.active) {
+            s.life += dt;
+            if (s.life >= s.maxLife) {
+              s.active = false;
+              s.mesh.visible = false;
+            } else {
+              s.vel.y -= 4.2 * dt;
+              s.pos.addScaledVector(s.vel, dt);
+              s.mesh.position.copy(s.pos);
+
+              const alpha = 1.0 - (s.life / s.maxLife);
+              s.mesh.scale.setScalar(alpha * 0.8);
+            }
+          }
+        }
+
+        // 9. Super Bloom Timer Decay
+        if (STATE.superBloomActive) {
+          STATE.superBloomTimer -= dt;
+          if (STATE.superBloomTimer <= 0) {
+            STATE.superBloomActive = false;
+            const overlay = document.getElementById('super-bloom-overlay');
+            if (overlay) overlay.classList.remove('active');
+          }
+        }
+
+        // 10. Sensory Session Timer Progress (Throttled DOM layout)
+        if (STATE.sessionMaxTimer > 0 && !STATE.sessionEnded) {
+          STATE.sessionTimer += dt;
+          const pct = Math.min(100, (STATE.sessionTimer / STATE.sessionMaxTimer) * 100);
+          const roundedPct = Math.round(pct * 10) / 10;
+          if (roundedPct !== lastRenderedPct) {
+            lastRenderedPct = roundedPct;
+            const bar = document.getElementById('session-progress');
+            if (bar) bar.style.width = roundedPct + '%';
+          }
+
+          if (STATE.sessionTimer >= STATE.sessionMaxTimer) {
+            STATE.sessionEnded = true;
+          }
+        }
+
+        renderer.render(scene, camera);
+      }
+
+      // --- RESPONSIVENESS & ASPECT RATIO ---
+      function handleResize() {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        STATE.aspectRatio = width / height;
+
+        camera.aspect = STATE.aspectRatio;
+
+        const baseFov = 45;
+        if (STATE.aspectRatio > 1.8) {
+          // Ultrawide 21:9 / 32:9 - keep stage centered and grand
+          camera.fov = baseFov;
+          camera.position.z = 11.0;
+        } else if (STATE.aspectRatio < 1.0) {
+          // Mobile Portrait - zoom camera back slightly for vertical clearance
+          camera.fov = 58;
+          camera.position.z = 14.5;
+        } else {
+          // Standard 16:9 TV
+          camera.fov = baseFov;
+          camera.position.z = 11.5;
+        }
+
+        camera.lookAt(0, 1.2, 0);
+        camera.updateProjectionMatrix();
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      }
+
+      window.addEventListener('resize', handleResize);
+
+      // --- USER INTERACTION & INPUT CONTROLS ---
+
+      const raycaster = new THREE.Raycaster();
+      const mouseVec = new THREE.Vector2();
+
+      function handleInteraction(clientX, clientY) {
+        initAudio();
+
+        mouseVec.x = (clientX / window.innerWidth) * 2 - 1;
+        mouseVec.y = -(clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(mouseVec, camera);
+
+        const intersects = raycaster.intersectObjects([stageMesh, dollSkirtMesh, dollHeadMesh, pedestalMesh], true);
+        if (intersects.length > 0) {
+          const pt = intersects[0].point;
+          triggerSensoryBurst(pt.x, pt.z, 35);
+        } else {
+          triggerSensoryBurst(0, 0, 35);
+        }
+      }
+
+      // Pointer / Tap Event
+      container.addEventListener('pointerdown', (e) => {
+        handleInteraction(e.clientX, e.clientY);
+      });
+
+      // Multi-touch Palm Grab Detection (Infant touch protection)
+      window.addEventListener('touchstart', (e) => {
+        if (e.touches.length >= 2) {
+          e.preventDefault();
+          triggerSuperBloom();
+          for (let i = 0; i < e.touches.length; i++) {
+            const touch = e.touches[i];
+            const normX = (touch.clientX / window.innerWidth) * 4 - 2;
+            const normZ = (touch.clientY / window.innerHeight) * 4 - 2;
+            triggerSensoryBurst(normX, normZ, 30);
+          }
+        }
+      }, { passive: false });
+
+      // Keyboard & TV Remote Navigation
+      window.addEventListener('keydown', (e) => {
+        const key = e.key;
+        const code = e.keyCode || e.which;
+
+        // TV Remote Back Keys -> Navigate smoothly to Hub
+        if (
+          key === 'Escape' ||
+          key === 'Back' ||
+          key === 'BrowserBack' ||
+          key === 'GoBack' ||
+          key === 'Backspace' ||
+          code === 10009 || // Samsung Tizen Return
+          code === 461 ||   // LG webOS Back
+          code === 4 ||     // Android TV Back
+          code === 8 ||     // Backspace
+          code === 27       // Escape
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+
+          const settingsPanel = document.getElementById('settings-panel');
+          if (settingsPanel && !settingsPanel.classList.contains('collapsed')) {
+            settingsPanel.classList.add('collapsed');
+            return;
+          }
+
+          window.location.href = '../../index.html';
+          return;
+        }
+
+        // Prevent scrolling for navigation keys during gameplay
+        if ([' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(key)) {
+          e.preventDefault();
+        }
+
+        // ANY other key triggers the joyful sensory burst
+        triggerSensoryBurst((Math.random() - 0.5) * 2, (Math.random() - 0.5) * 2, 40);
+      });
+
+      // Contextmenu Prevention (Iron rule for infant apps)
+      document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+      // Visibility Change / Tab Minimize Handling
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          if (audioCtx && audioCtx.state === 'running') {
+            audioCtx.suspend().catch(() => {});
+          }
+        } else {
+          if (audioCtx && audioCtx.state === 'suspended' && STATE.soundEnabled) {
+            audioCtx.resume().catch(() => {});
+          }
+          lastTimestamp = performance.now();
+        }
+      });
+
+      // Window Blur / Focus for Smart TV Overlays
+      window.addEventListener('blur', () => {
+        if (audioCtx && audioCtx.state === 'running') {
+          audioCtx.suspend().catch(() => {});
+        }
+      });
+
+      window.addEventListener('focus', () => {
+        if (audioCtx && audioCtx.state === 'suspended' && STATE.soundEnabled) {
+          audioCtx.resume().catch(() => {});
+        }
+        lastTimestamp = performance.now();
+      });
+
+      // Floating screen bubble taps
+      ['orb-1', 'orb-2', 'orb-3', 'orb-4'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.addEventListener('click', (e) => {
+            e.stopPropagation();
+            triggerSensoryBurst((Math.random() - 0.5) * 3, (Math.random() - 0.5) * 2, 40);
+            el.blur();
+          });
+        }
+      });
+
+      // --- UI CONTROLS & PARENT SETTINGS ---
+
+      const btnHome = document.getElementById('btn-home');
+      if (btnHome) {
+        btnHome.addEventListener('click', () => btnHome.blur());
+      }
+
+      // Sound Toggle
+      const btnSound = document.getElementById('btn-sound');
+      const soundIcon = document.getElementById('sound-icon');
+      btnSound.addEventListener('click', () => {
+        initAudio();
+        STATE.soundEnabled = !STATE.soundEnabled;
+        soundIcon.textContent = STATE.soundEnabled ? '🔊' : '🔇';
+        if (masterGain && audioCtx) {
+          const targetGain = STATE.soundEnabled ? STATE.volume : 0.0001;
+          masterGain.gain.setTargetAtTime(targetGain, audioCtx.currentTime, 0.03);
+        }
+        btnSound.blur();
+      });
+
+      // Fullscreen Toggle
+      const btnFullscreen = document.getElementById('btn-fullscreen');
+      btnFullscreen.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          document.exitFullscreen().catch(() => {});
+        }
+        btnFullscreen.blur();
+      });
+
+      // Settings Panel Toggle
+      const btnSettings = document.getElementById('btn-settings');
+      const settingsPanel = document.getElementById('settings-panel');
+      const btnCloseSettings = document.getElementById('btn-close-settings');
+
+      btnSettings.addEventListener('click', () => {
+        settingsPanel.classList.toggle('collapsed');
+        btnSettings.blur();
+      });
+
+      btnCloseSettings.addEventListener('click', () => {
+        settingsPanel.classList.add('collapsed');
+        btnCloseSettings.blur();
+      });
+
+      // Theme Selection Buttons
+      document.querySelectorAll('[data-theme]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('[data-theme]').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          applyTheme(btn.dataset.theme);
+          btn.blur();
+        });
+      });
+
+      // Pace Selection Buttons
+      document.querySelectorAll('[data-pace]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('[data-pace]').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          STATE.pace = btn.dataset.pace;
+          const paceDisplay = document.getElementById('pace-display');
+          if (paceDisplay) {
+            const labels = { calm: 'Lullaby', playful: 'Playful', utsab: 'Utsab' };
+            paceDisplay.textContent = labels[STATE.pace] || STATE.pace;
+          }
+          btn.blur();
+        });
+      });
+
+      // Session Duration Buttons
+      document.querySelectorAll('[data-timer]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('[data-timer]').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const duration = parseInt(btn.dataset.timer, 10);
+          STATE.sessionMaxTimer = duration;
+          STATE.sessionTimer = 0;
+          STATE.sessionEnded = false;
+          const sessionDisplay = document.getElementById('session-display');
+          if (sessionDisplay) {
+            sessionDisplay.textContent = duration === 0 ? 'Off' : `${duration / 60} Min`;
+          }
+          btn.blur();
+        });
+      });
+
+      // Volume Slider
+      const volumeSlider = document.getElementById('volume-slider');
+      const volumeDisplay = document.getElementById('volume-display');
+      volumeSlider.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value, 10);
+        STATE.volume = val / 100;
+        volumeDisplay.textContent = `${val}%`;
+        if (masterGain && audioCtx && STATE.soundEnabled) {
+          masterGain.gain.setTargetAtTime(STATE.volume, audioCtx.currentTime, 0.03);
+        }
+      });
+
+      ['change', 'pointerup', 'touchend', 'mouseup'].forEach(evt => {
+        volumeSlider.addEventListener(evt, () => volumeSlider.blur());
+      });
+
+      // Prompt banner click
+      const promptBanner = document.getElementById('prompt-banner');
+      if (promptBanner) {
+        promptBanner.addEventListener('click', () => {
+          triggerSensoryBurst(0, 0, 45);
+        });
+      }
+
+      // Initialize Scene & Loop
+      handleResize();
+      applyTheme('morning');
+      requestAnimationFrame(animate);
+
+    })();
+  </script>
+</body>
+</html>

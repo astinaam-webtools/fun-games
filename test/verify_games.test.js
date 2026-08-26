@@ -8,12 +8,17 @@ const GAMES = [
   'games/dreamy-highway/index.html',
   'games/bubble-aquarium/index.html',
   'games/starlight-safari/index.html',
-  'games/rainbow-cloud/index.html'
+  'games/rainbow-cloud/index.html',
+  'games/nouka-baich/index.html',
+  'games/boishakhi-mela/index.html',
+  'games/shakrain-soar/index.html',
+  'games/gram-bangla-rickshaw/index.html',
+  'games/winter-pitha/index.html'
 ];
 
 console.log('--- RUNNING INFANT 3D SENSORY GAMES AUTOMATED TEST SUITE ---');
 
-// Test 1: Dashboard exists and contains all 4 playable game links
+// Test 1: Dashboard exists and contains all playable game links
 console.log('\n[Test 1] Verifying Dashboard & Game Links...');
 assert(fs.existsSync(DASHBOARD_FILE), 'Dashboard index.html must exist');
 const dashboardContent = fs.readFileSync(DASHBOARD_FILE, 'utf8');
@@ -22,6 +27,11 @@ assert(dashboardContent.includes('games/dreamy-highway/index.html'), 'Dashboard 
 assert(dashboardContent.includes('games/bubble-aquarium/index.html'), 'Dashboard must link to bubble-aquarium');
 assert(dashboardContent.includes('games/starlight-safari/index.html'), 'Dashboard must link to starlight-safari');
 assert(dashboardContent.includes('games/rainbow-cloud/index.html'), 'Dashboard must link to rainbow-cloud');
+assert(dashboardContent.includes('games/nouka-baich/index.html'), 'Dashboard must link to nouka-baich');
+assert(dashboardContent.includes('games/boishakhi-mela/index.html'), 'Dashboard must link to boishakhi-mela');
+assert(dashboardContent.includes('games/shakrain-soar/index.html'), 'Dashboard must link to shakrain-soar');
+assert(dashboardContent.includes('games/gram-bangla-rickshaw/index.html'), 'Dashboard must link to gram-bangla-rickshaw');
+assert(dashboardContent.includes('games/winter-pitha/index.html'), 'Dashboard must link to winter-pitha');
 assert(dashboardContent.includes('contextmenu'), 'Dashboard must handle contextmenu');
 assert(dashboardContent.includes('visibilitychange'), 'Dashboard must handle visibilitychange');
 console.log('✓ Dashboard verification passed.');

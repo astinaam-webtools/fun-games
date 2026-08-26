@@ -1,0 +1,2266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Gram Bangla Rickshaw Cruise - Infant 3D Sensory Experience</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#feca57">
+  <style>
+    /* ==========================================================================
+       RESET & BASE ERGONOMICS (INFANT-SAFE, TOUCH-LOCK, TV-READY)
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    :root {
+      --mustard-yellow: #fed330;
+      --mustard-gold: #feca57;
+      --paddy-emerald: #20bf6b;
+      --paddy-green: #26de81;
+      --sky-morning: #74b9ff;
+      --sky-warm: #ffeaa7;
+      --rickshaw-red: #ff4757;
+      --rickshaw-teal: #00cec9;
+      --earth-road: #f7d794;
+      --glass-bg: rgba(255, 255, 255, 0.88);
+      --glass-border: rgba(255, 255, 255, 0.95);
+      --text-dark: #2d3436;
+      --text-muted: #636e72;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #ffeaa7;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      touch-action: none;
+      overscroll-behavior: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* 3D Canvas Host */
+    #canvas-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      cursor: pointer;
+    }
+
+    /* Soft Country Morning Vignette */
+    .vignette-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
+      box-shadow: inset 0 0 80px rgba(254, 202, 87, 0.25), inset 0 0 160px rgba(32, 191, 107, 0.25);
+      mix-blend-mode: soft-light;
+    }
+
+    /* Golden Speed Surge Halo Overlay */
+    .surge-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 3;
+      opacity: 0;
+      background: radial-gradient(circle at center, rgba(254, 211, 48, 0.38) 0%, rgba(255, 107, 129, 0.22) 50%, rgba(32, 191, 107, 0.35) 100%);
+      transition: opacity 0.35s ease;
+    }
+
+    .surge-overlay.active {
+      opacity: 1;
+      animation: surgePulse 0.8s ease-out forwards;
+    }
+
+    @keyframes surgePulse {
+      0% { opacity: 0.85; transform: scale(0.98); }
+      50% { opacity: 1.0; transform: scale(1.02); }
+      100% { opacity: 0; transform: scale(1.0); }
+    }
+
+    /* 2D Floating Interactive Mustard Blossoms */
+    #screen-blossoms-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 4;
+      overflow: hidden;
+    }
+
+    .screen-blossom {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #ffffff 0%, #fed330 45%, #feca57 85%, #ff9f43 100%);
+      box-shadow: 0 8px 24px rgba(254, 202, 87, 0.45), inset 0 0 12px rgba(255, 255, 255, 0.9);
+      border: 2px solid rgba(255, 255, 255, 0.95);
+      pointer-events: auto;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: floatScreenBlossom 6s infinite ease-in-out alternate;
+    }
+
+    .screen-blossom:hover, .screen-blossom:active {
+      transform: scale(1.3) rotate(15deg);
+    }
+
+    @keyframes floatScreenBlossom {
+      0% { transform: translateY(0px) rotate(0deg); }
+      100% { transform: translateY(-24px) rotate(22deg); }
+    }
+
+    /* Screen Tap Ripple Effect */
+    .touch-ripple {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%) scale(0);
+      animation: rippleExpand 0.8s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+      border: 3px solid rgba(255, 255, 255, 0.95);
+      box-shadow: 0 0 30px rgba(254, 202, 87, 0.85);
+      z-index: 5;
+    }
+
+    @keyframes rippleExpand {
+      0% { transform: translate(-50%, -50%) scale(0.1); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(3.5); opacity: 0; }
+    }
+
+    /* Session Progress Bar */
+    .session-progress-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.3);
+      z-index: 20;
+    }
+
+    .session-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #fed330 0%, #20bf6b 35%, #00cec9 70%, #ff4757 100%);
+      transition: width 0.5s linear;
+      box-shadow: 0 0 14px rgba(254, 202, 87, 0.85);
+    }
+
+    /* UI Overlay Layer */
+    .ui-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px 24px;
+      transition: opacity 0.5s ease;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      pointer-events: auto;
+    }
+
+    .brand-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 8px 20px;
+      border-radius: 999px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      border: 2px solid var(--glass-border);
+      animation: floatBadge 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatBadge {
+      0% { transform: translateY(0px); }
+      100% { transform: translateY(-4px); }
+    }
+
+    .brand-icon {
+      font-size: 24px;
+      display: inline-block;
+      animation: bellWiggle 2.5s ease-in-out infinite;
+    }
+
+    @keyframes bellWiggle {
+      0%, 100% { transform: rotate(0deg) scale(1); }
+      25% { transform: rotate(-12deg) scale(1.1); }
+      75% { transform: rotate(12deg) scale(1.1); }
+    }
+
+    .brand-title {
+      font-weight: 800;
+      font-size: 16px;
+      letter-spacing: 0.5px;
+      background: linear-gradient(135deg, #d35400 0%, #e67e22 45%, #27ae60 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .aspect-badge {
+      font-size: 11px;
+      background: #fef3c7;
+      color: #b45309;
+      padding: 3px 10px;
+      border-radius: 8px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .glass-btn {
+      background: var(--glass-bg);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 2px solid var(--glass-border);
+      border-radius: 999px;
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-dark);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: auto;
+      min-width: 48px;
+      min-height: 48px;
+      text-decoration: none;
+      outline: none;
+    }
+
+    .glass-btn:hover, .glass-btn:focus-visible {
+      transform: translateY(-2px) scale(1.05);
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 10px 25px rgba(254, 202, 87, 0.35);
+    }
+
+    .glass-btn:active {
+      transform: scale(0.95);
+    }
+
+    .icon-btn {
+      width: 48px;
+      height: 48px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 18px;
+    }
+
+    /* Start / Interactive Prompt Banner */
+    .prompt-banner {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      padding: 14px 32px;
+      border-radius: 999px;
+      border: 3px solid #ffffff;
+      box-shadow: 0 12px 38px rgba(254, 202, 87, 0.35);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      pointer-events: auto;
+      cursor: pointer;
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: pulseGlow 2.5s infinite ease-in-out;
+      min-height: 48px;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 8px 30px rgba(254, 202, 87, 0.4); transform: translateX(-50%) scale(1); }
+      50% { box-shadow: 0 16px 45px rgba(32, 191, 107, 0.45); transform: translateX(-50%) scale(1.03); }
+    }
+
+    .prompt-banner.hidden {
+      opacity: 0;
+      transform: translateX(-50%) translateY(40px) scale(0.9);
+      pointer-events: none;
+    }
+
+    .prompt-icon {
+      font-size: 30px;
+      animation: bouncePrompt 1.8s infinite ease-in-out;
+    }
+
+    @keyframes bouncePrompt {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .prompt-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .prompt-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-dark);
+    }
+
+    .prompt-subtitle {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    /* Parent Settings Modal */
+    .settings-modal {
+      position: absolute;
+      top: 75px;
+      right: 24px;
+      width: 320px;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 24px;
+      border: 2px solid rgba(255, 255, 255, 0.98);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+      padding: 20px;
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transform-origin: top right;
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: auto;
+    }
+
+    .settings-modal.collapsed {
+      opacity: 0;
+      transform: scale(0.8) translateY(-20px);
+      pointer-events: none;
+    }
+
+    .settings-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #f1f2f6;
+    }
+
+    .settings-header h3 {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .setting-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .setting-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .setting-control {
+      display: flex;
+      gap: 8px;
+    }
+
+    .pill-btn {
+      flex: 1;
+      padding: 8px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 12px;
+      border: 2px solid #e4e7eb;
+      background: #f8f9fa;
+      color: var(--text-muted);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pill-btn.active {
+      background: #f39c12;
+      border-color: #e67e22;
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(243, 156, 18, 0.4);
+    }
+
+    .slider-input {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      accent-color: #f39c12;
+      cursor: pointer;
+    }
+
+    /* Mobile Adaptations */
+    @media (max-width: 600px) {
+      .brand-title { display: none; }
+      .aspect-badge { display: none; }
+      .prompt-banner {
+        padding: 10px 20px;
+        bottom: 16px;
+        gap: 10px;
+      }
+      .prompt-title { font-size: 13px; }
+      .prompt-subtitle { font-size: 11px; }
+      .settings-modal {
+        width: calc(100vw - 32px);
+        right: 16px;
+        top: 72px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Sensory Session Progress Bar -->
+  <div class="session-progress-container">
+    <div class="session-progress-bar" id="session-progress"></div>
+  </div>
+
+  <!-- Three.js Canvas Container -->
+  <div id="canvas-container"></div>
+
+  <!-- Ambient Village Lighting & Overlays -->
+  <div class="vignette-overlay"></div>
+  <div class="surge-overlay" id="surge-overlay"></div>
+  <div id="screen-blossoms-container"></div>
+
+  <!-- UI Overlay Layer -->
+  <div class="ui-layer">
+    <header class="top-bar">
+      <div class="brand-badge">
+        <span class="brand-icon">🛺</span>
+        <span class="brand-title">Gram Bangla Rickshaw</span>
+        <span class="aspect-badge" id="aspect-badge">🌾 Mustard Fields</span>
+      </div>
+
+      <div class="top-actions">
+        <a href="../../index.html" class="glass-btn" style="text-decoration: none; color: #2d3436;" title="Back to Game Hub" id="btn-home">
+          <span>🏠</span> <span>Playroom</span>
+        </a>
+        <button class="glass-btn icon-btn" id="btn-sound" title="Toggle Sound / Rickshaw Bell" aria-label="Toggle Sound">
+          <span id="sound-icon">🔊</span>
+        </button>
+        <button class="glass-btn icon-btn" id="btn-fullscreen" title="Fullscreen Mode" aria-label="Toggle Fullscreen">
+          <span>⛶</span>
+        </button>
+        <button class="glass-btn icon-btn" id="btn-settings" title="Parent Settings" aria-label="Settings">
+          <span>⚙️</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Bottom Interactive Prompt Banner -->
+    <div class="prompt-banner" id="prompt-banner">
+      <span class="prompt-icon">🔔</span>
+      <div class="prompt-text">
+        <span class="prompt-title">Tap to Ring Rickshaw Bell &amp; Soar White Storks!</span>
+        <span class="prompt-subtitle">Multi-touch mustard burst • Cheerful Tring-Tring FM chimes</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Parent Settings Panel -->
+  <div class="settings-modal collapsed" id="settings-panel">
+    <div class="settings-header">
+      <h3><span>🛺</span> Rickshaw Cruise Settings</h3>
+      <button class="glass-btn icon-btn" style="width:34px; height:34px; font-size:14px; min-width:34px; min-height:34px;" id="btn-close-settings">✕</button>
+    </div>
+
+    <!-- Time of Day / Village Atmosphere -->
+    <div class="setting-item">
+      <div class="setting-label">
+        <span>Atmosphere</span>
+        <span id="atmosphere-display">Morning Sun</span>
+      </div>
+      <div class="setting-control">
+        <button class="pill-btn active" data-atmosphere="morning">Morning</button>
+        <button class="pill-btn" data-atmosphere="noon">Sunny</button>
+        <button class="pill-btn" data-atmosphere="sunset">Sunset</button>
+        <button class="pill-btn" data-atmosphere="night">Moonlight</button>
+      </div>
+    </div>
+
+    <!-- Cruise Speed -->
+    <div class="setting-item">
+      <div class="setting-label">
+        <span>Rickshaw Pace</span>
+        <span id="pace-display">Gentle</span>
+      </div>
+      <div class="setting-control">
+        <button class="pill-btn" data-pace="calm">Calm</button>
+        <button class="pill-btn active" data-pace="gentle">Gentle</button>
+        <button class="pill-btn" data-pace="lively">Lively</button>
+      </div>
+    </div>
+
+    <!-- Session Duration -->
+    <div class="setting-item">
+      <div class="setting-label">
+        <span>Session Timer</span>
+        <span id="session-display">3 Min</span>
+      </div>
+      <div class="setting-control">
+        <button class="pill-btn" data-timer="120">2 min</button>
+        <button class="pill-btn active" data-timer="180">3 min</button>
+        <button class="pill-btn" data-timer="300">5 min</button>
+        <button class="pill-btn" data-timer="0">Off</button>
+      </div>
+    </div>
+
+    <!-- Audio Volume -->
+    <div class="setting-item">
+      <div class="setting-label">
+        <span>Bell &amp; Flute Volume</span>
+        <span id="volume-display">70%</span>
+      </div>
+      <input type="range" class="slider-input" id="volume-slider" min="0" max="100" value="70">
+    </div>
+  </div>
+
+  <!-- Three.js CDN r128 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <script>
+    /* ==========================================================================
+       GRAM BANGLA RICKSHAW CRUISE - 3D INFANT SENSORY ENGINE
+       Zero-allocation WebGL, procedural canvas textures, FM rickshaw bell synth.
+       ========================================================================== */
+
+    (function() {
+      'use strict';
+
+      // --- CONFIGURATION & STATE ---
+      const CONFIG = {
+        sessionDuration: 180,
+        storkPoolSize: 8,
+        cowPoolSize: 6,
+        treePoolSize: 22,
+        hutPoolSize: 8,
+        mustardPatchPoolSize: 18,
+        particlePoolSize: 100,
+        cloudPoolSize: 12,
+        roadLength: 300,
+        roadWidth: 9,
+      };
+
+      const STATE = {
+        speed: 18,
+        targetSpeed: 18,
+        surgeTimer: 0,
+        distanceTraveled: 0,
+        atmosphere: 'morning',
+        sessionTimer: 0,
+        sessionWindDown: false,
+        soundEnabled: true,
+        volume: 0.7,
+        noteIndex: 0,
+        rickshawHop: 0,
+        rickshawHopVel: 0,
+        tasselSway: 0,
+      };
+
+      // Math helper for curving rural road
+      function getRoadX(z) {
+        return Math.sin(z * 0.015) * 8.0 + Math.sin(z * 0.005) * 4.0;
+      }
+      function getRoadY(z) {
+        return Math.sin(z * 0.02) * 0.6;
+      }
+
+      // Reusable math objects (Zero GC in animate loop)
+      const _scratchVec = new THREE.Vector3();
+      const _scratchEuler = new THREE.Euler();
+      const _scratchColor = new THREE.Color();
+
+      // --- PROCEDURAL TEXTURE GENERATOR & MAP CACHE ---
+      const TextureGenerator = {
+        cache: new Map(),
+
+        createCanvas(w, h) {
+          const c = document.createElement('canvas');
+          c.width = w;
+          c.height = h;
+          return { canvas: c, ctx: c.getContext('2d') };
+        },
+
+        // 1. Traditional Dhaka Rickshaw Folk Art Hood Texture
+        createRickshawArt() {
+          const key = 'tex_rickshaw_art';
+          if (this.cache.has(key)) return this.cache.get(key);
+
+          const { canvas, ctx } = this.createCanvas(512, 512);
+
+          // Deep Turquoise & Royal Blue Background
+          const bgGrad = ctx.createLinearGradient(0, 0, 512, 512);
+          bgGrad.addColorStop(0, '#00cec9');
+          bgGrad.addColorStop(0.5, '#0984e3');
+          bgGrad.addColorStop(1, '#6c5ce7');
+          ctx.fillStyle = bgGrad;
+          ctx.fillRect(0, 0, 512, 512);
+
+          // Ornate Yellow & Red Geometric Border (Classic Rickshaw Trim)
+          ctx.lineWidth = 14;
+          ctx.strokeStyle = '#feca57';
+          ctx.strokeRect(10, 10, 492, 492);
+          ctx.lineWidth = 6;
+          ctx.strokeStyle = '#ff4757';
+          ctx.strokeRect(22, 22, 468, 468);
+
+          // Chevron Zig-Zag Folk Pattern along border
+          ctx.fillStyle = '#fed330';
+          for (let x = 30; x < 480; x += 30) {
+            ctx.beginPath();
+            ctx.moveTo(x, 26);
+            ctx.lineTo(x + 15, 42);
+            ctx.lineTo(x + 30, 26);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(x, 486);
+            ctx.lineTo(x + 15, 470);
+            ctx.lineTo(x + 30, 486);
+            ctx.fill();
+          }
+
+          // Centerpiece: Majestic Blooming Lotus (Padma Ful) & Peacock Feather Art
+          const cx = 256, cy = 256;
+
+          // Peacock Eyes / Mandala Circles
+          const rings = [
+            { r: 170, color: 'rgba(255, 234, 167, 0.4)' },
+            { r: 140, color: 'rgba(254, 211, 48, 0.8)' },
+            { r: 110, color: 'rgba(255, 71, 87, 0.85)' },
+            { r: 80, color: 'rgba(0, 206, 201, 0.9)' },
+            { r: 50, color: '#2ed573' },
+            { r: 24, color: '#feca57' },
+          ];
+          rings.forEach(ring => {
+            ctx.beginPath();
+            ctx.arc(cx, cy, ring.r, 0, Math.PI * 2);
+            ctx.fillStyle = ring.color;
+            ctx.fill();
+          });
+
+          // Blooming Lotus Petals
+          const petalCount = 12;
+          for (let i = 0; i < petalCount; i++) {
+            const angle = (i * Math.PI * 2) / petalCount;
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(angle);
+
+            // Lotus Petal
+            ctx.fillStyle = i % 2 === 0 ? '#ff6b81' : '#ff9ff3';
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.quadraticCurveTo(35, 90, 0, 150);
+            ctx.quadraticCurveTo(-35, 90, 0, 0);
+            ctx.fill();
+
+            // Petal Tip Glow
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(0, 145, 6, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+          }
+
+          // Golden Heart Center with Rosy Cheeks
+          ctx.fillStyle = '#fffa65';
+          ctx.beginPath();
+          ctx.arc(cx, cy, 26, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#ff4757';
+          ctx.beginPath();
+          ctx.arc(cx - 8, cy + 4, 5, 0, Math.PI * 2);
+          ctx.arc(cx + 8, cy + 4, 5, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Cheerful Painted Tigers & Floral Dots in Corners
+          const corners = [[65, 65], [447, 65], [65, 447], [447, 447]];
+          corners.forEach(([x, y]) => {
+            ctx.fillStyle = '#ff9f43';
+            ctx.beginPath();
+            ctx.arc(x, y, 26, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#fffa65';
+            ctx.beginPath();
+            ctx.arc(x, y, 14, 0, Math.PI * 2);
+            ctx.fill();
+          });
+
+          const tex = new THREE.CanvasTexture(canvas);
+          tex.encoding = THREE.sRGBEncoding;
+          tex.needsUpdate = true;
+          this.cache.set(key, tex);
+          return tex;
+        },
+
+        // 2. Spotted Cow (Goru) Texture: Creamy White with Warm Caramel/Black Spots
+        createCowTexture() {
+          const key = 'tex_cow_spots';
+          if (this.cache.has(key)) return this.cache.get(key);
+
+          const { canvas, ctx } = this.createCanvas(256, 256);
+          // Soft Cream White Base
+          ctx.fillStyle = '#fdfbf7';
+          ctx.fillRect(0, 0, 256, 256);
+
+          // Organic Spots (Warm Brown & Charcoal)
+          const spots = [
+            { x: 50, y: 60, rx: 35, ry: 25, rot: 0.3, color: '#8854d0' },
+            { x: 180, y: 70, rx: 42, ry: 30, rot: -0.4, color: '#d35400' },
+            { x: 110, y: 160, rx: 50, ry: 38, rot: 0.6, color: '#d35400' },
+            { x: 210, y: 190, rx: 32, ry: 22, rot: -0.2, color: '#8854d0' },
+            { x: 30, y: 210, rx: 24, ry: 18, rot: 0.1, color: '#d35400' },
+          ];
+
+          spots.forEach(s => {
+            ctx.fillStyle = s.color;
+            ctx.beginPath();
+            ctx.ellipse(s.x, s.y, s.rx, s.ry, s.rot, 0, Math.PI * 2);
+            ctx.fill();
+          });
+
+          const tex = new THREE.CanvasTexture(canvas);
+          tex.encoding = THREE.sRGBEncoding;
+          tex.wrapS = THREE.RepeatWrapping;
+          tex.wrapT = THREE.RepeatWrapping;
+          this.cache.set(key, tex);
+          return tex;
+        },
+
+        // 3. Thatched Straw & Bamboo Roof Texture (Kure Ghor)
+        createThatchTexture() {
+          const key = 'tex_thatch';
+          if (this.cache.has(key)) return this.cache.get(key);
+
+          const { canvas, ctx } = this.createCanvas(256, 256);
+          ctx.fillStyle = '#e58e26';
+          ctx.fillRect(0, 0, 256, 256);
+
+          // Straw Lines
+          for (let y = 0; y < 256; y += 12) {
+            ctx.fillStyle = y % 24 === 0 ? '#d35400' : '#f39c12';
+            ctx.fillRect(0, y, 256, 4);
+
+            for (let x = 0; x < 256; x += 16) {
+              ctx.fillStyle = '#f7b731';
+              ctx.fillRect(x + (y % 8), y, 8, 10);
+            }
+          }
+
+          const tex = new THREE.CanvasTexture(canvas);
+          tex.encoding = THREE.sRGBEncoding;
+          tex.wrapS = THREE.RepeatWrapping;
+          tex.wrapT = THREE.RepeatWrapping;
+          this.cache.set(key, tex);
+          return tex;
+        },
+
+        // 4. Yellow Mustard Flower Field Pattern (Shorishe Khet)
+        createMustardTexture() {
+          const key = 'tex_mustard_field';
+          if (this.cache.has(key)) return this.cache.get(key);
+
+          const { canvas, ctx } = this.createCanvas(256, 256);
+          // Lush Green Stem Base
+          ctx.fillStyle = '#20bf6b';
+          ctx.fillRect(0, 0, 256, 256);
+
+          // Golden Yellow Flower Clusters
+          for (let i = 0; i < 90; i++) {
+            const x = Math.random() * 256;
+            const y = Math.random() * 256;
+            const r = 4 + Math.random() * 6;
+
+            ctx.fillStyle = Math.random() > 0.3 ? '#fed330' : '#fffa65';
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Little Orange/White center dot
+            ctx.fillStyle = '#f39c12';
+            ctx.beginPath();
+            ctx.arc(x, y, r * 0.35, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          const tex = new THREE.CanvasTexture(canvas);
+          tex.encoding = THREE.sRGBEncoding;
+          tex.wrapS = THREE.RepeatWrapping;
+          tex.wrapT = THREE.RepeatWrapping;
+          tex.repeat.set(4, 4);
+          this.cache.set(key, tex);
+          return tex;
+        },
+
+        // 5. Rural Earthen Village Road Texture (Matir Rasta / Herringbone Brick Edge)
+        createRoadTexture() {
+          const key = 'tex_rural_road';
+          if (this.cache.has(key)) return this.cache.get(key);
+
+          const { canvas, ctx } = this.createCanvas(512, 1024);
+
+          // Warm Sandstone / Earthen Ground
+          const grad = ctx.createLinearGradient(0, 0, 512, 0);
+          grad.addColorStop(0, '#e17055');
+          grad.addColorStop(0.12, '#f7d794');
+          grad.addColorStop(0.5, '#f5cd79');
+          grad.addColorStop(0.88, '#f7d794');
+          grad.addColorStop(1, '#e17055');
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, 512, 1024);
+
+          // Terracotta Brick Borders (Bangladeshi rural brick lining)
+          ctx.fillStyle = '#d63031';
+          const brickH = 40;
+          for (let y = 0; y < 1024; y += brickH + 6) {
+            // Left brick line
+            ctx.fillRect(16, y, 28, brickH);
+            // Right brick line
+            ctx.fillRect(512 - 44, y, 28, brickH);
+          }
+
+          // Center Marigold / Yellow flower dust trail
+          ctx.fillStyle = 'rgba(254, 211, 48, 0.7)';
+          for (let y = 30; y < 1024; y += 140) {
+            ctx.beginPath();
+            ctx.arc(256, y, 16, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(256, y, 6, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = 'rgba(254, 211, 48, 0.7)';
+          }
+
+          const tex = new THREE.CanvasTexture(canvas);
+          tex.encoding = THREE.sRGBEncoding;
+          tex.wrapS = THREE.RepeatWrapping;
+          tex.wrapT = THREE.RepeatWrapping;
+          tex.repeat.set(1, 4);
+          this.cache.set(key, tex);
+          return tex;
+        },
+
+        // 6. Cute Smiling Sun / Moon Face Texture
+        createCuteSunFace() {
+          const key = 'tex_sun_face';
+          if (this.cache.has(key)) return this.cache.get(key);
+
+          const { canvas, ctx } = this.createCanvas(256, 256);
+          ctx.fillStyle = '#fffa65';
+          ctx.fillRect(0, 0, 256, 256);
+
+          // Big Sparkling Eyes
+          ctx.fillStyle = '#2d3436';
+          ctx.beginPath();
+          ctx.arc(80, 110, 16, 0, Math.PI * 2);
+          ctx.arc(176, 110, 16, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Eye Highlights
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(74, 104, 6, 0, Math.PI * 2);
+          ctx.arc(86, 116, 3, 0, Math.PI * 2);
+          ctx.arc(170, 104, 6, 0, Math.PI * 2);
+          ctx.arc(182, 116, 3, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Rosy Cheeks
+          ctx.fillStyle = 'rgba(255, 107, 129, 0.7)';
+          ctx.beginPath();
+          ctx.ellipse(54, 140, 22, 14, 0, 0, Math.PI * 2);
+          ctx.ellipse(202, 140, 22, 14, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Warm Smile
+          ctx.strokeStyle = '#2d3436';
+          ctx.lineWidth = 8;
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.arc(128, 136, 30, 0.15 * Math.PI, 0.85 * Math.PI);
+          ctx.stroke();
+
+          // Pink Tongue
+          ctx.fillStyle = '#ff7675';
+          ctx.beginPath();
+          ctx.arc(128, 158, 12, 0, Math.PI);
+          ctx.fill();
+
+          const tex = new THREE.CanvasTexture(canvas);
+          tex.encoding = THREE.sRGBEncoding;
+          tex.needsUpdate = true;
+          this.cache.set(key, tex);
+          return tex;
+        }
+      };
+
+      // --- WEB AUDIO API HARMONIC RICKSHAW BELL & AMBIENT FLUTE SYNTHESIZER ---
+      const SoundSystem = {
+        ctx: null,
+        masterGain: null,
+        compressor: null,
+        ambientPadGain: null,
+        ambientOscillators: [],
+        initialized: false,
+
+        // Pentatonic C Major scale (Consonant & Soothing for infant hearing)
+        pentatonicScale: [
+          261.63, // C4
+          293.66, // D4
+          329.63, // E4
+          392.00, // G4
+          440.00, // A4
+          523.25, // C5
+          587.33, // D5
+          659.25, // E5
+          783.99, // G5
+          880.00, // A5
+          1046.50 // C6
+        ],
+
+        droneFrequencies: [130.81, 196.00, 261.63, 329.63], // C3, G3, C4, E4
+
+        init() {
+          if (this.initialized) return;
+          try {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            this.ctx = new AudioCtx();
+
+            // Mandatory Dynamics Compressor Limiter (-14dB, ratio 12)
+            this.compressor = this.ctx.createDynamicsCompressor();
+            this.compressor.threshold.setValueAtTime(-14, this.ctx.currentTime);
+            this.compressor.knee.setValueAtTime(25, this.ctx.currentTime);
+            this.compressor.ratio.setValueAtTime(12, this.ctx.currentTime);
+            this.compressor.attack.setValueAtTime(0.003, this.ctx.currentTime);
+            this.compressor.release.setValueAtTime(0.25, this.ctx.currentTime);
+
+            // Master Gain
+            this.masterGain = this.ctx.createGain();
+            const initVol = STATE.soundEnabled ? STATE.volume : 0;
+            this.masterGain.gain.setValueAtTime(initVol, this.ctx.currentTime);
+
+            this.compressor.connect(this.masterGain);
+            this.masterGain.connect(this.ctx.destination);
+
+            this.startAmbientFluteDrone();
+            this.initialized = true;
+          } catch (e) {
+            console.warn('AudioContext init prevented:', e);
+          }
+        },
+
+        resume() {
+          if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume().catch(() => {});
+          }
+        },
+
+        // Soft, calming Bhatiali-style Bansuri bamboo drone
+        startAmbientFluteDrone() {
+          if (!this.ctx) return;
+          const now = this.ctx.currentTime;
+
+          this.ambientPadGain = this.ctx.createGain();
+          this.ambientPadGain.gain.setValueAtTime(0.0001, now);
+          this.ambientPadGain.gain.linearRampToValueAtTime(0.08, now + 3.0);
+
+          const lowpass = this.ctx.createBiquadFilter();
+          lowpass.type = 'lowpass';
+          lowpass.frequency.setValueAtTime(480, now);
+
+          this.droneFrequencies.forEach((freq, idx) => {
+            const osc = this.ctx.createOscillator();
+            const oscGain = this.ctx.createGain();
+
+            osc.type = idx % 2 === 0 ? 'sine' : 'triangle';
+            osc.frequency.setValueAtTime(freq, now);
+
+            // Gentle vibrato LFO
+            const lfo = this.ctx.createOscillator();
+            const lfoGain = this.ctx.createGain();
+            lfo.frequency.setValueAtTime(0.25 + idx * 0.1, now);
+            lfoGain.gain.setValueAtTime(1.5, now);
+            lfo.connect(lfoGain);
+            lfoGain.connect(osc.frequency);
+            lfo.start(now);
+
+            oscGain.gain.setValueAtTime(0.25 / this.droneFrequencies.length, now);
+
+            osc.connect(oscGain);
+            oscGain.connect(lowpass);
+
+            osc.start(now);
+            this.ambientOscillators.push(osc, lfo);
+          });
+
+          lowpass.connect(this.ambientPadGain);
+          this.ambientPadGain.connect(this.compressor);
+        },
+
+        // Authentic Bangladeshi FM Rickshaw Bell ("Tring - Tring!")
+        playRickshawBell(pitchMultiplier = 1.0) {
+          if (!this.ctx || !STATE.soundEnabled) return;
+          this.resume();
+
+          const now = this.ctx.currentTime;
+          const baseFreq = 1760 * pitchMultiplier; // A6 brass chime fundamental
+
+          // Two rapid mechanical strikes spaced 115ms apart
+          [0, 0.115].forEach((delay, strikeIdx) => {
+            const t = now + delay;
+
+            // 1. Carrier Oscillator (Brass Bell Fundamental)
+            const carrier = this.ctx.createOscillator();
+            carrier.type = 'sine';
+            carrier.frequency.setValueAtTime(baseFreq * (strikeIdx === 1 ? 1.03 : 1.0), t);
+
+            // 2. Modulator Oscillator (Inharmonic metallic ratio 2.756)
+            const modulator = this.ctx.createOscillator();
+            modulator.type = 'sine';
+            modulator.frequency.setValueAtTime(baseFreq * 2.756, t);
+
+            const modGain = this.ctx.createGain();
+            modGain.gain.setValueAtTime(baseFreq * 1.6, t);
+            modGain.gain.exponentialRampToValueAtTime(1.0, t + 0.18);
+            modulator.connect(modGain);
+            modGain.connect(carrier.frequency);
+
+            // 3. Mechanical Rotary Gear Hammer Tremolo (28Hz flutter)
+            const tremolo = this.ctx.createOscillator();
+            tremolo.type = 'square';
+            tremolo.frequency.setValueAtTime(28, t);
+            const tremoloGain = this.ctx.createGain();
+            tremoloGain.gain.setValueAtTime(0.35, t);
+            tremoloGain.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
+
+            // 4. Output Envelope & Bandpass Shaper (Protects infant ears)
+            const strikeGain = this.ctx.createGain();
+            strikeGain.gain.setValueAtTime(0.0001, t);
+            strikeGain.gain.linearRampToValueAtTime(0.22, t + 0.008);
+            strikeGain.gain.exponentialRampToValueAtTime(0.0001, t + 0.7);
+
+            const filter = this.ctx.createBiquadFilter();
+            filter.type = 'bandpass';
+            filter.frequency.setValueAtTime(2400, t);
+            filter.Q.setValueAtTime(1.4, t);
+
+            carrier.connect(strikeGain);
+            strikeGain.connect(filter);
+            filter.connect(this.compressor);
+
+            // Resource cleanup
+            carrier.onended = () => {
+              try {
+                carrier.disconnect();
+                modulator.disconnect();
+                modGain.disconnect();
+                tremolo.disconnect();
+                tremoloGain.disconnect();
+                strikeGain.disconnect();
+                filter.disconnect();
+              } catch (e) {}
+            };
+
+            carrier.start(t);
+            modulator.start(t);
+            tremolo.start(t);
+
+            carrier.stop(t + 0.75);
+            modulator.stop(t + 0.75);
+            tremolo.stop(t + 0.75);
+          });
+
+          // Harmonious Pentatonic Glockenspiel Arpeggio follow-up chime
+          const noteIndex = STATE.noteIndex % this.pentatonicScale.length;
+          STATE.noteIndex = (STATE.noteIndex + 1) % this.pentatonicScale.length;
+          const glockFreq = this.pentatonicScale[noteIndex];
+
+          setTimeout(() => {
+            this.playHarmonicGlock(glockFreq);
+          }, 240);
+        },
+
+        // Soft glockenspiel bell chime
+        playHarmonicGlock(freq) {
+          if (!this.ctx || !STATE.soundEnabled) return;
+          const now = this.ctx.currentTime;
+
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now);
+
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.linearRampToValueAtTime(0.12, now + 0.015);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.9);
+
+          osc.connect(gain);
+          gain.connect(this.compressor);
+
+          osc.onended = () => {
+            try { osc.disconnect(); gain.disconnect(); } catch (e) {}
+          };
+
+          osc.start(now);
+          osc.stop(now + 0.95);
+        },
+
+        // Cheerful bird chirp for flying storks
+        playStorkChirp() {
+          if (!this.ctx || !STATE.soundEnabled) return;
+          const now = this.ctx.currentTime;
+
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(1400, now);
+          osc.frequency.exponentialRampToValueAtTime(2200, now + 0.08);
+          osc.frequency.exponentialRampToValueAtTime(1800, now + 0.16);
+
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.linearRampToValueAtTime(0.06, now + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
+
+          osc.connect(gain);
+          gain.connect(this.compressor);
+
+          osc.onended = () => {
+            try { osc.disconnect(); gain.disconnect(); } catch (e) {}
+          };
+
+          osc.start(now);
+          osc.stop(now + 0.22);
+        },
+
+        setVolume(val) {
+          if (this.masterGain && this.ctx) {
+            const now = this.ctx.currentTime;
+            this.masterGain.gain.setValueAtTime(STATE.soundEnabled ? val : 0, now);
+          }
+        },
+
+        toggleMute() {
+          STATE.soundEnabled = !STATE.soundEnabled;
+          this.setVolume(STATE.volume);
+          return STATE.soundEnabled;
+        }
+      };
+
+      // --- THREE.JS 3D SCENE SETUP ---
+      let scene, camera, renderer;
+      let rickshawGroup, bellMesh, handlebarGroup, tassels = [];
+      let roadMesh, leftFieldMesh, rightFieldMesh;
+      let sunMesh, sunLight, hemiLight;
+
+      // Object Pools
+      const storkPool = [];
+      const cowPool = [];
+      const treePool = [];
+      const hutPool = [];
+      const mustardPatchPool = [];
+      const cloudPool = [];
+      const particlePool = [];
+
+      function init3D() {
+        const container = document.getElementById('canvas-container');
+
+        // 1. Scene & Fog
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x74b9ff);
+        scene.fog = new THREE.Fog(0xffeaa7, 50, 200);
+
+        // 2. Camera (First-person rickshaw rider view, 21:9 ultrawide ready)
+        const aspect = window.innerWidth / window.innerHeight;
+        const fov = aspect > 2.0 ? 55 : (aspect < 1.0 ? 75 : 62);
+        camera = new THREE.PerspectiveCamera(fov, aspect, 0.1, 400);
+        camera.position.set(0, 2.6, 0);
+
+        // 3. Renderer
+        renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        container.appendChild(renderer.domElement);
+
+        // 4. Lighting
+        hemiLight = new THREE.HemisphereLight(0xdff9fb, 0xa8e6cf, 0.85);
+        scene.add(hemiLight);
+
+        sunLight = new THREE.DirectionalLight(0xfff9e6, 1.2);
+        sunLight.position.set(30, 50, 40);
+        sunLight.castShadow = true;
+        sunLight.shadow.mapSize.width = 1024;
+        sunLight.shadow.mapSize.height = 1024;
+        sunLight.shadow.camera.near = 10;
+        sunLight.shadow.camera.far = 250;
+        sunLight.shadow.camera.left = -40;
+        sunLight.shadow.camera.right = 40;
+        sunLight.shadow.camera.top = 40;
+        sunLight.shadow.camera.bottom = -40;
+        scene.add(sunLight);
+
+        // 5. Build Environment & Objects
+        buildRoadAndFields();
+        buildSunAndSky();
+        buildRickshawCockpit();
+        buildObjectPools();
+
+        // 6. Event Listeners & Resize
+        window.addEventListener('resize', onWindowResize);
+        setupInteractions();
+      }
+
+      // --- SCENERY: ROAD & MUSTARD / PADDY FIELDS ---
+      function buildRoadAndFields() {
+        // Earthen Village Road (Ribbon)
+        const roadGeo = new THREE.PlaneGeometry(CONFIG.roadWidth, CONFIG.roadLength, 32, 128);
+        roadGeo.rotateX(-Math.PI / 2);
+
+        // Deform vertices along curving road math
+        const pos = roadGeo.attributes.position;
+        for (let i = 0; i < pos.count; i++) {
+          const z = pos.getY(i) || pos.getZ(i);
+          pos.setX(i, pos.getX(i) + getRoadX(pos.getZ(i)));
+          pos.setY(i, pos.getY(i) + getRoadY(pos.getZ(i)));
+        }
+        roadGeo.computeVertexNormals();
+
+        const roadMat = new THREE.MeshLambertMaterial({
+          map: TextureGenerator.createRoadTexture(),
+          roughness: 0.9,
+        });
+        roadMesh = new THREE.Mesh(roadGeo, roadMat);
+        roadMesh.receiveShadow = true;
+        scene.add(roadMesh);
+
+        // Left Field: Vibrant Yellow Mustard Field (Shorishe Khet)
+        const fieldGeo = new THREE.PlaneGeometry(120, CONFIG.roadLength, 16, 64);
+        fieldGeo.rotateX(-Math.PI / 2);
+
+        const mustardMat = new THREE.MeshLambertMaterial({
+          map: TextureGenerator.createMustardTexture(),
+          roughness: 0.8,
+        });
+        leftFieldMesh = new THREE.Mesh(fieldGeo, mustardMat);
+        leftFieldMesh.position.x = -64;
+        leftFieldMesh.position.y = -0.15;
+        leftFieldMesh.receiveShadow = true;
+        scene.add(leftFieldMesh);
+
+        // Right Field: Emerald Green Paddy Lawn (Dhan Khet)
+        const paddyMat = new THREE.MeshLambertMaterial({
+          color: 0x20bf6b,
+          roughness: 0.7,
+        });
+        rightFieldMesh = new THREE.Mesh(fieldGeo, paddyMat);
+        rightFieldMesh.position.x = 64;
+        rightFieldMesh.position.y = -0.15;
+        rightFieldMesh.receiveShadow = true;
+        scene.add(rightFieldMesh);
+      }
+
+      // --- SUN & CELESTIAL SKY ---
+      function buildSunAndSky() {
+        const sunGeo = new THREE.SphereGeometry(7, 24, 24);
+        const sunMat = new THREE.MeshBasicMaterial({
+          map: TextureGenerator.createCuteSunFace(),
+        });
+        sunMesh = new THREE.Mesh(sunGeo, sunMat);
+        sunMesh.position.set(25, 45, -140);
+        scene.add(sunMesh);
+
+        // Smiling Sun Halo Ring
+        const ringGeo = new THREE.RingGeometry(8.5, 12, 32);
+        const ringMat = new THREE.MeshBasicMaterial({
+          color: 0xfffa65,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.6,
+        });
+        const sunRing = new THREE.Mesh(ringGeo, ringMat);
+        sunMesh.add(sunRing);
+      }
+
+      // --- RICKSHAW COCKPIT (FIRST-PERSON FOREGROUND ATTACHED TO CAMERA) ---
+      function buildRickshawCockpit() {
+        rickshawGroup = new THREE.Group();
+        rickshawGroup.position.set(0, -0.6, -1.8);
+
+        // 1. Rickshaw Hand-Painted Hood Canopy (Ornate Dhaka Folk Art)
+        const hoodGeo = new THREE.CylinderGeometry(1.6, 1.8, 1.4, 32, 1, false, Math.PI * 0.1, Math.PI * 0.8);
+        hoodGeo.rotateZ(Math.PI / 2);
+        hoodGeo.rotateY(Math.PI / 2);
+
+        const hoodMat = new THREE.MeshLambertMaterial({
+          map: TextureGenerator.createRickshawArt(),
+          side: THREE.DoubleSide,
+          roughness: 0.4,
+        });
+        const hoodMesh = new THREE.Mesh(hoodGeo, hoodMat);
+        hoodMesh.position.set(0, 1.2, 0.4);
+        hoodMesh.rotation.x = 0.25;
+        rickshawGroup.add(hoodMesh);
+
+        // Hood Polished Chrome Trim
+        const hoodTrimGeo = new THREE.TorusGeometry(1.65, 0.04, 12, 32, Math.PI * 0.8);
+        const chromeMat = new THREE.MeshStandardMaterial({
+          color: 0xf1f2f6,
+          metalness: 0.9,
+          roughness: 0.15,
+        });
+        const hoodTrim = new THREE.Mesh(hoodTrimGeo, chromeMat);
+        hoodTrim.position.set(0, 1.2, 0.4);
+        hoodTrim.rotation.y = Math.PI / 2;
+        hoodTrim.rotation.z = -Math.PI * 0.4;
+        rickshawGroup.add(hoodTrim);
+
+        // 2. Handlebars
+        handlebarGroup = new THREE.Group();
+        handlebarGroup.position.set(0, 0.45, 0.2);
+
+        // Main handlebar rod
+        const barGeo = new THREE.CylinderGeometry(0.045, 0.045, 1.9, 16);
+        barGeo.rotateZ(Math.PI / 2);
+        const barMat = new THREE.MeshStandardMaterial({
+          color: 0xfeca57,
+          metalness: 0.6,
+          roughness: 0.3,
+        });
+        const barMesh = new THREE.Mesh(barGeo, barMat);
+        handlebarGroup.add(barMesh);
+
+        // Stem riser
+        const stemGeo = new THREE.CylinderGeometry(0.05, 0.05, 0.7, 16);
+        const stemMesh = new THREE.Mesh(stemGeo, chromeMat);
+        stemMesh.position.set(0, -0.3, 0);
+        handlebarGroup.add(stemMesh);
+
+        // Cheerful Red Handgrips
+        const gripGeo = new THREE.CylinderGeometry(0.065, 0.065, 0.35, 16);
+        gripGeo.rotateZ(Math.PI / 2);
+        const gripMat = new THREE.MeshLambertMaterial({ color: 0xff4757 });
+        const leftGrip = new THREE.Mesh(gripGeo, gripMat);
+        leftGrip.position.set(-0.85, 0, 0);
+        const rightGrip = new THREE.Mesh(gripGeo, gripMat);
+        rightGrip.position.set(0.85, 0, 0);
+        handlebarGroup.add(leftGrip, rightGrip);
+
+        // 3. Iconic Rotary Brass Rickshaw Bell (Tring-Tring Bell!)
+        const bellDomeGeo = new THREE.SphereGeometry(0.14, 20, 14, 0, Math.PI * 2, 0, Math.PI * 0.5);
+        const bellMat = new THREE.MeshStandardMaterial({
+          color: 0xf1c40f,
+          metalness: 0.95,
+          roughness: 0.15,
+        });
+        bellMesh = new THREE.Mesh(bellDomeGeo, bellMat);
+        bellMesh.position.set(0.48, 0.08, 0);
+        handlebarGroup.add(bellMesh);
+
+        // Bell Lever Strike Arm
+        const leverGeo = new THREE.BoxGeometry(0.04, 0.02, 0.12);
+        const leverMesh = new THREE.Mesh(leverGeo, chromeMat);
+        leverMesh.position.set(0.48, 0.04, 0.09);
+        handlebarGroup.add(leverMesh);
+
+        // 4. Colorful Dangling Pom-Pom Tassels (Swaying with motion)
+        const tasselColors = [0xff4757, 0x2ed573, 0x1e90ff, 0xfeca57, 0xff6b81];
+        [-0.8, -0.4, 0, 0.4, 0.8].forEach((xPos, idx) => {
+          const tasselRoot = new THREE.Group();
+          tasselRoot.position.set(xPos, 0.4, 0.2);
+
+          const stringGeo = new THREE.CylinderGeometry(0.01, 0.01, 0.2, 8);
+          const stringMesh = new THREE.Mesh(stringGeo, new THREE.MeshBasicMaterial({ color: 0xffffff }));
+          stringMesh.position.y = -0.1;
+          tasselRoot.add(stringMesh);
+
+          const pomGeo = new THREE.SphereGeometry(0.07, 12, 12);
+          const pomMat = new THREE.MeshLambertMaterial({ color: tasselColors[idx % tasselColors.length] });
+          const pomMesh = new THREE.Mesh(pomGeo, pomMat);
+          pomMesh.position.y = -0.22;
+          tasselRoot.add(pomMesh);
+
+          rickshawGroup.add(tasselRoot);
+          tassels.push(tasselRoot);
+        });
+
+        rickshawGroup.add(handlebarGroup);
+        camera.add(rickshawGroup);
+        scene.add(camera);
+      }
+
+      // --- OBJECT POOLS: STORKS, COWS, TREES, HUTS, CLOUDS, PARTICLES ---
+      function buildObjectPools() {
+        // 1. Flying White Storks (Bok)
+        for (let i = 0; i < CONFIG.storkPoolSize; i++) {
+          const stork = createStorkMesh();
+          stork.position.set((Math.random() - 0.5) * 50, 7 + Math.random() * 8, -30 - i * 35);
+          stork.userData = {
+            baseY: stork.position.y,
+            flightTime: Math.random() * 10,
+            speed: 4 + Math.random() * 4,
+            soarBoost: 0,
+          };
+          scene.add(stork);
+          storkPool.push(stork);
+        }
+
+        // 2. Grazing Spotted Cows (Goru)
+        for (let i = 0; i < CONFIG.cowPoolSize; i++) {
+          const cow = createCowMesh();
+          const side = i % 2 === 0 ? -1 : 1;
+          cow.position.set(side * (9 + Math.random() * 12), 0, -20 - i * 45);
+          cow.rotation.y = side === 1 ? -Math.PI * 0.7 : Math.PI * 0.7;
+          cow.userData = {
+            baseX: cow.position.x,
+            hopTime: 0,
+            hopVel: 0,
+            chewTime: Math.random() * 5,
+          };
+          scene.add(cow);
+          cowPool.push(cow);
+        }
+
+        // 3. Trees: Coconut Palms (Narikel), Date Palms (Khejur), Banana Trees (Kola)
+        for (let i = 0; i < CONFIG.treePoolSize; i++) {
+          const treeType = i % 3; // 0: Palm, 1: Date Palm, 2: Banana Tree
+          const tree = createTreeMesh(treeType);
+          const side = i % 2 === 0 ? -1 : 1;
+          tree.position.set(side * (12 + Math.random() * 22), 0, -i * 14);
+          scene.add(tree);
+          treePool.push(tree);
+        }
+
+        // 4. Village Thatched Huts (Kure Ghor)
+        for (let i = 0; i < CONFIG.hutPoolSize; i++) {
+          const hut = createHutMesh();
+          const side = i % 2 === 0 ? -1 : 1;
+          hut.position.set(side * (18 + Math.random() * 14), 0, -15 - i * 38);
+          hut.rotation.y = (side === 1 ? -0.3 : 0.3) + Math.random() * 0.2;
+          scene.add(hut);
+          hutPool.push(hut);
+        }
+
+        // 5. Low-Poly Fluffy Clouds
+        for (let i = 0; i < CONFIG.cloudPoolSize; i++) {
+          const cloud = createCloudMesh();
+          cloud.position.set((Math.random() - 0.5) * 120, 22 + Math.random() * 14, -i * 25);
+          scene.add(cloud);
+          cloudPool.push(cloud);
+        }
+
+        // 6. Mustard Flower & Star Sensory Burst Particles
+        const partGeo = new THREE.PlaneGeometry(0.6, 0.6);
+        const partMat = new THREE.MeshBasicMaterial({
+          color: 0xfeca57,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0,
+        });
+
+        for (let i = 0; i < CONFIG.particlePoolSize; i++) {
+          const p = new THREE.Mesh(partGeo, partMat.clone());
+          p.visible = false;
+          p.userData = {
+            velX: 0, velY: 0, velZ: 0,
+            rotSpeed: 0,
+            life: 0,
+            maxLife: 1.0,
+          };
+          scene.add(p);
+          particlePool.push(p);
+        }
+      }
+
+      // --- MESH BUILDERS (PROCEDURAL PRIMITIVES) ---
+
+      // White Stork (Bok)
+      function createStorkMesh() {
+        const stork = new THREE.Group();
+        const whiteMat = new THREE.MeshLambertMaterial({ color: 0xf5f6fa });
+        const beakMat = new THREE.MeshLambertMaterial({ color: 0xf39c12 });
+
+        // Body
+        const bodyGeo = new THREE.ConeGeometry(0.4, 1.4, 8);
+        bodyGeo.rotateX(Math.PI / 2);
+        const body = new THREE.Mesh(bodyGeo, whiteMat);
+        stork.add(body);
+
+        // Slender Neck & Head
+        const neckGeo = new THREE.CylinderGeometry(0.1, 0.15, 0.8, 8);
+        neckGeo.rotateX(0.4);
+        const neck = new THREE.Mesh(neckGeo, whiteMat);
+        neck.position.set(0, 0.4, 0.5);
+        stork.add(neck);
+
+        const headGeo = new THREE.SphereGeometry(0.2, 8, 8);
+        const head = new THREE.Mesh(headGeo, whiteMat);
+        head.position.set(0, 0.75, 0.75);
+        stork.add(head);
+
+        // Long Yellow Beak
+        const beakGeo = new THREE.ConeGeometry(0.07, 0.7, 6);
+        beakGeo.rotateX(Math.PI / 2);
+        const beak = new THREE.Mesh(beakGeo, beakMat);
+        beak.position.set(0, 0.75, 1.15);
+        stork.add(beak);
+
+        // Articulated Wings (Left & Right)
+        const wingGeo = new THREE.BoxGeometry(1.6, 0.04, 0.7);
+        wingGeo.translate(0.8, 0, 0);
+
+        const leftWing = new THREE.Mesh(wingGeo, whiteMat);
+        leftWing.position.set(0.2, 0.1, 0);
+        stork.add(leftWing);
+
+        const rightWingGeo = new THREE.BoxGeometry(1.6, 0.04, 0.7);
+        rightWingGeo.translate(-0.8, 0, 0);
+        const rightWing = new THREE.Mesh(rightWingGeo, whiteMat);
+        rightWing.position.set(-0.2, 0.1, 0);
+        stork.add(rightWing);
+
+        stork.userData.leftWing = leftWing;
+        stork.userData.rightWing = rightWing;
+        return stork;
+      }
+
+      // Spotted Cow (Goru)
+      function createCowMesh() {
+        const cow = new THREE.Group();
+        const cowMat = new THREE.MeshLambertMaterial({
+          map: TextureGenerator.createCowTexture(),
+        });
+        const pinkMat = new THREE.MeshLambertMaterial({ color: 0xffb8b8 });
+
+        // Barrel Body
+        const bodyGeo = new THREE.BoxGeometry(1.4, 1.1, 2.2);
+        const body = new THREE.Mesh(bodyGeo, cowMat);
+        body.position.y = 1.3;
+        body.castShadow = true;
+        cow.add(body);
+
+        // Head Group (For cheerful bobbing & nodding)
+        const headGroup = new THREE.Group();
+        headGroup.position.set(0, 1.8, 1.2);
+
+        const headGeo = new THREE.BoxGeometry(0.8, 0.8, 0.9);
+        const head = new THREE.Mesh(headGeo, cowMat);
+        headGroup.add(head);
+
+        // Pink Snout / Nose
+        const snoutGeo = new THREE.BoxGeometry(0.7, 0.45, 0.4);
+        const snout = new THREE.Mesh(snoutGeo, pinkMat);
+        snout.position.set(0, -0.2, 0.55);
+        headGroup.add(snout);
+
+        // Floppy Ears
+        const earGeo = new THREE.ConeGeometry(0.14, 0.4, 6);
+        earGeo.rotateZ(Math.PI / 3);
+        const leftEar = new THREE.Mesh(earGeo, cowMat);
+        leftEar.position.set(-0.48, 0.25, 0);
+        const rightEar = new THREE.Mesh(earGeo, cowMat);
+        rightEar.position.set(0.48, 0.25, 0);
+        rightEar.rotation.z = -Math.PI * 0.66;
+        headGroup.add(leftEar, rightEar);
+
+        // Cute Horns
+        const hornGeo = new THREE.ConeGeometry(0.08, 0.35, 6);
+        const hornMat = new THREE.MeshLambertMaterial({ color: 0xf39c12 });
+        const leftHorn = new THREE.Mesh(hornGeo, hornMat);
+        leftHorn.position.set(-0.25, 0.5, -0.1);
+        leftHorn.rotation.z = 0.2;
+        const rightHorn = new THREE.Mesh(hornGeo, hornMat);
+        rightHorn.position.set(0.25, 0.5, -0.1);
+        rightHorn.rotation.z = -0.2;
+        headGroup.add(leftHorn, rightHorn);
+
+        cow.add(headGroup);
+        cow.userData.headGroup = headGroup;
+
+        // 4 Legs
+        const legGeo = new THREE.CylinderGeometry(0.14, 0.12, 0.9, 8);
+        [[-0.45, 0.45, 0.7], [0.45, 0.45, 0.7], [-0.45, 0.45, -0.7], [0.45, 0.45, -0.7]].forEach(([lx, ly, lz]) => {
+          const leg = new THREE.Mesh(legGeo, cowMat);
+          leg.position.set(lx, ly, lz);
+          leg.castShadow = true;
+          cow.add(leg);
+        });
+
+        return cow;
+      }
+
+      // Trees: Coconut, Date Palm & Banana Tree
+      function createTreeMesh(type) {
+        const tree = new THREE.Group();
+        const trunkMat = new THREE.MeshLambertMaterial({ color: 0x8d5524 });
+        const leafMat = new THREE.MeshLambertMaterial({ color: 0x26de81 });
+        const darkLeafMat = new THREE.MeshLambertMaterial({ color: 0x20bf6b });
+
+        if (type === 0) {
+          // Coconut Palm (Narikel Gach)
+          const trunkGeo = new THREE.CylinderGeometry(0.25, 0.4, 7.5, 8);
+          trunkGeo.translate(0, 3.75, 0);
+          const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+          trunk.rotation.z = (Math.random() - 0.5) * 0.15;
+          trunk.castShadow = true;
+          tree.add(trunk);
+
+          // Coconut Fronds
+          const frondGeo = new THREE.ConeGeometry(1.6, 5.0, 5);
+          frondGeo.translate(0, 2.5, 0);
+          frondGeo.rotateX(Math.PI / 2.5);
+
+          for (let i = 0; i < 7; i++) {
+            const frond = new THREE.Mesh(frondGeo, i % 2 === 0 ? leafMat : darkLeafMat);
+            frond.position.set(0, 7.2, 0);
+            frond.rotation.y = (i * Math.PI * 2) / 7;
+            tree.add(frond);
+          }
+        } else if (type === 1) {
+          // Date Palm (Khejur Gach)
+          const trunkGeo = new THREE.CylinderGeometry(0.35, 0.5, 5.5, 8);
+          trunkGeo.translate(0, 2.75, 0);
+          const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+          trunk.castShadow = true;
+          tree.add(trunk);
+
+          // Compact Dense Crown
+          for (let i = 0; i < 9; i++) {
+            const crownGeo = new THREE.ConeGeometry(1.2, 4.0, 5);
+            crownGeo.translate(0, 2.0, 0);
+            crownGeo.rotateX(Math.PI / 3);
+            const frond = new THREE.Mesh(crownGeo, leafMat);
+            frond.position.set(0, 5.4, 0);
+            frond.rotation.y = (i * Math.PI * 2) / 9;
+            tree.add(frond);
+          }
+        } else {
+          // Banana Tree (Kola Gach)
+          const trunkGeo = new THREE.CylinderGeometry(0.2, 0.35, 4.0, 8);
+          trunkGeo.translate(0, 2.0, 0);
+          const trunk = new THREE.Mesh(trunkGeo, leafMat);
+          tree.add(trunk);
+
+          // Big Wide Paddle Leaves
+          const leafGeo = new THREE.BoxGeometry(0.8, 0.05, 3.2);
+          leafGeo.translate(0, 0, 1.6);
+          for (let i = 0; i < 5; i++) {
+            const leaf = new THREE.Mesh(leafGeo, darkLeafMat);
+            leaf.position.set(0, 3.8, 0);
+            leaf.rotation.y = (i * Math.PI * 2) / 5;
+            leaf.rotation.x = -0.35;
+            tree.add(leaf);
+          }
+        }
+
+        return tree;
+      }
+
+      // Village Thatched Hut (Kure Ghor)
+      function createHutMesh() {
+        const hut = new THREE.Group();
+        const wallMat = new THREE.MeshLambertMaterial({ color: 0xf5cd79 });
+        const roofMat = new THREE.MeshLambertMaterial({
+          map: TextureGenerator.createThatchTexture(),
+        });
+        const woodMat = new THREE.MeshLambertMaterial({ color: 0x795548 });
+
+        // Clay Walls
+        const wallGeo = new THREE.BoxGeometry(4.2, 2.5, 3.4);
+        const walls = new THREE.Mesh(wallGeo, wallMat);
+        walls.position.y = 1.25;
+        walls.castShadow = true;
+        hut.add(walls);
+
+        // Thatched 4-Pitched Roof (Chouchala Thatch Roof)
+        const roofGeo = new THREE.ConeGeometry(3.6, 2.2, 4);
+        roofGeo.rotateY(Math.PI / 4);
+        const roof = new THREE.Mesh(roofGeo, roofMat);
+        roof.position.y = 3.3;
+        roof.castShadow = true;
+        hut.add(roof);
+
+        // Wooden Door & Window
+        const doorGeo = new THREE.PlaneGeometry(1.0, 1.8);
+        const door = new THREE.Mesh(doorGeo, woodMat);
+        door.position.set(0, 0.9, 1.71);
+        hut.add(door);
+
+        return hut;
+      }
+
+      // Fluffy Low-Poly Cloud
+      function createCloudMesh() {
+        const cloud = new THREE.Group();
+        const cloudMat = new THREE.MeshLambertMaterial({
+          color: 0xffffff,
+          transparent: true,
+          opacity: 0.92,
+          roughness: 0.9,
+        });
+
+        const spheres = [
+          { r: 2.2, x: 0, y: 0, z: 0 },
+          { r: 1.7, x: -1.8, y: -0.2, z: 0 },
+          { r: 1.8, x: 1.8, y: -0.1, z: 0 },
+          { r: 1.4, x: -0.8, y: 1.0, z: 0 },
+          { r: 1.3, x: 0.9, y: 0.9, z: 0 },
+        ];
+
+        spheres.forEach(s => {
+          const geo = new THREE.SphereGeometry(s.r, 8, 8);
+          const mesh = new THREE.Mesh(geo, cloudMat);
+          mesh.position.set(s.x, s.y, s.z);
+          cloud.add(mesh);
+        });
+
+        return cloud;
+      }
+
+      // --- SENSORY BURST SPAWNER (CONFETTI, STARS & MUSTARD PETALS) ---
+      function triggerSensoryBurst(screenX, screenY) {
+        // 1. Ring Authentic Dual-Tone Rickshaw Bell + Glockenspiel
+        SoundSystem.playRickshawBell();
+
+        // 2. Cheerful Rickshaw Hop
+        STATE.rickshawHopVel = 0.16;
+        STATE.surgeTimer = 1.4;
+
+        // 3. UI Halo Flare Overlay
+        const surgeEl = document.getElementById('surge-overlay');
+        if (surgeEl) {
+          surgeEl.classList.remove('active');
+          void surgeEl.offsetWidth; // Trigger reflow
+          surgeEl.classList.add('active');
+        }
+
+        // 4. Storks Soar Upward excitedly
+        storkPool.forEach(stork => {
+          stork.userData.soarBoost = 6.0;
+          stork.userData.speed += 4.0;
+        });
+        SoundSystem.playStorkChirp();
+
+        // 5. Grazing Cows Joyful Jump
+        cowPool.forEach(cow => {
+          cow.userData.hopVel = 0.14;
+        });
+
+        // 6. Spawn 3D Flying Golden Mustard Petals & Rainbow Stars from Pool
+        let spawned = 0;
+        const colors = [0xfeca57, 0xfed330, 0xff6b81, 0x2ed573, 0x54a0ff, 0xff9ff3];
+
+        for (let i = 0; i < particlePool.length; i++) {
+          const p = particlePool[i];
+          if (!p.visible && spawned < 24) {
+            p.visible = true;
+            p.position.set(
+              (Math.random() - 0.5) * 3.5,
+              0.8 + Math.random() * 1.5,
+              -1.5 - Math.random() * 2.0
+            );
+            p.material.color.setHex(colors[spawned % colors.length]);
+            p.material.opacity = 1.0;
+            p.userData.velX = (Math.random() - 0.5) * 4.5;
+            p.userData.velY = 2.5 + Math.random() * 3.5;
+            p.userData.velZ = 2.0 + Math.random() * 3.0;
+            p.userData.rotSpeed = (Math.random() - 0.5) * 8.0;
+            p.userData.life = 0;
+            p.userData.maxLife = 0.8 + Math.random() * 0.4;
+            spawned++;
+          }
+        }
+
+        // 7. Screen Touch Ripple Effect
+        if (screenX !== undefined && screenY !== undefined) {
+          createTouchRipple(screenX, screenY);
+        }
+
+        // Hide prompt banner after first interaction
+        const banner = document.getElementById('prompt-banner');
+        if (banner && !banner.classList.contains('hidden')) {
+          banner.classList.add('hidden');
+        }
+      }
+
+      function createTouchRipple(x, y) {
+        const ripple = document.createElement('div');
+        ripple.className = 'touch-ripple';
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        document.body.appendChild(ripple);
+        setTimeout(() => {
+          if (ripple.parentNode) ripple.parentNode.removeChild(ripple);
+        }, 800);
+      }
+
+      // --- INTERACTION & INPUT CONTROLS ---
+      function setupInteractions() {
+        // Spacebar / Any Key Slap
+        window.addEventListener('keydown', (e) => {
+          const code = e.keyCode || e.which;
+          const key = e.key;
+
+          SoundSystem.init();
+
+          // TV Remote Return / Back Key Routing to Playroom Dashboard
+          if (['Escape', 'Back', 'GoBack', 'BrowserBack'].includes(key) || [10009, 461, 4, 27].includes(code)) {
+            e.preventDefault();
+            window.location.href = '../../index.html';
+            return;
+          }
+
+          // Any Key / Space / Enter / D-Pad triggers Sensory Bell Burst
+          triggerSensoryBurst(window.innerWidth / 2, window.innerHeight * 0.6);
+        });
+
+        // Mouse Click & Tap on Canvas
+        const container = document.getElementById('canvas-container');
+        container.addEventListener('pointerdown', (e) => {
+          SoundSystem.init();
+          triggerSensoryBurst(e.clientX, e.clientY);
+        });
+
+        // Multi-touch Palm Grab Detection (2+ fingers)
+        window.addEventListener('touchstart', (e) => {
+          SoundSystem.init();
+          if (e.touches && e.touches.length >= 2) {
+            // Super Golden Bloom Multi-Burst across all touch points
+            for (let i = 0; i < e.touches.length; i++) {
+              triggerSensoryBurst(e.touches[i].clientX, e.touches[i].clientY);
+            }
+          }
+        }, { passive: true });
+
+        // Disable Context Menu / Right Click
+        document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+        // Visibility Change / Tab Minimize Handling
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden) {
+            if (SoundSystem.ctx && SoundSystem.ctx.state === 'running') {
+              SoundSystem.ctx.suspend().catch(() => {});
+            }
+          } else {
+            if (SoundSystem.ctx && SoundSystem.ctx.state === 'suspended' && STATE.soundEnabled) {
+              SoundSystem.ctx.resume().catch(() => {});
+            }
+          }
+        });
+
+        // UI Top Bar Controls
+        const btnSound = document.getElementById('btn-sound');
+        const soundIcon = document.getElementById('sound-icon');
+        btnSound.addEventListener('click', () => {
+          btnSound.blur();
+          SoundSystem.init();
+          const isEnabled = SoundSystem.toggleMute();
+          soundIcon.textContent = isEnabled ? '🔊' : '🔇';
+        });
+
+        const btnFullscreen = document.getElementById('btn-fullscreen');
+        btnFullscreen.addEventListener('click', () => {
+          btnFullscreen.blur();
+          const docEl = document.documentElement;
+          const isFull = document.fullscreenElement || document.webkitFullscreenElement;
+          if (!isFull) {
+            const req = docEl.requestFullscreen || docEl.webkitRequestFullscreen;
+            if (req) req.call(docEl).catch(() => {});
+          } else {
+            const exit = document.exitFullscreen || document.webkitExitFullscreen;
+            if (exit) exit.call(document).catch(() => {});
+          }
+        });
+
+        const btnSettings = document.getElementById('btn-settings');
+        const settingsPanel = document.getElementById('settings-panel');
+        const btnCloseSettings = document.getElementById('btn-close-settings');
+
+        btnSettings.addEventListener('click', () => {
+          btnSettings.blur();
+          settingsPanel.classList.toggle('collapsed');
+        });
+        btnCloseSettings.addEventListener('click', () => {
+          btnCloseSettings.blur();
+          settingsPanel.classList.add('collapsed');
+        });
+
+        // Settings Controls
+        document.querySelectorAll('[data-atmosphere]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            btn.blur();
+            document.querySelectorAll('[data-atmosphere]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            setAtmosphere(btn.dataset.atmosphere);
+          });
+        });
+
+        document.querySelectorAll('[data-pace]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            btn.blur();
+            document.querySelectorAll('[data-pace]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const pace = btn.dataset.pace;
+            STATE.targetSpeed = pace === 'calm' ? 12 : (pace === 'lively' ? 26 : 18);
+            document.getElementById('pace-display').textContent = btn.textContent;
+          });
+        });
+
+        document.querySelectorAll('[data-timer]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            btn.blur();
+            document.querySelectorAll('[data-timer]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            CONFIG.sessionDuration = parseInt(btn.dataset.timer, 10);
+            STATE.sessionTimer = 0;
+            document.getElementById('session-display').textContent = btn.textContent;
+          });
+        });
+
+        const volumeSlider = document.getElementById('volume-slider');
+        volumeSlider.addEventListener('input', (e) => {
+          const val = parseFloat(e.target.value) / 100;
+          STATE.volume = val;
+          SoundSystem.setVolume(val);
+          document.getElementById('volume-display').textContent = `${Math.round(val * 100)}%`;
+        });
+
+        // Spawn 2D Floating Tap Blossoms
+        spawnScreenBlossoms();
+      }
+
+      function setAtmosphere(mode) {
+        STATE.atmosphere = mode;
+        const display = document.getElementById('atmosphere-display');
+
+        if (mode === 'morning') {
+          display.textContent = 'Morning Sun';
+          scene.background.setHex(0x74b9ff);
+          scene.fog.color.setHex(0xffeaa7);
+          hemiLight.color.setHex(0xdff9fb);
+          hemiLight.groundColor.setHex(0xa8e6cf);
+          sunLight.color.setHex(0xfff9e6);
+          sunMesh.position.set(25, 45, -140);
+        } else if (mode === 'noon') {
+          display.textContent = 'Sunny Bright';
+          scene.background.setHex(0x48dbfb);
+          scene.fog.color.setHex(0xfff9e6);
+          hemiLight.color.setHex(0xffffff);
+          hemiLight.groundColor.setHex(0x26de81);
+          sunLight.color.setHex(0xfffa65);
+          sunMesh.position.set(0, 55, -140);
+        } else if (mode === 'sunset') {
+          display.textContent = 'Golden Sunset';
+          scene.background.setHex(0xff7675);
+          scene.fog.color.setHex(0xfdcb6e);
+          hemiLight.color.setHex(0xffbe76);
+          hemiLight.groundColor.setHex(0xe17055);
+          sunLight.color.setHex(0xff9f43);
+          sunMesh.position.set(-25, 25, -140);
+        } else if (mode === 'night') {
+          display.textContent = 'Moonlit Sky';
+          scene.background.setHex(0x1e272e);
+          scene.fog.color.setHex(0x2d3436);
+          hemiLight.color.setHex(0xa4b0be);
+          hemiLight.groundColor.setHex(0x1e272e);
+          sunLight.color.setHex(0xdff9fb);
+          sunMesh.position.set(25, 45, -140);
+        }
+      }
+
+      function spawnScreenBlossoms() {
+        const container = document.getElementById('screen-blossoms-container');
+        const blossoms = ['🌼', '🌸', '🌻', '🌺'];
+        for (let i = 0; i < 4; i++) {
+          const blossom = document.createElement('div');
+          blossom.className = 'screen-blossom';
+          blossom.style.width = '52px';
+          blossom.style.height = '52px';
+          blossom.style.top = (18 + Math.random() * 60) + '%';
+          blossom.style.left = (8 + i * 24 + Math.random() * 8) + '%';
+          blossom.style.animationDelay = (-i * 1.5) + 's';
+          blossom.textContent = blossoms[i % blossoms.length];
+
+          blossom.addEventListener('pointerdown', (e) => {
+            e.stopPropagation();
+            SoundSystem.init();
+            triggerSensoryBurst(e.clientX, e.clientY);
+            blossom.style.transform = 'scale(0)';
+            setTimeout(() => {
+              blossom.style.top = (18 + Math.random() * 60) + '%';
+              blossom.style.left = (8 + Math.random() * 80) + '%';
+              blossom.style.transform = '';
+            }, 3000);
+          });
+          container.appendChild(blossom);
+        }
+      }
+
+      // --- RESIZE & DYNAMIC ASPECT FOV ---
+      function onWindowResize() {
+        const aspect = window.innerWidth / window.innerHeight;
+        camera.aspect = aspect;
+        camera.fov = aspect > 2.0 ? 55 : (aspect < 1.0 ? 75 : 62);
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      }
+
+      // --- MAIN 60FPS ANIMATION LOOP (STRICTLY ZERO RUNTIME GC) ---
+      let lastTime = performance.now();
+
+      function animate(now) {
+        requestAnimationFrame(animate);
+
+        const delta = Math.min((now - lastTime) / 1000, 0.1);
+        lastTime = now;
+
+        // 1. Smooth Speed Interpolation & Surge Decay
+        if (STATE.surgeTimer > 0) {
+          STATE.surgeTimer -= delta;
+          STATE.speed = THREE.MathUtils.lerp(STATE.speed, STATE.targetSpeed * 1.6, delta * 4);
+        } else {
+          STATE.speed = THREE.MathUtils.lerp(STATE.speed, STATE.targetSpeed, delta * 3);
+        }
+
+        const distanceDelta = STATE.speed * delta;
+        STATE.distanceTraveled += distanceDelta;
+
+        // 2. Rickshaw Cheerful Motion & Bobbing Physics
+        const rideBounce = Math.sin(now * 0.008) * 0.035;
+        const rideSway = Math.sin(now * 0.004) * 0.02;
+
+        // Hop velocity integration
+        STATE.rickshawHop += STATE.rickshawHopVel;
+        STATE.rickshawHopVel -= 0.6 * delta; // Gravity
+        if (STATE.rickshawHop < 0) {
+          STATE.rickshawHop = 0;
+          STATE.rickshawHopVel = 0;
+        }
+
+        if (rickshawGroup) {
+          rickshawGroup.position.y = -0.6 + rideBounce + STATE.rickshawHop;
+          rickshawGroup.rotation.z = rideSway;
+          rickshawGroup.rotation.x = -STATE.rickshawHop * 0.3;
+        }
+
+        // Tassels sway with speed and lateral tilt
+        tassels.forEach((tassel, idx) => {
+          tassel.rotation.z = rideSway * 2.5 + Math.sin(now * 0.006 + idx) * 0.15;
+          tassel.rotation.x = 0.15 + (STATE.speed / 18) * 0.2;
+        });
+
+        // 3. Recycle Trees, Huts, Clouds along Z loop
+        const recycleZ = camera.position.z + 10;
+        const resetOffset = CONFIG.roadLength;
+
+        // Trees
+        for (let i = 0; i < treePool.length; i++) {
+          const tree = treePool[i];
+          tree.position.z += distanceDelta;
+          if (tree.position.z > recycleZ) {
+            tree.position.z -= resetOffset;
+            const side = Math.random() > 0.5 ? -1 : 1;
+            tree.position.x = side * (12 + Math.random() * 22) + getRoadX(tree.position.z);
+            tree.position.y = getRoadY(tree.position.z);
+          }
+        }
+
+        // Village Huts
+        for (let i = 0; i < hutPool.length; i++) {
+          const hut = hutPool[i];
+          hut.position.z += distanceDelta;
+          if (hut.position.z > recycleZ) {
+            hut.position.z -= resetOffset;
+            const side = Math.random() > 0.5 ? -1 : 1;
+            hut.position.x = side * (18 + Math.random() * 14) + getRoadX(hut.position.z);
+            hut.position.y = getRoadY(hut.position.z);
+          }
+        }
+
+        // Flying Storks (Sinusoidal flapping and soaring flight)
+        for (let i = 0; i < storkPool.length; i++) {
+          const stork = storkPool[i];
+          stork.userData.flightTime += delta;
+          stork.position.z += (distanceDelta * 0.4 + stork.userData.speed * delta);
+
+          // Soar boost integration
+          if (stork.userData.soarBoost > 0) {
+            stork.userData.soarBoost -= delta * 3.0;
+            stork.position.y += delta * 4.0;
+          } else {
+            stork.position.y = THREE.MathUtils.lerp(
+              stork.position.y,
+              stork.userData.baseY + Math.sin(stork.userData.flightTime * 2.5) * 0.8,
+              delta * 2
+            );
+          }
+
+          // Flapping Wings
+          const flap = Math.sin(stork.userData.flightTime * 7) * 0.45;
+          if (stork.userData.leftWing) stork.userData.leftWing.rotation.z = flap;
+          if (stork.userData.rightWing) stork.userData.rightWing.rotation.z = -flap;
+
+          if (stork.position.z > recycleZ) {
+            stork.position.z -= resetOffset;
+            stork.position.x = (Math.random() - 0.5) * 50;
+            stork.position.y = stork.userData.baseY;
+          }
+        }
+
+        // Grazing Cows (Head nodding & joyful hops)
+        for (let i = 0; i < cowPool.length; i++) {
+          const cow = cowPool[i];
+          cow.position.z += distanceDelta;
+          cow.userData.chewTime += delta;
+
+          // Head nodding
+          if (cow.userData.headGroup) {
+            cow.userData.headGroup.rotation.x = Math.sin(cow.userData.chewTime * 2) * 0.15;
+          }
+
+          // Hop jump physics
+          if (cow.userData.hopVel > 0 || cow.position.y > 0) {
+            cow.position.y += cow.userData.hopVel;
+            cow.userData.hopVel -= 0.6 * delta;
+            if (cow.position.y <= 0) {
+              cow.position.y = 0;
+              cow.userData.hopVel = 0;
+            }
+          }
+
+          if (cow.position.z > recycleZ) {
+            cow.position.z -= resetOffset;
+            const side = Math.random() > 0.5 ? -1 : 1;
+            cow.position.x = side * (9 + Math.random() * 12) + getRoadX(cow.position.z);
+            cow.position.y = getRoadY(cow.position.z);
+          }
+        }
+
+        // Clouds drifting
+        for (let i = 0; i < cloudPool.length; i++) {
+          const cloud = cloudPool[i];
+          cloud.position.z += distanceDelta * 0.2;
+          cloud.position.x += Math.sin(now * 0.0005 + i) * 0.02;
+          if (cloud.position.z > recycleZ + 20) {
+            cloud.position.z -= resetOffset;
+            cloud.position.x = (Math.random() - 0.5) * 120;
+          }
+        }
+
+        // 4. Update Sensory Burst Particle Pool
+        for (let i = 0; i < particlePool.length; i++) {
+          const p = particlePool[i];
+          if (p.visible) {
+            p.userData.life += delta;
+            if (p.userData.life >= p.userData.maxLife) {
+              p.visible = false;
+            } else {
+              p.position.x += p.userData.velX * delta;
+              p.position.y += p.userData.velY * delta;
+              p.position.z += p.userData.velZ * delta;
+              p.userData.velY -= 4.0 * delta; // Gravity
+              p.rotation.z += p.userData.rotSpeed * delta;
+              p.material.opacity = 1.0 - (p.userData.life / p.userData.maxLife);
+            }
+          }
+        }
+
+        // 5. Update Session Progress Bar
+        if (CONFIG.sessionDuration > 0) {
+          STATE.sessionTimer += delta;
+          const progress = Math.min((STATE.sessionTimer / CONFIG.sessionDuration) * 100, 100);
+          const bar = document.getElementById('session-progress');
+          if (bar) bar.style.width = `${progress}%`;
+        }
+
+        // 6. Camera follows Road Curvature
+        camera.position.x = getRoadX(camera.position.z);
+        camera.position.y = 2.6 + getRoadY(camera.position.z);
+
+        renderer.render(scene, camera);
+      }
+
+      // Initialize on DOM Ready
+      window.addEventListener('DOMContentLoaded', () => {
+        init3D();
+        requestAnimationFrame(animate);
+      });
+
+    })();
+  </script>
+</body>
+</html>

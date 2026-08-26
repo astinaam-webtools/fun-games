@@ -4,7 +4,7 @@ A collection of lightweight, self-contained HTML5 & Three.js 3D sensory web game
 
 ---
 
-## 🌟 Featured Games (All 4 Live & Playable!)
+## 🌟 Featured Games
 
 | Game | Status | Description | Key Features |
 |---|---|---|---|
@@ -12,6 +12,11 @@ A collection of lightweight, self-contained HTML5 & Three.js 3D sensory web game
 | **🫧 Bubble Aquarium** | 🟢 **Playable** | Bioluminescent crystal reef with swimming clownfish, jumping dolphins, floating sea stars, tap-to-pop bubbles, and soothing ocean harp chords. | Bioluminescent shaders, floating bubble pool, underwater drone pad, multi-grab water bloom. |
 | **🌙 Starlight Safari** | 🟢 **Playable** | Bedtime constellation voyage connecting glowing star animals (Giraffe, Lion, Elephant, Bear, Owl) with music box celesta lullabies and shooting stars. | 5 constellation animal meshes, shooting star pool, sleepy moon halo, soothing bedtime pad. |
 | **☁️ Rainbow Cloud Meadow** | 🟢 **Playable** | Soft puffy cloud trampolines where friendly bunnies bounce along rainbow arches and hot-air balloons float to cheerful xylophone bells. | Cloud spring deformation, bunny jump physics, rainbow arches, multi-grab balloon lift. |
+| **⛵ Nouka Baich** | 🟢 **Playable** | A calm 3D river journey on an ornate Bangladeshi wooden boat through serene green riverbanks with blooming pink Shapla and jumping Ilish fish. | Stylized wooden Nouka with animated oars, dynamic river wave shader, leaping Ilish fish, Bhatiali bamboo flute synth. |
+| **🏮 Boishakhi Mela** | 🟢 **Playable** | A joyful Pohela Boishakh celebration with a rotating Alpona geometric carousel stage, spinning paper pinwheels, clay owls, bouncing smiling dolls, and melodic Bansuri flute. | Procedural Alpona mandala canvas textures, Marigold & Krishnachura petal fountains, spinning Chorki pinwheels, Raag Bhupali flute synth. |
+| **🛺 Gram Bangla Rickshaw** | 🟢 **Playable** | Low-poly countryside cruise aboard a hand-painted rickshaw through vibrant yellow mustard flower fields, grazing spotted cows, and soaring white storks. | Hand-painted rickshaw folk art hood, dual FM Tring-Tring bell chimes, flying storks, bouncing cows, mustard blossom bursts. |
+| **🪁 Shakrain Kite Soar** | 🟢 **Playable** | A tranquil dusk-to-night rooftop festival with colorful paper kites (Chula/Chokhdar) and warm glowing Fanush lanterns soaring through a starry sky. | Authentic Shakrain kites with zero-GC dynamic ribbon tail, warm Fanush sky lanterns, golden stardust firework rain, music box bells & dusk synth pad. |
+| **🍯 Winter Pitha** | 🟢 **Playable** | Cozy misty winter morning with traditional clay stoves, steaming Bhapa, rolled Patishapta, and golden date jaggery droplets with joyful acoustic kalimba chimes. | Procedural clay stove & steamer pot, snow-white Bhapa & rolled Patishapta models, bouncing Khejur Rosh jaggery drops, ascending pentatonic kalimba/plop synth. |
 
 ---
 

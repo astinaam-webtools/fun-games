@@ -16,8 +16,18 @@ Welcome to the **Little Explorers Playroom** (`fun-games`) codebase. This reposi
 │   │   └── index.html           # 🫧 Floating Bubble Aquarium (Bioluminescent coral reef)
 │   ├── starlight-safari/
 │   │   └── index.html           # 🌙 Starlight Constellation Safari (Bedtime glowing star animals)
-│   └── rainbow-cloud/
-│       └── index.html           # ☁️ Rainbow Cloud Meadow (Cloud trampolines & hopping bunnies)
+│   ├── rainbow-cloud/
+│   │   └── index.html           # ☁️ Rainbow Cloud Meadow (Cloud trampolines & hopping bunnies)
+│   ├── nouka-baich/
+│   │   └── index.html           # ⛵ Nouka Baich River Cruise (Ornate boat & leaping Ilish fish)
+│   ├── boishakhi-mela/
+│   │   └── index.html           # 🏮 Boishakhi Mela Celebration (Alpona carousel & spinning pinwheels)
+│   ├── shakrain-soar/
+│   │   └── index.html           # 🪁 Shakrain Kite & Lantern Soar (Rooftop sunset & glowing Fanush)
+│   ├── gram-bangla-rickshaw/
+│   │   └── index.html           # 🛺 Gram Bangla Rickshaw Cruise (Mustard fields & Tring-Tring bells)
+│   └── winter-pitha/
+│       └── index.html           # 🍯 Winter Pitha & Sweet Jaggery Drop (Clay stove & Khejur Rosh)
 ├── test/
 │   └── verify_games.test.js     # 🧪 Automated TDD verification test suite
 ├── package.json                 # Project manifest & test scripts

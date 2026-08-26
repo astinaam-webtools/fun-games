@@ -1,0 +1,2606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Nouka Baich River Cruise - Infant 3D Sensory Experience</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#10ac84">
+  <style>
+    /* ==========================================================================
+       RESET & BASE ERGONOMICS (INFANT-SAFE, TOUCH-LOCK, TV-READY)
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    :root {
+      --primary-teal: #10ac84;
+      --river-emerald: #1dd1a1;
+      --water-cyan: #48dbfb;
+      --shapla-pink: #ff7675;
+      --shapla-glow: #ff9ff3;
+      --golden-sun: #feca57;
+      --wood-warm: #d35400;
+      --glass-bg: rgba(255, 255, 255, 0.88);
+      --glass-border: rgba(255, 255, 255, 0.95);
+      --text-dark: #2d3436;
+      --text-muted: #636e72;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #0f3d3e;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      touch-action: none;
+      overscroll-behavior: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* 3D Canvas Host */
+    #canvas-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      cursor: pointer;
+    }
+
+    /* Soft Riverbank Vignette Overlay */
+    .vignette-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
+      box-shadow: inset 0 0 90px rgba(29, 209, 161, 0.25), inset 0 0 160px rgba(15, 61, 62, 0.5);
+      mix-blend-mode: soft-light;
+    }
+
+    /* Super Regatta Speed Surge Glow Overlay */
+    .surge-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 3;
+      opacity: 0;
+      background: radial-gradient(circle at center, rgba(254, 202, 87, 0.35) 0%, rgba(29, 209, 161, 0.25) 50%, rgba(16, 172, 132, 0.4) 100%);
+      transition: opacity 0.4s ease;
+    }
+
+    .surge-overlay.active {
+      opacity: 1;
+      animation: surgePulse 0.8s ease-out forwards;
+    }
+
+    @keyframes surgePulse {
+      0% { opacity: 0.8; transform: scale(0.98); }
+      50% { opacity: 1.0; transform: scale(1.02); }
+      100% { opacity: 0; transform: scale(1.0); }
+    }
+
+    /* 2D Floating Interactive Screen Shapla Water Lilies */
+    #screen-lilies-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 4;
+      overflow: hidden;
+    }
+
+    .screen-lily {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #ffffff 0%, #ff9ff3 40%, #ff7675 80%, rgba(255, 118, 117, 0.9) 100%);
+      box-shadow: 0 8px 24px rgba(255, 118, 117, 0.35), inset 0 0 14px rgba(255, 255, 255, 0.9);
+      border: 2px solid rgba(255, 255, 255, 0.92);
+      pointer-events: auto;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: floatScreenLily 6s infinite ease-in-out alternate;
+    }
+
+    .screen-lily:hover, .screen-lily:active {
+      transform: scale(1.25) rotate(15deg);
+    }
+
+    @keyframes floatScreenLily {
+      0% { transform: translateY(0px) rotate(0deg); }
+      100% { transform: translateY(-26px) rotate(20deg); }
+    }
+
+    /* Tap Ripple Effect */
+    .touch-ripple {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%) scale(0);
+      animation: rippleExpand 0.8s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+      border: 3px solid rgba(255, 255, 255, 0.95);
+      box-shadow: 0 0 32px rgba(29, 209, 161, 0.8);
+      z-index: 5;
+    }
+
+    @keyframes rippleExpand {
+      0% { transform: translate(-50%, -50%) scale(0.1); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(3.5); opacity: 0; }
+    }
+
+    /* Session Progress Bar */
+    .session-progress-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.25);
+      z-index: 20;
+    }
+
+    .session-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #1dd1a1 0%, #48dbfb 35%, #feca57 70%, #ff9ff3 100%);
+      transition: width 0.5s linear;
+      box-shadow: 0 0 14px rgba(29, 209, 161, 0.8);
+    }
+
+    /* UI Overlay Layer */
+    .ui-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px 24px;
+      padding-top: max(20px, env(safe-area-inset-top));
+      padding-bottom: max(20px, env(safe-area-inset-bottom));
+      padding-left: max(24px, env(safe-area-inset-left));
+      padding-right: max(24px, env(safe-area-inset-right));
+      transition: opacity 0.5s ease;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      pointer-events: auto;
+    }
+
+    .brand-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 8px 20px;
+      border-radius: 999px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      border: 2px solid var(--glass-border);
+      animation: floatBadge 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatBadge {
+      0% { transform: translateY(0px); }
+      100% { transform: translateY(-4px); }
+    }
+
+    .brand-icon {
+      font-size: 24px;
+      display: inline-block;
+      animation: paddleWiggle 2.5s ease-in-out infinite;
+    }
+
+    @keyframes paddleWiggle {
+      0%, 100% { transform: rotate(0deg) scale(1); }
+      25% { transform: rotate(-10deg) scale(1.1); }
+      75% { transform: rotate(10deg) scale(1.1); }
+    }
+
+    .brand-title {
+      font-weight: 800;
+      font-size: 16px;
+      letter-spacing: 0.5px;
+      background: linear-gradient(135deg, #10ac84 0%, #1dd1a1 50%, #feca57 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .aspect-badge {
+      font-size: 11px;
+      background: #e6fffa;
+      color: #0d9488;
+      padding: 3px 10px;
+      border-radius: 8px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .glass-btn {
+      background: var(--glass-bg);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 2px solid var(--glass-border);
+      border-radius: 999px;
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-dark);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: auto;
+      min-width: 48px;
+      min-height: 48px;
+      text-decoration: none;
+      outline: none;
+    }
+
+    .glass-btn:hover, .glass-btn:focus-visible {
+      transform: translateY(-2px) scale(1.05);
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 10px 25px rgba(16, 172, 132, 0.25);
+    }
+
+    .glass-btn:active {
+      transform: scale(0.95);
+    }
+
+    .icon-btn {
+      width: 48px;
+      height: 48px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 18px;
+    }
+
+    /* Start / Interactive Prompt Banner */
+    .prompt-banner {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      padding: 14px 32px;
+      border-radius: 999px;
+      border: 3px solid #ffffff;
+      box-shadow: 0 12px 38px rgba(16, 172, 132, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      pointer-events: auto;
+      cursor: pointer;
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: pulseGlow 2.5s infinite ease-in-out;
+      min-height: 48px;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 8px 30px rgba(16, 172, 132, 0.35); transform: translateX(-50%) scale(1); }
+      50% { box-shadow: 0 16px 45px rgba(254, 202, 87, 0.5); transform: translateX(-50%) scale(1.03); }
+    }
+
+    .prompt-banner.hidden {
+      opacity: 0;
+      transform: translateX(-50%) translateY(40px) scale(0.9);
+      pointer-events: none;
+    }
+
+    .prompt-icon {
+      font-size: 30px;
+      animation: bouncePrompt 1.8s infinite ease-in-out;
+    }
+
+    @keyframes bouncePrompt {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .prompt-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .prompt-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-dark);
+    }
+
+    .prompt-subtitle {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    /* Parent Settings Modal */
+    .settings-modal {
+      position: absolute;
+      top: 75px;
+      right: 24px;
+      width: 320px;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 24px;
+      border: 2px solid rgba(255, 255, 255, 0.98);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+      padding: 20px;
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transform-origin: top right;
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: auto;
+    }
+
+    .settings-modal.collapsed {
+      opacity: 0;
+      transform: scale(0.8) translateY(-20px);
+      pointer-events: none;
+    }
+
+    .settings-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #f1f2f6;
+    }
+
+    .settings-header h3 {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .setting-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .setting-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .setting-control {
+      display: flex;
+      gap: 8px;
+    }
+
+    .pill-btn {
+      flex: 1;
+      padding: 8px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 12px;
+      border: 2px solid #e4e7eb;
+      background: #f8f9fa;
+      color: var(--text-muted);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pill-btn.active {
+      background: #10ac84;
+      border-color: #1dd1a1;
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(16, 172, 132, 0.4);
+    }
+
+    .slider-input {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      accent-color: #10ac84;
+      cursor: pointer;
+    }
+
+    /* Mobile Adaptations */
+    @media (max-width: 600px) {
+      .brand-title { display: none; }
+      .aspect-badge { display: none; }
+      .prompt-banner {
+        padding: 10px 20px;
+        bottom: 16px;
+        gap: 10px;
+      }
+      .prompt-title { font-size: 13px; }
+      .prompt-subtitle { font-size: 11px; }
+      .settings-modal {
+        width: calc(100vw - 32px);
+        right: 16px;
+        top: 72px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Sensory Session Progress Bar -->
+  <div class="session-progress-container">
+    <div class="session-progress-bar" id="session-progress"></div>
+  </div>
+
+  <!-- Three.js Canvas Container -->
+  <div id="canvas-container"></div>
+
+  <!-- Ambient River Lighting & Overlays -->
+  <div class="vignette-overlay"></div>
+  <div class="surge-overlay" id="surge-overlay"></div>
+  <div id="screen-lilies-container"></div>
+
+  <!-- UI Overlay Layer -->
+  <div class="ui-layer">
+    <header class="top-bar">
+      <div class="brand-badge">
+        <span class="brand-icon">🚣</span>
+        <span class="brand-title">Nouka Baich River</span>
+        <span class="aspect-badge" id="aspect-badge">🌊 River Ready</span>
+      </div>
+
+      <div class="top-actions">
+        <a href="../../index.html" class="glass-btn" style="text-decoration: none; color: #2d3436;" title="Back to Game Hub" id="btn-home">
+          <span>🏠</span> <span>Playroom</span>
+        </a>
+        <button class="glass-btn icon-btn" id="btn-sound" title="Toggle Sound / River Flute" aria-label="Toggle Sound">
+          <span id="sound-icon">🔊</span>
+        </button>
+        <button class="glass-btn icon-btn" id="btn-fullscreen" title="Fullscreen Mode" aria-label="Toggle Fullscreen">
+          <span>⛶</span>
+        </button>
+        <button class="glass-btn icon-btn" id="btn-settings" title="Parent Settings" aria-label="Settings">
+          <span>⚙️</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Bottom Interactive Prompt Banner -->
+    <div class="prompt-banner" id="prompt-banner">
+      <span class="prompt-icon">🌸</span>
+      <div class="prompt-text">
+        <span class="prompt-title">Tap to Row Nouka &amp; Splash Silvery Ilish!</span>
+        <span class="prompt-subtitle">Multi-touch regatta burst • Relaxing pentatonic bamboo flute</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Parent Settings Panel -->
+  <div class="settings-modal collapsed" id="settings-panel">
+    <div class="settings-header">
+      <h3><span>🚣</span> River Cruise Settings</h3>
+      <button class="glass-btn icon-btn" style="width:44px; height:44px; font-size:16px; min-width:44px; min-height:44px;" id="btn-close-settings" aria-label="Close Settings">✕</button>
+    </div>
+
+    <!-- Time of Day / River Atmosphere -->
+    <div class="setting-item">
+      <div class="setting-label">
+        <span>Atmosphere</span>
+        <span id="atmosphere-display">Morning Sun</span>
+      </div>
+      <div class="setting-control">
+        <button class="pill-btn active" data-atmosphere="morning">Morning</button>
+        <button class="pill-btn" data-atmosphere="sunset">Sunset</button>
+        <button class="pill-btn" data-atmosphere="night">Moonlight</button>
+      </div>
+    </div>
+
+    <!-- Cruise Speed -->
+    <div class="setting-item">
+      <div class="setting-label">
+        <span>Boat Pace</span>
+        <span id="pace-display">Gentle</span>
+      </div>
+      <div class="setting-control">
+        <button class="pill-btn" data-pace="calm">Calm</button>
+        <button class="pill-btn active" data-pace="gentle">Gentle</button>
+        <button class="pill-btn" data-pace="lively">Lively</button>
+      </div>
+    </div>
+
+    <!-- Session Duration -->
+    <div class="setting-item">
+      <div class="setting-label">
+        <span>Session Timer</span>
+        <span id="session-display">3 Min</span>
+      </div>
+      <div class="setting-control">
+        <button class="pill-btn" data-timer="120">2 min</button>
+        <button class="pill-btn active" data-timer="180">3 min</button>
+        <button class="pill-btn" data-timer="300">5 min</button>
+        <button class="pill-btn" data-timer="0">Off</button>
+      </div>
+    </div>
+
+    <!-- Audio Volume -->
+    <div class="setting-item">
+      <div class="setting-label">
+        <span>Flute &amp; River Chimes</span>
+        <span id="volume-display">70%</span>
+      </div>
+      <input type="range" class="slider-input" id="volume-slider" min="0" max="100" value="70">
+    </div>
+  </div>
+
+  <!-- Three.js CDN r128 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <script>
+    /* ==========================================================================
+       NOUKA BAICH RIVER CRUISE - 3D INFANT SENSORY ENGINE
+       Zero-allocation WebGL, procedural canvas textures, Bhatiali pentatonic synth.
+       ========================================================================== */
+
+    (function() {
+      'use strict';
+
+      // --- CONFIGURATION & STATE ---
+      const CONFIG = {
+        sessionDuration: 180,
+        fishPoolSize: 8,
+        ripplePoolSize: 20,
+        particlePoolSize: 90,
+        lilyPoolSize: 24,
+        treePoolSize: 20,
+        riverLength: 220,
+        riverWidth: 46,
+      };
+
+      const STATE = {
+        atmosphere: 'morning', // 'morning' | 'sunset' | 'night'
+        pace: 'gentle',        // 'calm' | 'gentle' | 'lively'
+        speedMultiplier: 1.0,
+        surgeTimer: 0,
+        soundEnabled: true,
+        volume: 0.7,
+        sessionTimer: 0,
+        sessionActive: true,
+        noteIndex: 0,
+        time: 0,
+        riverScrollZ: 0,
+        boatRockTime: 0,
+        aspectRatio: window.innerWidth / window.innerHeight,
+        isPortrait: window.innerHeight > window.innerWidth,
+      };
+
+      // --- ATMOSPHERE PALETTES ---
+      const ATMOSPHERES = {
+        morning: {
+          name: 'Morning Sun',
+          skyTop: 0x81ecec,
+          skyBottom: 0xffeaa7,
+          fogColor: 0x81ecec,
+          waterColor: 0x10ac84,
+          waterEmissive: 0x01a3a4,
+          sunColor: 0xfffa65,
+          sunLightColor: 0xfff9e6,
+          sunLightIntensity: 1.2,
+          ambientLightColor: 0xdff9fb,
+          ambientLightIntensity: 0.85,
+          bankColor: 0x26de81,
+          sandColor: 0xf7d794,
+          boatWoodColor: 0x8b4513,
+          bambooColor: 0xf1c40f,
+          isNight: false,
+        },
+        sunset: {
+          name: 'Golden Sunset (Godhuli)',
+          skyTop: 0xff7675,
+          skyBottom: 0xfeca57,
+          fogColor: 0xff9f43,
+          waterColor: 0xd35400,
+          waterEmissive: 0xe67e22,
+          sunColor: 0xff6b6b,
+          sunLightColor: 0xffb142,
+          sunLightIntensity: 1.3,
+          ambientLightColor: 0xffcccc,
+          ambientLightIntensity: 0.75,
+          bankColor: 0x20bf6b,
+          sandColor: 0xf3a683,
+          boatWoodColor: 0x6e2c00,
+          bambooColor: 0xf39c12,
+          isNight: false,
+        },
+        night: {
+          name: 'Moonlit Night (Chander Alo)',
+          skyTop: 0x0c2461,
+          skyBottom: 0x1e3799,
+          fogColor: 0x0a192f,
+          waterColor: 0x071e3d,
+          waterEmissive: 0x10ac84,
+          sunColor: 0xf5f6fa,
+          sunLightColor: 0xa55eea,
+          sunLightIntensity: 0.8,
+          ambientLightColor: 0x4b7bec,
+          ambientLightIntensity: 0.6,
+          bankColor: 0x0b6623,
+          sandColor: 0x3d3d3d,
+          boatWoodColor: 0x3e1f0c,
+          bambooColor: 0xd4ac0d,
+          isNight: true,
+        }
+      };
+
+      // --- PROCEDURAL TEXTURE GENERATOR & STATIC MAP CACHE ---
+      const TextureGenerator = {
+        cache: new Map(),
+
+        createCanvas(w, h) {
+          const c = document.createElement('canvas');
+          c.width = w;
+          c.height = h;
+          return { canvas: c, ctx: c.getContext('2d') };
+        },
+
+        // Ornate Wooden Boat Texture with Brass / Gold Filigree
+        createWoodTexture() {
+          const key = 'boat_wood_tex';
+          if (this.cache.has(key)) return this.cache.get(key);
+
+          const { canvas, ctx } = this.createCanvas(512, 512);
+
+          // Rich Teak / Rosewood Base
+          const grad = ctx.createLinearGradient(0, 0, 0, 512);
+          grad.addColorStop(0, '#6d3916');
+          grad.addColorStop(0.3, '#8e4a1e');
+          grad.addColorStop(0.7, '#783c14');
+          grad.addColorStop(1, '#562a0d');
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, 512, 512);
+
+          // Wood Planks & Grain
+          ctx.strokeStyle = 'rgba(40, 20, 5, 0.45)';
+          ctx.lineWidth = 3;
+          for (let y = 0; y <= 512; y += 32) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.bezierCurveTo(128, y + 4, 384, y - 4, 512, y);
+            ctx.stroke();
+          }
+
+          // Fine grain fibers
+          ctx.strokeStyle = 'rgba(255, 200, 150, 0.15)';
+          ctx.lineWidth = 1;
+          for (let i = 0; i < 40; i++) {
+            const y = Math.random() * 512;
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(512, y + (Math.random() - 0.5) * 10);
+            ctx.stroke();
+          }
+
+          // Traditional Golden Inlay Floral Motifs
+          ctx.fillStyle = '#f1c40f';
+          ctx.strokeStyle = '#f39c12';
+          ctx.lineWidth = 2;
+          for (let x = 64; x < 512; x += 128) {
+            for (let y = 32; y < 512; y += 64) {
+              ctx.beginPath();
+              ctx.arc(x, y, 4, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.stroke();
+              // Small diamond accents
+              ctx.fillRect(x - 8, y - 2, 16, 4);
+            }
+          }
+
+          const tex = new THREE.CanvasTexture(canvas);
+          tex.encoding = THREE.sRGBEncoding;
+          this.cache.set(key, tex);
+          return tex;
+        },
+
+        // Bamboo Thatch Canopy ("Chhoi")
+        createBambooTexture() {
+          const key = 'bamboo_chhoi_tex';
+          if (this.cache.has(key)) return this.cache.get(key);
+
+          const { canvas, ctx } = this.createCanvas(256, 256);
+
+          // Warm honey bamboo base
+          ctx.fillStyle = '#f5cd79';
+          ctx.fillRect(0, 0, 256, 256);
+
+          // Woven bamboo slats (horizontal & vertical weave)
+          ctx.strokeStyle = '#e1b12c';
+          ctx.lineWidth = 6;
+          for (let x = 0; x <= 256; x += 16) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, 256);
+            ctx.stroke();
+          }
+
+          ctx.strokeStyle = '#d4ac0d';
+          ctx.lineWidth = 4;
+          for (let y = 0; y <= 256; y += 16) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(256, y);
+            ctx.stroke();
+          }
+
+          // Shading dots
+          ctx.fillStyle = 'rgba(120, 80, 20, 0.2)';
+          for (let x = 0; x <= 256; x += 16) {
+            for (let y = 0; y <= 256; y += 16) {
+              ctx.fillRect(x - 2, y - 2, 4, 4);
+            }
+          }
+
+          const tex = new THREE.CanvasTexture(canvas);
+          tex.encoding = THREE.sRGBEncoding;
+          tex.wrapS = THREE.RepeatWrapping;
+          tex.wrapT = THREE.RepeatWrapping;
+          tex.repeat.set(4, 2);
+          this.cache.set(key, tex);
+          return tex;
+        },
+
+        // Pink Shapla (Water Lily) Petal Texture
+        createShaplaPetalTexture() {
+          const key = 'shapla_petal_tex';
+          if (this.cache.has(key)) return this.cache.get(key);
+
+          const { canvas, ctx } = this.createCanvas(256, 256);
+
+          // Radial delicate pink to radiant white gradient
+          const grad = ctx.createRadialGradient(128, 220, 10, 128, 128, 120);
+          grad.addColorStop(0, '#ffffff');
+          grad.addColorStop(0.4, '#ff9ff3');
+          grad.addColorStop(0.85, '#ff7675');
+          grad.addColorStop(1, '#ff6b81');
+
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, 256, 256);
+
+          // Delicate vein lines
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+          ctx.lineWidth = 1.5;
+          for (let i = -3; i <= 3; i++) {
+            ctx.beginPath();
+            ctx.moveTo(128, 240);
+            ctx.quadraticCurveTo(128 + i * 25, 128, 128 + i * 40, 20);
+            ctx.stroke();
+          }
+
+          const tex = new THREE.CanvasTexture(canvas);
+          tex.encoding = THREE.sRGBEncoding;
+          this.cache.set(key, tex);
+          return tex;
+        },
+
+        // Round Emerald Lily Pad Texture with Notch and Veins
+        createLilyPadTexture() {
+          const key = 'lily_pad_tex';
+          if (this.cache.has(key)) return this.cache.get(key);
+
+          const { canvas, ctx } = this.createCanvas(256, 256);
+          const cx = 128, cy = 128, r = 120;
+
+          // Rich emerald circular gradient
+          const grad = ctx.createRadialGradient(cx, cy, 20, cx, cy, r);
+          grad.addColorStop(0, '#55efc4');
+          grad.addColorStop(0.6, '#00b894');
+          grad.addColorStop(1, '#009432');
+
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, 0.18 * Math.PI, 1.82 * Math.PI);
+          ctx.lineTo(cx, cy);
+          ctx.closePath();
+          ctx.fill();
+
+          // Pad radial veins
+          ctx.strokeStyle = '#81ecec';
+          ctx.lineWidth = 2.5;
+          for (let a = 0.25 * Math.PI; a < 1.75 * Math.PI; a += 0.25 * Math.PI) {
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(cx + Math.cos(a) * (r - 8), cy + Math.sin(a) * (r - 8));
+            ctx.stroke();
+          }
+
+          // Golden center pistil seed spot
+          ctx.fillStyle = '#feca57';
+          ctx.beginPath();
+          ctx.arc(cx, cy, 14, 0, Math.PI * 2);
+          ctx.fill();
+
+          const tex = new THREE.CanvasTexture(canvas);
+          tex.encoding = THREE.sRGBEncoding;
+          this.cache.set(key, tex);
+          return tex;
+        },
+
+        // Silvery Smiling Ilish (Hilsa) Fish Texture
+        createIlishFishTexture() {
+          const key = 'ilish_fish_tex';
+          if (this.cache.has(key)) return this.cache.get(key);
+
+          const { canvas, ctx } = this.createCanvas(512, 256);
+
+          // Silvery iridescent gradient
+          const bgGrad = ctx.createLinearGradient(0, 0, 512, 0);
+          bgGrad.addColorStop(0, '#dff9fb');
+          bgGrad.addColorStop(0.3, '#c7ecee');
+          bgGrad.addColorStop(0.6, '#7ed6df');
+          bgGrad.addColorStop(1, '#22a6b3');
+          ctx.fillStyle = bgGrad;
+          ctx.fillRect(0, 0, 512, 256);
+
+          // Shimmering diamond scales
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+          ctx.lineWidth = 2;
+          for (let x = 120; x < 480; x += 24) {
+            for (let y = 40; y < 220; y += 20) {
+              const offsetX = (y % 40 === 0) ? 12 : 0;
+              ctx.beginPath();
+              ctx.arc(x + offsetX, y, 10, 0, Math.PI);
+              ctx.stroke();
+            }
+          }
+
+          // Big Sparkly Baby Eye
+          ctx.fillStyle = '#2d3436';
+          ctx.beginPath();
+          ctx.arc(70, 95, 20, 0, Math.PI * 2);
+          ctx.fill();
+          // Eye Highlights
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(62, 88, 8, 0, Math.PI * 2);
+          ctx.arc(76, 102, 4, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Rosy Pink Cheek
+          ctx.fillStyle = 'rgba(255, 118, 117, 0.7)';
+          ctx.beginPath();
+          ctx.arc(65, 135, 16, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Cute Cheerful Smile
+          ctx.strokeStyle = '#2d3436';
+          ctx.lineWidth = 5;
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.arc(50, 125, 18, 0.15 * Math.PI, 0.75 * Math.PI);
+          ctx.stroke();
+
+          const tex = new THREE.CanvasTexture(canvas);
+          tex.encoding = THREE.sRGBEncoding;
+          this.cache.set(key, tex);
+          return tex;
+        },
+
+        // Smiling Golden Sun / Moon Texture
+        createCelestialTexture(isMoon = false) {
+          const key = isMoon ? 'celestial_moon' : 'celestial_sun';
+          if (this.cache.has(key)) return this.cache.get(key);
+
+          const { canvas, ctx } = this.createCanvas(256, 256);
+          const cx = 128, cy = 128;
+
+          if (!isMoon) {
+            // Radiant Golden Sun
+            const grad = ctx.createRadialGradient(cx, cy, 20, cx, cy, 120);
+            grad.addColorStop(0, '#ffffff');
+            grad.addColorStop(0.5, '#feca57');
+            grad.addColorStop(0.9, '#ff9f43');
+            grad.addColorStop(1, 'rgba(255, 159, 67, 0)');
+
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 256, 256);
+
+            // Friendly Smiling Face
+            ctx.fillStyle = '#d35400';
+            ctx.beginPath();
+            ctx.arc(95, 110, 10, 0, Math.PI * 2);
+            ctx.arc(161, 110, 10, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Eye sparkle
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(92, 106, 4, 0, Math.PI * 2);
+            ctx.arc(158, 106, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Rosy cheeks
+            ctx.fillStyle = 'rgba(255, 107, 129, 0.5)';
+            ctx.beginPath();
+            ctx.arc(80, 130, 12, 0, Math.PI * 2);
+            ctx.arc(176, 130, 12, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Happy Smile
+            ctx.strokeStyle = '#d35400';
+            ctx.lineWidth = 5;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.arc(cx, 130, 28, 0.2 * Math.PI, 0.8 * Math.PI);
+            ctx.stroke();
+          } else {
+            // Dreamy Pearlescent Moon
+            const grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, 120);
+            grad.addColorStop(0, '#ffffff');
+            grad.addColorStop(0.6, '#dff9fb');
+            grad.addColorStop(0.9, '#a55eea');
+            grad.addColorStop(1, 'rgba(165, 94, 234, 0)');
+
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 256, 256);
+
+            // Sleepy Cute Eyes
+            ctx.strokeStyle = '#4834d4';
+            ctx.lineWidth = 4;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.arc(95, 115, 8, 0.9 * Math.PI, 2.1 * Math.PI);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(161, 115, 8, 0.9 * Math.PI, 2.1 * Math.PI);
+            ctx.stroke();
+
+            // Soft pink blush
+            ctx.fillStyle = 'rgba(255, 159, 243, 0.6)';
+            ctx.beginPath();
+            ctx.arc(80, 132, 10, 0, Math.PI * 2);
+            ctx.arc(176, 132, 10, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Sweet gentle smile
+            ctx.beginPath();
+            ctx.arc(cx, 135, 16, 0.2 * Math.PI, 0.8 * Math.PI);
+            ctx.stroke();
+          }
+
+          const tex = new THREE.CanvasTexture(canvas);
+          tex.encoding = THREE.sRGBEncoding;
+          this.cache.set(key, tex);
+          return tex;
+        },
+
+        // Palm & Banana Leaf Texture
+        createFoliageTexture() {
+          const key = 'foliage_leaf_tex';
+          if (this.cache.has(key)) return this.cache.get(key);
+
+          const { canvas, ctx } = this.createCanvas(256, 256);
+
+          const grad = ctx.createLinearGradient(0, 0, 256, 0);
+          grad.addColorStop(0, '#10ac84');
+          grad.addColorStop(0.5, '#1dd1a1');
+          grad.addColorStop(1, '#10ac84');
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, 256, 256);
+
+          // Leaf ribs
+          ctx.strokeStyle = '#a8e6cf';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(128, 0);
+          ctx.lineTo(128, 256);
+          ctx.stroke();
+
+          ctx.lineWidth = 1.5;
+          for (let y = 20; y < 256; y += 24) {
+            ctx.beginPath();
+            ctx.moveTo(128, y);
+            ctx.lineTo(20, y + 20);
+            ctx.moveTo(128, y);
+            ctx.lineTo(236, y + 20);
+            ctx.stroke();
+          }
+
+          const tex = new THREE.CanvasTexture(canvas);
+          tex.encoding = THREE.sRGBEncoding;
+          this.cache.set(key, tex);
+          return tex;
+        },
+
+        // Water Splash Ripple Ring Texture
+        createRippleTexture() {
+          const key = 'water_ripple_ring';
+          if (this.cache.has(key)) return this.cache.get(key);
+
+          const { canvas, ctx } = this.createCanvas(128, 128);
+          const cx = 64, cy = 64;
+
+          const grad = ctx.createRadialGradient(cx, cy, 20, cx, cy, 60);
+          grad.addColorStop(0, 'rgba(255, 255, 255, 0)');
+          grad.addColorStop(0.7, 'rgba(255, 255, 255, 0.9)');
+          grad.addColorStop(0.85, 'rgba(129, 236, 236, 0.8)');
+          grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, 128, 128);
+
+          const tex = new THREE.CanvasTexture(canvas);
+          tex.encoding = THREE.sRGBEncoding;
+          this.cache.set(key, tex);
+          return tex;
+        },
+
+        // Firefly & Water Sparkle Texture
+        createSparkleTexture() {
+          const key = 'sparkle_glow';
+          if (this.cache.has(key)) return this.cache.get(key);
+
+          const { canvas, ctx } = this.createCanvas(64, 64);
+          const cx = 32, cy = 32;
+
+          const grad = ctx.createRadialGradient(cx, cy, 2, cx, cy, 30);
+          grad.addColorStop(0, '#ffffff');
+          grad.addColorStop(0.3, '#feca57');
+          grad.addColorStop(0.7, '#1dd1a1');
+          grad.addColorStop(1, 'rgba(29, 209, 161, 0)');
+
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, 64, 64);
+
+          const tex = new THREE.CanvasTexture(canvas);
+          tex.encoding = THREE.sRGBEncoding;
+          this.cache.set(key, tex);
+          return tex;
+        }
+      };
+
+      // --- WEB AUDIO API BHATIALI PENTATONIC SYNTHESIZER ---
+      const SoundSystem = {
+        ctx: null,
+        masterGain: null,
+        compressor: null,
+        ambientGain: null,
+        initialized: false,
+        activeVoices: 0,
+        maxPolyphony: 10,
+
+        // Soothing Consonant Pentatonic Scale (Bhatiali River Journey in C Major / A Minor)
+        // C4, D4, E4, G4, A4, C5, D5, E5, G5, A5, C6
+        scale: [
+          261.63, 293.66, 329.63, 392.00, 440.00,
+          523.25, 587.33, 659.25, 783.99, 880.00, 1046.50
+        ],
+
+        init() {
+          if (this.initialized) return;
+          try {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            this.ctx = new AudioContextClass();
+
+            // Mandatory Master Dynamics Compressor Limiter (Protects infant ears)
+            this.compressor = this.ctx.createDynamicsCompressor();
+            this.compressor.threshold.setValueAtTime(-14, this.ctx.currentTime);
+            this.compressor.knee.setValueAtTime(20, this.ctx.currentTime);
+            this.compressor.ratio.setValueAtTime(12, this.ctx.currentTime);
+            this.compressor.attack.setValueAtTime(0.003, this.ctx.currentTime);
+            this.compressor.release.setValueAtTime(0.25, this.ctx.currentTime);
+
+            // Master Gain Node
+            this.masterGain = this.ctx.createGain();
+            const initGain = STATE.soundEnabled ? STATE.volume : 0;
+            this.masterGain.gain.setValueAtTime(initGain, this.ctx.currentTime);
+
+            this.compressor.connect(this.masterGain);
+            this.masterGain.connect(this.ctx.destination);
+
+            this.startRiverAmbience();
+            this.initialized = true;
+          } catch (e) {
+            console.warn('Web Audio initialization error:', e);
+          }
+        },
+
+        resume() {
+          if (!this.ctx) this.init();
+          if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume();
+          }
+        },
+
+        suspend() {
+          if (this.ctx && this.ctx.state === 'running') {
+            this.ctx.suspend();
+          }
+        },
+
+        setVolume(val) {
+          STATE.volume = val;
+          if (this.masterGain && this.ctx) {
+            const target = STATE.soundEnabled ? STATE.volume : 0;
+            this.masterGain.gain.setTargetAtTime(target, this.ctx.currentTime, 0.05);
+          }
+        },
+
+        toggleSound() {
+          STATE.soundEnabled = !STATE.soundEnabled;
+          if (this.masterGain && this.ctx) {
+            const target = STATE.soundEnabled ? STATE.volume : 0;
+            this.masterGain.gain.setTargetAtTime(target, this.ctx.currentTime, 0.05);
+          }
+          return STATE.soundEnabled;
+        },
+
+        // Soothing low-pass filtered river murmur & ambient drone (< 320Hz)
+        startRiverAmbience() {
+          if (!this.ctx) return;
+          const now = this.ctx.currentTime;
+
+          this.ambientGain = this.ctx.createGain();
+          this.ambientGain.gain.setValueAtTime(0.09, now);
+
+          // Warm low-pass acoustic filter
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(260, now);
+          filter.Q.setValueAtTime(1.0, now);
+
+          // Harmonic river pad drone tones: C3 (130.81), G3 (196.00), C4 (261.63)
+          [130.81, 196.00, 261.63].forEach((freq, i) => {
+            const osc = this.ctx.createOscillator();
+            osc.type = i === 1 ? 'triangle' : 'sine';
+            osc.frequency.setValueAtTime(freq, now);
+            osc.detune.setValueAtTime((i - 1) * 4, now);
+
+            const vGain = this.ctx.createGain();
+            vGain.gain.setValueAtTime(0.16, now);
+
+            osc.connect(vGain);
+            vGain.connect(filter);
+            osc.start(now);
+          });
+
+          // Procedural Continuous Pink Noise River Stream Murmur
+          try {
+            const bufferSize = this.ctx.sampleRate * 2;
+            const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+            const output = noiseBuffer.getChannelData(0);
+            let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+            for (let i = 0; i < bufferSize; i++) {
+              const white = Math.random() * 2 - 1;
+              b0 = 0.99886 * b0 + white * 0.0555179;
+              b1 = 0.99332 * b1 + white * 0.0750759;
+              b2 = 0.96900 * b2 + white * 0.1538520;
+              b3 = 0.86650 * b3 + white * 0.3104856;
+              b4 = 0.55000 * b4 + white * 0.5329522;
+              b5 = -0.7616 * b5 - white * 0.0168980;
+              output[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.06;
+              b6 = white * 0.115926;
+            }
+
+            const noiseSource = this.ctx.createBufferSource();
+            noiseSource.buffer = noiseBuffer;
+            noiseSource.loop = true;
+
+            const noiseFilter = this.ctx.createBiquadFilter();
+            noiseFilter.type = 'lowpass';
+            noiseFilter.frequency.setValueAtTime(220, now);
+
+            const noiseGain = this.ctx.createGain();
+            noiseGain.gain.setValueAtTime(0.04, now);
+
+            noiseSource.connect(noiseFilter);
+            noiseFilter.connect(noiseGain);
+            noiseGain.connect(this.ambientGain);
+            noiseSource.start(now);
+          } catch (e) {}
+
+          filter.connect(this.ambientGain);
+          this.ambientGain.connect(this.compressor);
+        },
+
+        // Play relaxing Bamboo Flute (Bansuri) tone
+        playBambooFlute(noteIdx = null, isRegatta = false) {
+          if (!this.ctx || !STATE.soundEnabled) return;
+          this.resume();
+
+          if (this.activeVoices >= this.maxPolyphony) return;
+          this.activeVoices++;
+
+          const now = this.ctx.currentTime;
+          const idx = (noteIdx !== null) ? (noteIdx % this.scale.length) : STATE.noteIndex;
+          const freq = this.scale[idx];
+          STATE.noteIndex = (STATE.noteIndex + 1) % this.scale.length;
+
+          // Fundamental Flute tone
+          const osc1 = this.ctx.createOscillator();
+          osc1.type = 'sine';
+          osc1.frequency.setValueAtTime(freq, now);
+
+          // Breath overtone (3rd harmonic)
+          const osc2 = this.ctx.createOscillator();
+          osc2.type = 'triangle';
+          osc2.frequency.setValueAtTime(freq * 3, now);
+
+          // Vibrato LFO
+          const lfo = this.ctx.createOscillator();
+          const lfoGain = this.ctx.createGain();
+          lfo.frequency.setValueAtTime(5.2, now);
+          lfoGain.gain.setValueAtTime(freq * 0.012, now);
+          lfo.connect(osc1.frequency);
+          lfo.start(now + 0.1);
+
+          // Low-pass body warmth filter
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(isRegatta ? 3800 : 2600, now);
+          filter.frequency.exponentialRampToValueAtTime(500, now + 1.8);
+
+          // Flute Envelope
+          const gain = this.ctx.createGain();
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.linearRampToValueAtTime(isRegatta ? 0.22 : 0.16, now + 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.9);
+
+          const overGain = this.ctx.createGain();
+          overGain.gain.setValueAtTime(0.03, now);
+
+          osc1.connect(gain);
+          osc2.connect(overGain);
+          overGain.connect(gain);
+          gain.connect(filter);
+          filter.connect(this.compressor);
+
+          osc1.onended = () => {
+            try {
+              osc1.disconnect();
+              osc2.disconnect();
+              overGain.disconnect();
+              lfo.disconnect();
+              lfoGain.disconnect();
+              gain.disconnect();
+              filter.disconnect();
+            } catch (e) {}
+            this.activeVoices = Math.max(0, this.activeVoices - 1);
+          };
+
+          osc1.start(now);
+          osc2.start(now);
+          osc1.stop(now + 2.0);
+          osc2.stop(now + 2.0);
+          lfo.stop(now + 2.0);
+        },
+
+        // Play Wooden Marimba / Dotara Pluck
+        playDotaraPluck(noteIdx = null) {
+          if (!this.ctx || !STATE.soundEnabled) return;
+          this.resume();
+
+          if (this.activeVoices >= this.maxPolyphony) return;
+          this.activeVoices++;
+
+          const now = this.ctx.currentTime;
+          const idx = (noteIdx !== null) ? (noteIdx % this.scale.length) : STATE.noteIndex;
+          const freq = this.scale[idx];
+
+          const osc = this.ctx.createOscillator();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now);
+
+          const gain = this.ctx.createGain();
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.linearRampToValueAtTime(0.18, now + 0.015);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.9);
+
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(2400, now);
+          filter.frequency.exponentialRampToValueAtTime(350, now + 0.85);
+
+          osc.connect(gain);
+          gain.connect(filter);
+          filter.connect(this.compressor);
+
+          osc.onended = () => {
+            try { osc.disconnect(); gain.disconnect(); filter.disconnect(); } catch (e) {}
+            this.activeVoices = Math.max(0, this.activeVoices - 1);
+          };
+
+          osc.start(now);
+          osc.stop(now + 0.95);
+        },
+
+        // Play Water Splash Ripple Chime ("Bloop-sploosh")
+        playWaterSplash(pitchOffset = 0) {
+          if (!this.ctx || !STATE.soundEnabled) return;
+          this.resume();
+
+          if (this.activeVoices >= this.maxPolyphony) return;
+          this.activeVoices++;
+
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          osc.type = 'sine';
+          const baseFreq = 380 + Math.random() * 200 + pitchOffset;
+          osc.frequency.setValueAtTime(baseFreq, now);
+          osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.7, now + 0.14);
+
+          const gain = this.ctx.createGain();
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.linearRampToValueAtTime(0.16, now + 0.015);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.28);
+
+          osc.connect(gain);
+          gain.connect(this.compressor);
+
+          osc.onended = () => {
+            try { osc.disconnect(); gain.disconnect(); } catch (e) {}
+            this.activeVoices = Math.max(0, this.activeVoices - 1);
+          };
+
+          osc.start(now);
+          osc.stop(now + 0.3);
+        },
+
+        // Play Super Baich Regatta Chord Cascade
+        playRegattaCascade() {
+          if (!this.ctx || !STATE.soundEnabled) return;
+          this.resume();
+
+          const arpeggio = [2, 4, 6, 8, 10, 8, 6, 4];
+          arpeggio.forEach((noteIdx, i) => {
+            setTimeout(() => {
+              if (!STATE.soundEnabled || !this.ctx || this.ctx.state !== 'running') return;
+              this.playBambooFlute(noteIdx, true);
+              this.playDotaraPluck(noteIdx);
+              this.playWaterSplash(i * 35);
+            }, i * 70);
+          });
+        }
+      };
+
+      // --- THREE.JS 3D WORLD ARCHITECTURE ---
+      let scene, camera, renderer;
+      let boatGroup, boatHullMesh, boatCanopyMesh;
+      const oars = [];
+      let riverMesh, leftBankMesh, rightBankMesh;
+      let celestialMesh, sunLight, ambientLight;
+
+      // Pools
+      const fishPool = [];
+      const ripplePool = [];
+      const particlePool = [];
+      const lilyPool = [];
+      const treePool = [];
+
+      // Scratch Vectors for Zero-Allocation loop
+      const _v1 = new THREE.Vector3();
+      const _v2 = new THREE.Vector3();
+      const _v3 = new THREE.Vector3();
+      const _q1 = new THREE.Quaternion();
+      const raycaster = new THREE.Raycaster();
+      const mouseVec = new THREE.Vector2();
+
+      // --- BUILD THE 3D WORLD ---
+
+      function init3D() {
+        const container = document.getElementById('canvas-container');
+
+        // Scene
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(ATMOSPHERES.morning.skyTop);
+        scene.fog = new THREE.FogExp2(ATMOSPHERES.morning.fogColor, 0.012);
+
+        // Camera
+        const aspect = window.innerWidth / window.innerHeight;
+        camera = new THREE.PerspectiveCamera(46, aspect, 0.1, 400);
+        updateCameraPosition(aspect);
+
+        // Renderer
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        container.appendChild(renderer.domElement);
+
+        // Lighting
+        ambientLight = new THREE.AmbientLight(ATMOSPHERES.morning.ambientLightColor, ATMOSPHERES.morning.ambientLightIntensity);
+        scene.add(ambientLight);
+
+        sunLight = new THREE.DirectionalLight(ATMOSPHERES.morning.sunLightColor, ATMOSPHERES.morning.sunLightIntensity);
+        sunLight.position.set(30, 60, -40);
+        sunLight.castShadow = true;
+        sunLight.shadow.mapSize.width = 1024;
+        sunLight.shadow.mapSize.height = 1024;
+        sunLight.shadow.bias = -0.001;
+        sunLight.shadow.normalBias = 0.02;
+        scene.add(sunLight);
+
+        // Build Environment
+        buildRiver();
+        buildRiverbanks();
+        buildCelestial();
+        buildNoukaBoat();
+        buildPools();
+
+        // Start Ambient Floaters on screen
+        createScreenLilies();
+      }
+
+      function updateCameraPosition(aspect) {
+        if (aspect < 1.0) { // Portrait Mobile
+          camera.fov = 65;
+          camera.position.set(0, 14, 28);
+        } else if (aspect >= 2.0) { // 21:9 Ultrawide
+          camera.fov = 40;
+          camera.position.set(0, 11, 24);
+        } else { // 16:9 Smart TV / Desktop
+          camera.fov = 46;
+          camera.position.set(0, 12, 26);
+        }
+        camera.lookAt(0, 2, -6);
+        camera.updateProjectionMatrix();
+      }
+
+      // --- BUILD RIVER WATER ---
+      function buildRiver() {
+        const geom = new THREE.PlaneGeometry(CONFIG.riverWidth, CONFIG.riverLength, 24, 36);
+        geom.rotateX(-Math.PI / 2);
+
+        const mat = new THREE.MeshStandardMaterial({
+          color: ATMOSPHERES.morning.waterColor,
+          emissive: ATMOSPHERES.morning.waterEmissive,
+          emissiveIntensity: 0.15,
+          roughness: 0.2,
+          metalness: 0.15,
+          transparent: true,
+          opacity: 0.94,
+        });
+
+        riverMesh = new THREE.Mesh(geom, mat);
+        riverMesh.position.set(0, 0, 0);
+        riverMesh.receiveShadow = true;
+        scene.add(riverMesh);
+      }
+
+      // --- BUILD RIVERBANKS & SCENERY ---
+      function buildRiverbanks() {
+        const bankGeom = new THREE.PlaneGeometry(35, CONFIG.riverLength, 16, 40);
+        bankGeom.rotateX(-Math.PI / 2);
+
+        // Deform bank geometry to create rolling grassy hills
+        const pos = bankGeom.attributes.position;
+        for (let i = 0; i < pos.count; i++) {
+          const x = pos.getX(i);
+          const z = pos.getZ(i);
+          const hillY = Math.sin(x * 0.18) * 1.8 + Math.cos(z * 0.08) * 1.5 + (Math.abs(x) * 0.18);
+          pos.setY(i, hillY);
+        }
+        bankGeom.computeVertexNormals();
+
+        const bankMat = new THREE.MeshStandardMaterial({
+          color: ATMOSPHERES.morning.bankColor,
+          roughness: 0.85,
+          metalness: 0.05,
+          flatShading: true,
+        });
+
+        leftBankMesh = new THREE.Mesh(bankGeom, bankMat);
+        leftBankMesh.position.set(-CONFIG.riverWidth / 2 - 12, 0.4, 0);
+        leftBankMesh.receiveShadow = true;
+        scene.add(leftBankMesh);
+
+        rightBankMesh = new THREE.Mesh(bankGeom, bankMat);
+        rightBankMesh.position.set(CONFIG.riverWidth / 2 + 12, 0.4, 0);
+        rightBankMesh.rotation.y = Math.PI;
+        rightBankMesh.receiveShadow = true;
+        scene.add(rightBankMesh);
+      }
+
+      // --- BUILD CELESTIAL SUN / MOON ---
+      function buildCelestial() {
+        const geom = new THREE.PlaneGeometry(28, 28);
+        const mat = new THREE.MeshBasicMaterial({
+          map: TextureGenerator.createCelestialTexture(false),
+          transparent: true,
+          depthWrite: false,
+        });
+
+        celestialMesh = new THREE.Mesh(geom, mat);
+        celestialMesh.position.set(40, 50, -110);
+        scene.add(celestialMesh);
+      }
+
+      // --- BUILD TRADITIONAL BANGLADESHI NOUKA BOAT ---
+      function buildNoukaBoat() {
+        boatGroup = new THREE.Group();
+
+        const woodTex = TextureGenerator.createWoodTexture();
+        const bambooTex = TextureGenerator.createBambooTexture();
+
+        const woodMat = new THREE.MeshStandardMaterial({
+          map: woodTex,
+          color: ATMOSPHERES.morning.boatWoodColor,
+          roughness: 0.45,
+          metalness: 0.1,
+        });
+
+        const goldMat = new THREE.MeshStandardMaterial({
+          color: 0xfeca57,
+          roughness: 0.25,
+          metalness: 0.8,
+        });
+
+        // 1. Sleek Curved Hull (Nouka body with raised prow & stern)
+        const hullGroup = new THREE.Group();
+
+        // Hull center keel
+        const keelGeom = new THREE.CylinderGeometry(0.9, 0.5, 12, 12, 1, false);
+        keelGeom.rotateX(Math.PI / 2);
+        keelGeom.scale(1.8, 0.7, 1.0);
+        boatHullMesh = new THREE.Mesh(keelGeom, woodMat);
+        boatHullMesh.castShadow = true;
+        boatHullMesh.receiveShadow = true;
+        hullGroup.add(boatHullMesh);
+
+        // Raised pointed Bow (Galui) - curving upwards elegantly
+        const bowGeom = new THREE.ConeGeometry(1.2, 4.5, 8);
+        bowGeom.rotateX(-Math.PI / 2.3);
+        bowGeom.scale(1.3, 1.0, 0.8);
+        const bowMesh = new THREE.Mesh(bowGeom, woodMat);
+        bowMesh.position.set(0, 0.85, -7.2);
+        bowMesh.castShadow = true;
+        hullGroup.add(bowMesh);
+
+        // Golden Brass Bow Tip Ornament
+        const bowTipGeom = new THREE.SphereGeometry(0.4, 8, 8);
+        const bowTipMesh = new THREE.Mesh(bowTipGeom, goldMat);
+        bowTipMesh.position.set(0, 1.8, -9.2);
+        hullGroup.add(bowTipMesh);
+
+        // Raised Stern (Back Galui)
+        const sternGeom = new THREE.ConeGeometry(1.1, 4.2, 8);
+        sternGeom.rotateX(Math.PI / 2.3);
+        sternGeom.scale(1.2, 1.0, 0.8);
+        const sternMesh = new THREE.Mesh(sternGeom, woodMat);
+        sternMesh.position.set(0, 0.75, 7.2);
+        sternMesh.castShadow = true;
+        hullGroup.add(sternMesh);
+
+        // Gunwale side rims
+        const rimGeom = new THREE.BoxGeometry(0.3, 0.35, 12.5);
+        const leftRim = new THREE.Mesh(rimGeom, goldMat);
+        leftRim.position.set(-1.6, 0.55, 0);
+        hullGroup.add(leftRim);
+
+        const rightRim = new THREE.Mesh(rimGeom, goldMat);
+        rightRim.position.set(1.6, 0.55, 0);
+        hullGroup.add(rightRim);
+
+        // Deck ribs / benches
+        for (let z = -4; z <= 4; z += 2) {
+          const benchGeom = new THREE.BoxGeometry(2.8, 0.15, 0.6);
+          const bench = new THREE.Mesh(benchGeom, woodMat);
+          bench.position.set(0, 0.3, z);
+          hullGroup.add(bench);
+        }
+
+        boatGroup.add(hullGroup);
+
+        // 2. Bamboo Thatch Canopy ("Chhoi")
+        const chhoiGeom = new THREE.CylinderGeometry(2.0, 2.0, 5.8, 16, 1, true, 0, Math.PI);
+        chhoiGeom.rotateZ(Math.PI / 2);
+        chhoiGeom.scale(0.85, 0.75, 1.0);
+
+        const chhoiMat = new THREE.MeshStandardMaterial({
+          map: bambooTex,
+          color: ATMOSPHERES.morning.bambooColor,
+          roughness: 0.6,
+          side: THREE.DoubleSide,
+        });
+
+        boatCanopyMesh = new THREE.Mesh(chhoiGeom, chhoiMat);
+        boatCanopyMesh.position.set(0, 0.75, 0.2);
+        boatCanopyMesh.castShadow = true;
+        boatGroup.add(boatCanopyMesh);
+
+        // Front Lantern Hanging from Canopy
+        const lanternPoleGeom = new THREE.CylinderGeometry(0.04, 0.04, 1.2);
+        const lanternPole = new THREE.Mesh(lanternPoleGeom, goldMat);
+        lanternPole.position.set(0, 1.4, -3.2);
+        boatGroup.add(lanternPole);
+
+        const lanternGlowGeom = new THREE.SphereGeometry(0.35, 12, 12);
+        const lanternGlowMat = new THREE.MeshBasicMaterial({ color: 0xfffa65 });
+        const lantern = new THREE.Mesh(lanternGlowGeom, lanternGlowMat);
+        lantern.position.set(0, 0.8, -3.2);
+        boatGroup.add(lantern);
+
+        // 3. Wooden Rowing Oars (Baitha) - 2 on left, 2 on right
+        const oarPositions = [
+          { side: -1, z: -2.5 },
+          { side: -1, z: 2.2 },
+          { side: 1, z: -2.5 },
+          { side: 1, z: 2.2 },
+        ];
+
+        oarPositions.forEach((cfg) => {
+          const oarPivot = new THREE.Group();
+          oarPivot.position.set(cfg.side * 1.65, 0.55, cfg.z);
+
+          // Shaft
+          const shaftGeom = new THREE.CylinderGeometry(0.08, 0.08, 4.2);
+          shaftGeom.translate(0, -1.8, 0);
+          const shaft = new THREE.Mesh(shaftGeom, woodMat);
+
+          // Teardrop Blade
+          const bladeGeom = new THREE.BoxGeometry(0.5, 1.2, 0.08);
+          bladeGeom.translate(0, -3.4, 0);
+          const blade = new THREE.Mesh(bladeGeom, goldMat);
+
+          oarPivot.add(shaft);
+          oarPivot.add(blade);
+
+          // Initial rotation angling outwards
+          oarPivot.rotation.z = cfg.side * 0.45;
+          boatGroup.add(oarPivot);
+
+          oars.push({
+            group: oarPivot,
+            side: cfg.side,
+            baseZRot: cfg.side * 0.45,
+            phase: cfg.z * 0.8,
+          });
+        });
+
+        boatGroup.position.set(0, 0.2, 4);
+        scene.add(boatGroup);
+      }
+
+      // --- BUILD OBJECT POOLS (ZERO RUNTIME ALLOCATIONS) ---
+      function buildPools() {
+        buildFishPool();
+        buildRipplePool();
+        buildParticlePool();
+        buildLilyPool();
+        buildTreePool();
+      }
+
+      // 1. Jumping Silvery Ilish Fish Pool
+      function buildFishPool() {
+        const fishTex = TextureGenerator.createIlishFishTexture();
+        const fishMat = new THREE.MeshStandardMaterial({
+          map: fishTex,
+          roughness: 0.2,
+          metalness: 0.4,
+          side: THREE.DoubleSide,
+        });
+
+        for (let i = 0; i < CONFIG.fishPoolSize; i++) {
+          const fishGroup = new THREE.Group();
+
+          // Sleek Streamlined Fish Body
+          const bodyGeom = new THREE.ConeGeometry(0.65, 2.6, 12);
+          bodyGeom.rotateX(Math.PI / 2);
+          bodyGeom.scale(0.5, 0.9, 1.0);
+          const bodyMesh = new THREE.Mesh(bodyGeom, fishMat);
+          fishGroup.add(bodyMesh);
+
+          // Caudal Tail Fin
+          const tailGeom = new THREE.BufferGeometry();
+          const verts = new Float32Array([
+            0, 0, 1.3,
+            0, 0.7, 2.3,
+            0, -0.7, 2.3
+          ]);
+          tailGeom.setAttribute('position', new THREE.BufferAttribute(verts, 3));
+          tailGeom.computeVertexNormals();
+          const tailMesh = new THREE.Mesh(tailGeom, fishMat);
+          fishGroup.add(tailMesh);
+
+          // Dorsal Top Fin
+          const finGeom = new THREE.BufferGeometry();
+          const finVerts = new Float32Array([
+            0, 0.45, -0.3,
+            0, 0.9, 0.4,
+            0, 0.35, 0.6
+          ]);
+          finGeom.setAttribute('position', new THREE.BufferAttribute(finVerts, 3));
+          finGeom.computeVertexNormals();
+          const finMesh = new THREE.Mesh(finGeom, fishMat);
+          fishGroup.add(finMesh);
+
+          fishGroup.visible = false;
+          fishGroup.userData = {
+            active: false,
+            progress: 0,
+            duration: 1.2,
+            startX: 0,
+            startY: 0,
+            startZ: 0,
+            endX: 0,
+            endY: 0,
+            endZ: 0,
+            peakY: 5.5,
+            rotSpeed: 4.0,
+          };
+
+          scene.add(fishGroup);
+          fishPool.push(fishGroup);
+        }
+      }
+
+      // 2. Water Splash Ripple Pool
+      function buildRipplePool() {
+        const rippleTex = TextureGenerator.createRippleTexture();
+        const rippleGeom = new THREE.PlaneGeometry(1, 1);
+        rippleGeom.rotateX(-Math.PI / 2);
+
+        for (let i = 0; i < CONFIG.ripplePoolSize; i++) {
+          const mat = new THREE.MeshBasicMaterial({
+            map: rippleTex,
+            transparent: true,
+            opacity: 0,
+            depthWrite: false,
+          });
+
+          const mesh = new THREE.Mesh(rippleGeom, mat);
+          mesh.position.set(0, 0.05, 0);
+          mesh.visible = false;
+          mesh.userData = {
+            active: false,
+            age: 0,
+            life: 1.0,
+            maxScale: 3.5,
+          };
+
+          scene.add(mesh);
+          ripplePool.push(mesh);
+        }
+      }
+
+      // 3. Firefly & Water Droplet Sparkle Particle Pool
+      function buildParticlePool() {
+        const sparkleTex = TextureGenerator.createSparkleTexture();
+
+        for (let i = 0; i < CONFIG.particlePoolSize; i++) {
+          const mat = new THREE.SpriteMaterial({
+            map: sparkleTex,
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0,
+            blending: THREE.AdditiveBlending,
+          });
+
+          const sprite = new THREE.Sprite(mat);
+          sprite.scale.set(0.8, 0.8, 1);
+          sprite.visible = false;
+          sprite.userData = {
+            active: false,
+            velX: 0,
+            velY: 0,
+            velZ: 0,
+            age: 0,
+            life: 1.2,
+          };
+
+          scene.add(sprite);
+          particlePool.push(sprite);
+        }
+      }
+
+      // 4. Floating Pink Shapla (Water Lily) Pool
+      function buildLilyPool() {
+        const padTex = TextureGenerator.createLilyPadTexture();
+        const petalTex = TextureGenerator.createShaplaPetalTexture();
+
+        const padMat = new THREE.MeshStandardMaterial({
+          map: padTex,
+          roughness: 0.5,
+          side: THREE.DoubleSide,
+        });
+
+        const petalMat = new THREE.MeshStandardMaterial({
+          map: petalTex,
+          roughness: 0.35,
+          side: THREE.DoubleSide,
+        });
+
+        const centerMat = new THREE.MeshBasicMaterial({ color: 0xfeca57 });
+
+        for (let i = 0; i < CONFIG.lilyPoolSize; i++) {
+          const cluster = new THREE.Group();
+
+          // 1. Lily Pad
+          const padGeom = new THREE.PlaneGeometry(2.4, 2.4);
+          padGeom.rotateX(-Math.PI / 2);
+          const padMesh = new THREE.Mesh(padGeom, padMat);
+          padMesh.receiveShadow = true;
+          cluster.add(padMesh);
+
+          // 2. Blooming Pink Shapla Flower
+          const flowerGroup = new THREE.Group();
+          flowerGroup.position.set(0.3, 0.15, 0.2);
+
+          // Starburst Petals
+          for (let p = 0; p < 8; p++) {
+            const petalGeom = new THREE.PlaneGeometry(0.7, 1.2);
+            petalGeom.translate(0, 0.6, 0);
+            petalGeom.rotateX(Math.PI / 3);
+            const petalMesh = new THREE.Mesh(petalGeom, petalMat);
+            petalMesh.rotation.y = (p / 8) * Math.PI * 2;
+            flowerGroup.add(petalMesh);
+          }
+
+          // Golden Pistil Core
+          const coreGeom = new THREE.SphereGeometry(0.3, 8, 8);
+          const coreMesh = new THREE.Mesh(coreGeom, centerMat);
+          coreMesh.position.set(0, 0.2, 0);
+          flowerGroup.add(coreMesh);
+
+          cluster.add(flowerGroup);
+
+          // Initial placement scattered along river
+          const side = (i % 2 === 0) ? -1 : 1;
+          const x = side * (6 + Math.random() * 12);
+          const z = -CONFIG.riverLength / 2 + (i / CONFIG.lilyPoolSize) * CONFIG.riverLength;
+          cluster.position.set(x, 0.06, z);
+          cluster.rotation.y = Math.random() * Math.PI * 2;
+
+          scene.add(cluster);
+          lilyPool.push(cluster);
+        }
+      }
+
+      // 5. Riverbank Coconut Palms & Banana Plants Pool
+      function buildTreePool() {
+        const foliageTex = TextureGenerator.createFoliageTexture();
+        const trunkTex = TextureGenerator.createWoodTexture();
+
+        const trunkMat = new THREE.MeshStandardMaterial({
+          map: trunkTex,
+          color: 0x8b5a2b,
+          roughness: 0.8,
+        });
+
+        const leafMat = new THREE.MeshStandardMaterial({
+          map: foliageTex,
+          roughness: 0.4,
+          side: THREE.DoubleSide,
+        });
+
+        for (let i = 0; i < CONFIG.treePoolSize; i++) {
+          const treeGroup = new THREE.Group();
+          const isPalm = (i % 2 === 0);
+
+          if (isPalm) {
+            // Coconut Palm with Curved Trunk
+            const trunkGeom = new THREE.CylinderGeometry(0.35, 0.55, 9, 8);
+            trunkGeom.translate(0, 4.5, 0);
+            const trunkMesh = new THREE.Mesh(trunkGeom, trunkMat);
+            trunkMesh.rotation.z = (Math.random() - 0.5) * 0.25;
+            trunkMesh.castShadow = true;
+            treeGroup.add(trunkMesh);
+
+            // Palm Fronds
+            for (let f = 0; f < 6; f++) {
+              const frondGeom = new THREE.PlaneGeometry(1.4, 4.2);
+              frondGeom.translate(0, 2.1, 0);
+              frondGeom.rotateX(Math.PI / 2.8);
+              const frond = new THREE.Mesh(frondGeom, leafMat);
+              frond.position.set(0, 8.8, 0);
+              frond.rotation.y = (f / 6) * Math.PI * 2;
+              treeGroup.add(frond);
+            }
+          } else {
+            // Banana Plant with Broad Leaves
+            const bTrunkGeom = new THREE.CylinderGeometry(0.4, 0.6, 4, 8);
+            bTrunkGeom.translate(0, 2, 0);
+            const bTrunk = new THREE.Mesh(bTrunkGeom, trunkMat);
+            bTrunk.castShadow = true;
+            treeGroup.add(bTrunk);
+
+            for (let b = 0; b < 5; b++) {
+              const leafGeom = new THREE.PlaneGeometry(1.6, 4.8);
+              leafGeom.translate(0, 2.4, 0);
+              leafGeom.rotateX(Math.PI / 3);
+              const leaf = new THREE.Mesh(leafGeom, leafMat);
+              leaf.position.set(0, 3.8, 0);
+              leaf.rotation.y = (b / 5) * Math.PI * 2;
+              treeGroup.add(leaf);
+            }
+          }
+
+          const side = (i % 2 === 0) ? -1 : 1;
+          const x = side * (CONFIG.riverWidth / 2 + 5 + Math.random() * 8);
+          const z = -CONFIG.riverLength / 2 + (i / CONFIG.treePoolSize) * CONFIG.riverLength;
+          treeGroup.position.set(x, 1.2, z);
+
+          scene.add(treeGroup);
+          treePool.push(treeGroup);
+        }
+      }
+
+      // --- 2D SCREEN LILY FLOATERS (TODDLER TAP-TO-POP) ---
+      function createScreenLilies() {
+        const container = document.getElementById('screen-lilies-container');
+        if (!container) return;
+
+        const emojis = ['🌸', '🪷', '✨', '🐟', '🫧'];
+        for (let i = 0; i < 4; i++) {
+          const lily = document.createElement('div');
+          lily.className = 'screen-lily';
+          lily.style.width = '64px';
+          lily.style.height = '64px';
+          lily.style.left = `${10 + i * 24 + Math.random() * 8}%`;
+          lily.style.top = `${20 + (i % 3) * 22 + Math.random() * 10}%`;
+          lily.style.animationDelay = `${-i * 1.5}s`;
+          lily.textContent = emojis[i % emojis.length];
+
+          lily.addEventListener('click', (e) => {
+            e.stopPropagation();
+            SoundSystem.playDotaraPluck(i * 2);
+            SoundSystem.playWaterSplash(40);
+            createScreenRipple(e.clientX, e.clientY);
+            triggerRegattaSurge();
+
+            // Reposition
+            lily.style.left = `${10 + Math.random() * 75}%`;
+            lily.style.top = `${15 + Math.random() * 65}%`;
+          });
+
+          container.appendChild(lily);
+        }
+      }
+
+      function createScreenRipple(x, y) {
+        const ripple = document.createElement('div');
+        ripple.className = 'touch-ripple';
+        ripple.style.left = `${x}px`;
+        ripple.style.top = `${y}px`;
+        ripple.style.width = '70px';
+        ripple.style.height = '70px';
+        document.body.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 850);
+      }
+
+      // --- SENSORY ACTIONS & BURSTS (ZERO FAIL STATES) ---
+
+      function spawnWaterRipple(x, z, maxScale = 3.5) {
+        for (let i = 0; i < ripplePool.length; i++) {
+          const r = ripplePool[i];
+          if (!r.userData.active) {
+            r.userData.active = true;
+            r.userData.age = 0;
+            r.userData.life = 1.0;
+            r.userData.maxScale = maxScale;
+            r.position.set(x, 0.06, z);
+            r.scale.set(0.2, 0.2, 0.2);
+            r.material.opacity = 0.9;
+            r.visible = true;
+            break;
+          }
+        }
+      }
+
+      function spawnSparkleParticles(x, y, z, count = 12, isRegatta = false) {
+        let spawned = 0;
+        for (let i = 0; i < particlePool.length && spawned < count; i++) {
+          const p = particlePool[i];
+          if (!p.userData.active) {
+            p.userData.active = true;
+            p.userData.age = 0;
+            p.userData.life = 0.8 + Math.random() * 0.6;
+            p.position.set(x + (Math.random() - 0.5) * 1.5, y + Math.random() * 0.8, z + (Math.random() - 0.5) * 1.5);
+
+            const speed = isRegatta ? 6.5 : 4.0;
+            p.userData.velX = (Math.random() - 0.5) * speed;
+            p.userData.velY = 2.0 + Math.random() * speed;
+            p.userData.velZ = (Math.random() - 0.5) * speed;
+
+            p.material.opacity = 1.0;
+            p.visible = true;
+            spawned++;
+          }
+        }
+      }
+
+      function triggerJumpingIlish(side = -1) {
+        for (let i = 0; i < fishPool.length; i++) {
+          const f = fishPool[i];
+          if (!f.userData.active) {
+            f.userData.active = true;
+            f.userData.progress = 0;
+            f.userData.duration = 1.3;
+
+            const startX = side * (3.5 + Math.random() * 2.5);
+            const startZ = boatGroup.position.z - 2 + (Math.random() - 0.5) * 4;
+            const endX = startX + side * 4.0;
+            const endZ = startZ - 6.0;
+
+            f.userData.startX = startX;
+            f.userData.startY = 0;
+            f.userData.startZ = startZ;
+            f.userData.endX = endX;
+            f.userData.endY = 0;
+            f.userData.endZ = endZ;
+            f.userData.peakY = 4.5 + Math.random() * 2.0;
+
+            f.position.set(startX, 0, startZ);
+            f.visible = true;
+
+            // Launch splash & bloop sound
+            spawnWaterRipple(startX, startZ, 2.5);
+            spawnSparkleParticles(startX, 0.4, startZ, 8);
+            SoundSystem.playWaterSplash(60);
+            break;
+          }
+        }
+      }
+
+      function triggerRegattaSurge() {
+        STATE.surgeTimer = 1.6;
+        const overlay = document.getElementById('surge-overlay');
+        if (overlay) {
+          overlay.classList.remove('active');
+          void overlay.offsetWidth; // Trigger reflow
+          overlay.classList.add('active');
+        }
+
+        // Multi-fish regatta jump
+        triggerJumpingIlish(-1);
+        triggerJumpingIlish(1);
+
+        // Oar splash ripples
+        oars.forEach(oar => {
+          _v1.set(oar.group.position.x * 1.5, 0, boatGroup.position.z + oar.group.position.z);
+          spawnWaterRipple(_v1.x, _v1.z, 3.2);
+          spawnSparkleParticles(_v1.x, 0.5, _v1.z, 10, true);
+        });
+
+        SoundSystem.playRegattaCascade();
+      }
+
+      function handleInteraction(clientX, clientY, isMultiTouch = false) {
+        SoundSystem.resume();
+
+        const prompt = document.getElementById('prompt-banner');
+        if (prompt && !prompt.classList.contains('hidden')) {
+          prompt.classList.add('hidden');
+        }
+
+        if (clientX && clientY) {
+          createScreenRipple(clientX, clientY);
+        }
+
+        if (isMultiTouch) {
+          triggerRegattaSurge();
+          return;
+        }
+
+        // Single tap / key action: Row burst, flute note, single fish jump
+        SoundSystem.playBambooFlute();
+        SoundSystem.playDotaraPluck();
+        SoundSystem.playWaterSplash();
+
+        const jumpSide = (Math.random() > 0.5) ? 1 : -1;
+        triggerJumpingIlish(jumpSide);
+
+        // Oar ripples
+        const randomOar = oars[Math.floor(Math.random() * oars.length)];
+        if (randomOar) {
+          _v1.set(randomOar.group.position.x * 1.4, 0, boatGroup.position.z + randomOar.group.position.z);
+          spawnWaterRipple(_v1.x, _v1.z, 2.4);
+          spawnSparkleParticles(_v1.x, 0.4, _v1.z, 8);
+        }
+      }
+
+      // --- ATMOSPHERE THEME SWITCHER ---
+      function applyAtmosphere(key) {
+        const atmo = ATMOSPHERES[key] || ATMOSPHERES.morning;
+        STATE.atmosphere = key;
+
+        scene.background.setHex(atmo.skyTop);
+        scene.fog.color.setHex(atmo.fogColor);
+
+        if (ambientLight) {
+          ambientLight.color.setHex(atmo.ambientLightColor);
+          ambientLight.intensity = atmo.ambientLightIntensity;
+        }
+
+        if (sunLight) {
+          sunLight.color.setHex(atmo.sunLightColor);
+          sunLight.intensity = atmo.sunLightIntensity;
+        }
+
+        if (riverMesh) {
+          riverMesh.material.color.setHex(atmo.waterColor);
+          riverMesh.material.emissive.setHex(atmo.waterEmissive);
+        }
+
+        if (leftBankMesh && rightBankMesh) {
+          leftBankMesh.material.color.setHex(atmo.bankColor);
+          rightBankMesh.material.color.setHex(atmo.bankColor);
+        }
+
+        if (boatHullMesh) {
+          boatHullMesh.material.color.setHex(atmo.boatWoodColor);
+        }
+
+        if (boatCanopyMesh) {
+          boatCanopyMesh.material.color.setHex(atmo.bambooColor);
+        }
+
+        if (celestialMesh) {
+          celestialMesh.material.map = TextureGenerator.createCelestialTexture(atmo.isNight);
+          celestialMesh.material.needsUpdate = true;
+        }
+
+        const disp = document.getElementById('atmosphere-display');
+        if (disp) disp.textContent = atmo.name;
+
+        document.querySelectorAll('.pill-btn[data-atmosphere]').forEach(btn => {
+          btn.classList.toggle('active', btn.getAttribute('data-atmosphere') === key);
+        });
+      }
+
+      // --- MAIN ANIMATION & ZERO-ALLOCATION RENDER LOOP ---
+      let lastTime = performance.now();
+
+      function animate() {
+        requestAnimationFrame(animate);
+
+        const now = performance.now();
+        const delta = Math.min((now - lastTime) / 1000, 0.1);
+        lastTime = now;
+
+        STATE.time += delta;
+
+        // Determine Cruise Speed
+        let speed = 6.0;
+        if (STATE.pace === 'calm') speed = 4.0;
+        if (STATE.pace === 'lively') speed = 9.0;
+
+        if (STATE.surgeTimer > 0) {
+          STATE.surgeTimer -= delta;
+          speed *= 1.8;
+        }
+
+        // 1. Animate River Water Waves (Vertex Displacement)
+        if (riverMesh) {
+          const pos = riverMesh.geometry.attributes.position;
+          const t = STATE.time * 2.2;
+          for (let i = 0; i < pos.count; i++) {
+            const vx = pos.getX(i);
+            const vz = pos.getZ(i);
+            const vy = Math.sin(vx * 0.35 + t) * 0.18 + Math.cos(vz * 0.25 + t * 0.8) * 0.14;
+            pos.setY(i, vy);
+          }
+          pos.needsUpdate = true;
+        }
+
+        // 2. Continuous River Forward Motion (Scroll Scenery along Z-axis)
+        const scrollDist = speed * delta;
+        STATE.riverScrollZ += scrollDist;
+
+        // Recycle Floating Lilies
+        for (let i = 0; i < lilyPool.length; i++) {
+          const l = lilyPool[i];
+          l.position.z += scrollDist;
+          l.position.y = 0.06 + Math.sin(STATE.time * 2.0 + i) * 0.04; // Gentle water bobbing
+          if (l.position.z > 25) {
+            l.position.z -= CONFIG.riverLength;
+            l.position.x = ((i % 2 === 0) ? -1 : 1) * (6 + Math.random() * 12);
+          }
+        }
+
+        // Recycle Bank Trees
+        for (let i = 0; i < treePool.length; i++) {
+          const tree = treePool[i];
+          tree.position.z += scrollDist;
+          if (tree.position.z > 25) {
+            tree.position.z -= CONFIG.riverLength;
+          }
+        }
+
+        // 3. Gentle Boat Rocking & Rowing Oars Rhythm
+        if (boatGroup) {
+          const rowFrequency = (speed * 0.6);
+          const rowCycle = (STATE.time * rowFrequency);
+
+          // Boat pitch & roll
+          boatGroup.rotation.z = Math.sin(rowCycle) * 0.04;
+          boatGroup.rotation.x = Math.cos(rowCycle * 0.8) * 0.025;
+          boatGroup.position.y = 0.2 + Math.sin(rowCycle * 2.0) * 0.05;
+
+          // Animate Oars
+          oars.forEach(oar => {
+            const oarTime = rowCycle + oar.phase;
+            const stroke = Math.sin(oarTime);
+            const lift = Math.cos(oarTime);
+
+            // Dip into water and push back
+            oar.group.rotation.x = stroke * 0.35;
+            oar.group.rotation.z = oar.baseZRot + (lift > 0 ? lift * 0.15 : 0);
+
+            // Spawn splash ripple when oar blade hits water peak
+            if (stroke > 0.95 && Math.random() < 0.15) {
+              _v1.set(oar.group.position.x * 1.4, 0, boatGroup.position.z + oar.group.position.z);
+              spawnWaterRipple(_v1.x, _v1.z, 1.8);
+            }
+          });
+        }
+
+        // 4. Animate Jumping Ilish Fish Pool
+        for (let i = 0; i < fishPool.length; i++) {
+          const f = fishPool[i];
+          if (f.userData.active) {
+            f.userData.progress += delta / f.userData.duration;
+            const p = f.userData.progress;
+
+            if (p >= 1.0) {
+              f.userData.active = false;
+              f.visible = false;
+              // Splashdown ripples & particles
+              spawnWaterRipple(f.userData.endX, f.userData.endZ, 2.8);
+              spawnSparkleParticles(f.userData.endX, 0.4, f.userData.endZ, 10);
+              SoundSystem.playWaterSplash(80);
+            } else {
+              // Parabolic Arc
+              const curX = f.userData.startX + (f.userData.endX - f.userData.startX) * p;
+              const curZ = f.userData.startZ + (f.userData.endZ - f.userData.startZ) * p;
+              const curY = f.userData.peakY * 4.0 * p * (1.0 - p);
+
+              f.position.set(curX, curY, curZ);
+
+              // Tangent Rotation
+              const tangentY = (1.0 - 2.0 * p) * 1.5;
+              f.rotation.x = -Math.atan2(tangentY, 1.0);
+              f.rotation.y = (f.userData.endX > f.userData.startX) ? 0.3 : -0.3;
+              f.rotation.z = Math.sin(p * Math.PI * 4.0) * 0.25; // Tail flutter
+            }
+          }
+        }
+
+        // 5. Animate Water Ripple Rings Pool
+        for (let i = 0; i < ripplePool.length; i++) {
+          const r = ripplePool[i];
+          if (r.userData.active) {
+            r.userData.age += delta;
+            const progress = r.userData.age / r.userData.life;
+            if (progress >= 1.0) {
+              r.userData.active = false;
+              r.visible = false;
+            } else {
+              const currentScale = 0.2 + progress * (r.userData.maxScale - 0.2);
+              r.scale.set(currentScale, currentScale, currentScale);
+              r.material.opacity = (1.0 - progress) * 0.9;
+              r.position.z += scrollDist; // Drift with river
+            }
+          }
+        }
+
+        // 6. Animate Sparkle / Firefly Particles Pool
+        for (let i = 0; i < particlePool.length; i++) {
+          const p = particlePool[i];
+          if (p.userData.active) {
+            p.userData.age += delta;
+            const prog = p.userData.age / p.userData.life;
+            if (prog >= 1.0) {
+              p.userData.active = false;
+              p.visible = false;
+            } else {
+              p.position.x += p.userData.velX * delta;
+              p.position.y += p.userData.velY * delta;
+              p.position.z += (p.userData.velZ + speed) * delta;
+              p.userData.velY -= 4.0 * delta; // Gentle gravity
+              p.material.opacity = 1.0 - prog;
+            }
+          }
+        }
+
+        // 7. Celestial Sun / Moon Subtle Orbit
+        if (celestialMesh) {
+          celestialMesh.rotation.z = Math.sin(STATE.time * 0.5) * 0.05;
+        }
+
+        // 8. Session Timer Progress & Bedtime Lullaby Wind-Down
+        if (CONFIG.sessionDuration > 0 && STATE.sessionActive) {
+          STATE.sessionTimer += delta;
+          const pct = Math.min(100, (STATE.sessionTimer / CONFIG.sessionDuration) * 100);
+          if (sessionProgressEl) sessionProgressEl.style.width = `${pct}%`;
+
+          if (pct >= 100 && !STATE.sessionEnded) {
+            STATE.sessionEnded = true;
+            setAtmosphere('night');
+            STATE.pace = 'calm';
+            document.getElementById('pace-display').textContent = 'Calm';
+            SoundSystem.playBambooFlute(0);
+          }
+        }
+
+        renderer.render(scene, camera);
+      }
+
+      // --- EVENT LISTENERS & ERGONOMICS ---
+      let sessionProgressEl = null;
+
+      function initEventListeners() {
+        const container = document.getElementById('canvas-container');
+        const settingsPanel = document.getElementById('settings-panel');
+        sessionProgressEl = document.getElementById('session-progress');
+
+        // Prevent Context Menu
+        document.addEventListener('contextmenu', e => e.preventDefault());
+
+        // Pointer Down on Canvas (Mouse only - touch handled by touchstart)
+        container.addEventListener('pointerdown', e => {
+          if (e.pointerType === 'touch') return; // Handled by touchstart
+          if (e.pointerType === 'mouse' && e.button !== 0) return;
+          if (document.activeElement && document.activeElement !== document.body) {
+            document.activeElement.blur();
+          }
+          handleInteraction(e.clientX, e.clientY, false);
+        });
+
+        // Multi-Touch Palm Grab Detection (touches.length >= 2) -> Super Baich Regatta Burst!
+        window.addEventListener('touchstart', e => {
+          const touches = e.touches;
+          if (touches.length >= 2) {
+            e.preventDefault();
+            for (let i = 0; i < Math.min(touches.length, 5); i++) {
+              createScreenRipple(touches[i].clientX, touches[i].clientY);
+            }
+            handleInteraction(touches[0].clientX, touches[0].clientY, true);
+          } else if (touches.length === 1) {
+            createScreenRipple(touches[0].clientX, touches[0].clientY);
+            handleInteraction(touches[0].clientX, touches[0].clientY, false);
+          }
+        }, { passive: false });
+
+        // Keyboard & Smart TV Remote Navigation with Debounce
+        let lastKeyTime = 0;
+        window.addEventListener('keydown', e => {
+          if (e.repeat) return; // Prevent key-repeat overload
+
+          const key = e.key;
+          const code = e.keyCode;
+
+          // TV Remote Back Button -> Return to Hub
+          if (
+            key === 'Escape' ||
+            key === 'Back' ||
+            key === 'GoBack' ||
+            key === 'BrowserBack' ||
+            code === 10009 || // Samsung Tizen
+            code === 461 ||   // LG webOS
+            code === 4 ||     // Android TV Back
+            code === 8
+          ) {
+            e.preventDefault();
+            window.location.href = '../../index.html';
+            return;
+          }
+
+          // If settings modal is open and user is navigating with arrows/inputs, ignore burst
+          if (settingsPanel && !settingsPanel.classList.contains('collapsed')) {
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(key)) {
+              return;
+            }
+          }
+
+          if (e.target && e.target.tagName === 'INPUT') return;
+
+          // Debounce rapid keyboard mash to 90ms
+          const now = performance.now();
+          if (now - lastKeyTime < 90) return;
+          lastKeyTime = now;
+
+          if (key === ' ' || key === 'Space') e.preventDefault();
+
+          if (document.activeElement && document.activeElement !== document.body) {
+            document.activeElement.blur();
+          }
+
+          // Trigger sensory action burst
+          handleInteraction(window.innerWidth / 2, window.innerHeight / 2, false);
+        });
+
+        // Tab Minimize & Visibility Change Handling
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden) {
+            SoundSystem.suspend();
+          } else {
+            SoundSystem.resume();
+            SoundSystem.playDotaraPluck(0);
+          }
+        });
+
+        window.addEventListener('blur', () => SoundSystem.suspend());
+        window.addEventListener('focus', () => SoundSystem.resume());
+
+        // Window Resize & Dynamic FOV
+        window.addEventListener('resize', onWindowResize);
+
+        // Setup UI Buttons
+        setupUiControls();
+      }
+
+      function onWindowResize() {
+        if (!camera || !renderer) return;
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const aspect = width / height;
+        STATE.aspectRatio = aspect;
+        STATE.isPortrait = height > width;
+
+        camera.aspect = aspect;
+        updateCameraPosition(aspect);
+        renderer.setSize(width, height);
+      }
+
+      function setupUiControls() {
+        // Sound Button
+        const btnSound = document.getElementById('btn-sound');
+        const soundIcon = document.getElementById('sound-icon');
+        if (btnSound) {
+          btnSound.addEventListener('click', () => {
+            const enabled = SoundSystem.toggleSound();
+            if (soundIcon) soundIcon.textContent = enabled ? '🔊' : '🔇';
+            btnSound.blur();
+          });
+        }
+
+        // Fullscreen Button
+        const btnFullscreen = document.getElementById('btn-fullscreen');
+        if (btnFullscreen) {
+          btnFullscreen.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+              document.documentElement.requestFullscreen().catch(() => {});
+            } else {
+              if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+            }
+            btnFullscreen.blur();
+          });
+        }
+
+        // Settings Button & Panel
+        const btnSettings = document.getElementById('btn-settings');
+        const btnCloseSettings = document.getElementById('btn-close-settings');
+        const settingsPanel = document.getElementById('settings-panel');
+
+        if (btnSettings && settingsPanel) {
+          btnSettings.addEventListener('click', () => {
+            settingsPanel.classList.toggle('collapsed');
+            btnSettings.blur();
+          });
+        }
+
+        if (btnCloseSettings && settingsPanel) {
+          btnCloseSettings.addEventListener('click', () => {
+            settingsPanel.classList.add('collapsed');
+            btnCloseSettings.blur();
+          });
+        }
+
+        // Atmosphere Buttons
+        document.querySelectorAll('.pill-btn[data-atmosphere]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const atmoKey = btn.getAttribute('data-atmosphere');
+            applyAtmosphere(atmoKey);
+            btn.blur();
+          });
+        });
+
+        // Boat Pace Buttons
+        document.querySelectorAll('.pill-btn[data-pace]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const pace = btn.getAttribute('data-pace');
+            STATE.pace = pace;
+            document.querySelectorAll('.pill-btn[data-pace]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const paceDisp = document.getElementById('pace-display');
+            if (paceDisp) paceDisp.textContent = btn.textContent;
+            btn.blur();
+          });
+        });
+
+        // Timer Buttons
+        document.querySelectorAll('.pill-btn[data-timer]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const sec = parseInt(btn.getAttribute('data-timer'), 10);
+            CONFIG.sessionDuration = sec;
+            STATE.sessionTimer = 0;
+            document.querySelectorAll('.pill-btn[data-timer]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const sessionDisp = document.getElementById('session-display');
+            if (sessionDisp) sessionDisp.textContent = btn.textContent;
+            btn.blur();
+          });
+        });
+
+        // Volume Slider
+        const volSlider = document.getElementById('volume-slider');
+        const volDisplay = document.getElementById('volume-display');
+        if (volSlider) {
+          volSlider.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value) / 100;
+            SoundSystem.setVolume(val);
+            if (volDisplay) volDisplay.textContent = `${Math.round(val * 100)}%`;
+          });
+        }
+
+        // Prompt Banner Click
+        const promptBanner = document.getElementById('prompt-banner');
+        if (promptBanner) {
+          promptBanner.addEventListener('click', () => {
+            handleInteraction(window.innerWidth / 2, window.innerHeight / 2, false);
+          });
+        }
+      }
+
+      // --- INITIALIZE APPLICATION ---
+      window.addEventListener('DOMContentLoaded', () => {
+        init3D();
+        initEventListeners();
+        animate();
+      });
+
+    })();
+  </script>
+</body>
+</html>

@@ -195,8 +195,10 @@
     }
 
     .icon-btn {
-      width: 46px;
-      height: 46px;
+      width: 48px;
+      height: 48px;
+      min-width: 48px;
+      min-height: 48px;
       padding: 0;
       display: flex;
       align-items: center;
@@ -257,14 +259,14 @@
     /* Game Cards Grid */
     .games-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 28px;
       margin-bottom: 30px;
     }
 
-    @media (min-width: 1400px) {
+    @media (min-width: 1600px) {
       .games-grid {
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(5, 1fr);
       }
     }
 
@@ -380,6 +382,26 @@
 
     .art-cloud {
       background: linear-gradient(135deg, #ff9ff3 0%, #feca57 50%, #ff6b81 100%);
+    }
+
+    .art-nouka {
+      background: linear-gradient(135deg, #10ac84 0%, #2ed573 50%, #00d2d3 100%);
+    }
+
+    .art-mela {
+      background: linear-gradient(135deg, #e84118 0%, #ff7f0e 50%, #ffd124 100%);
+    }
+
+    .art-shakrain {
+      background: linear-gradient(135deg, #ff7675 0%, #fd79a8 30%, #6c5ce7 70%, #1e1346 100%);
+    }
+
+    .art-rickshaw {
+      background: linear-gradient(135deg, #fed330 0%, #feca57 40%, #00cec9 80%, #ff4757 100%);
+    }
+
+    .art-pitha {
+      background: linear-gradient(135deg, #d35400 0%, #e67e22 40%, #f39c12 75%, #f7ebe1 100%);
     }
 
     .art-art-icon {
@@ -674,6 +696,176 @@
           <span>➜</span>
         </button>
       </a>
+
+      <!-- 5. Nouka Baich River Cruise (PLAYABLE NOW) -->
+      <a href="games/nouka-baich/index.html" class="game-card" tabindex="0" data-game="nouka" aria-label="Play Nouka Baich River Cruise">
+        <div>
+          <div class="card-top">
+            <span class="card-badge badge-live">🟢 Playable</span>
+            <span class="card-age-tag">Ages 0 - 3</span>
+          </div>
+
+          <div class="card-art-box art-nouka">
+            <span class="art-art-icon">🚣</span>
+            <span class="art-art-subicon" style="top: 15px; right: 20px;">🌸</span>
+            <span class="art-art-subicon" style="bottom: 18px; left: 22px;">🐟</span>
+            <span class="art-art-subicon" style="top: 20px; left: 25px;">🌴</span>
+          </div>
+
+          <h2 class="card-title">Nouka Baich</h2>
+          <p class="card-desc">
+            Gentle 3D river cruise on a traditional ornate wooden boat through serene green riverbanks with blooming pink Shapla and jumping Ilish fish.
+          </p>
+
+          <div class="card-tags">
+            <span class="tag-pill">🚣 Wooden Boat</span>
+            <span class="tag-pill">🌸 Water Lilies</span>
+            <span class="tag-pill">🐟 Jumping Ilish</span>
+            <span class="tag-pill">🎶 Bamboo Flute</span>
+          </div>
+        </div>
+
+        <button class="card-btn btn-play" style="background: linear-gradient(135deg, #10ac84 0%, #00d2d3 100%);">
+          <span>Play Now</span>
+          <span>➜</span>
+        </button>
+      </a>
+
+      <!-- 6. Boishakhi Mela Celebration (PLAYABLE NOW) -->
+      <a href="games/boishakhi-mela/index.html" class="game-card" tabindex="0" data-game="mela" aria-label="Play Boishakhi Mela Celebration">
+        <div>
+          <div class="card-top">
+            <span class="card-badge badge-live">🟢 Playable</span>
+            <span class="card-age-tag">Ages 0 - 3</span>
+          </div>
+
+          <div class="card-art-box art-mela">
+            <span class="art-art-icon">🏮</span>
+            <span class="art-art-subicon" style="top: 15px; right: 20px;">🪅</span>
+            <span class="art-art-subicon" style="bottom: 18px; left: 22px;">🦉</span>
+            <span class="art-art-subicon" style="top: 20px; left: 25px;">🌸</span>
+          </div>
+
+          <h2 class="card-title">Boishakhi Mela</h2>
+          <p class="card-desc">
+            Vibrant Bengali New Year carousel with geometric Alpona rings, spinning pinwheels, clay owls, bouncing smiling dolls, and melodic Bansuri flute.
+          </p>
+
+          <div class="card-tags">
+            <span class="tag-pill">🏮 Pohela Boishakh</span>
+            <span class="tag-pill">🎨 Alpona Patterns</span>
+            <span class="tag-pill">🪅 Pinwheel Chorki</span>
+            <span class="tag-pill">🎶 Bansuri Flute</span>
+          </div>
+        </div>
+
+        <button class="card-btn btn-play" style="background: linear-gradient(135deg, #e84118 0%, #ffd124 100%);">
+          <span>Play Now</span>
+          <span>➜</span>
+        </button>
+      </a>
+
+      <!-- 7. Shakrain Kite & Lantern Soar (PLAYABLE NOW) -->
+      <a href="games/shakrain-soar/index.html" class="game-card" tabindex="0" data-game="shakrain" aria-label="Play Shakrain Kite and Lantern Soar">
+        <div>
+          <div class="card-top">
+            <span class="card-badge badge-live">🟢 Playable</span>
+            <span class="card-age-tag">Ages 0 - 3</span>
+          </div>
+
+          <div class="card-art-box art-shakrain">
+            <span class="art-art-icon">🪁</span>
+            <span class="art-art-subicon" style="top: 15px; right: 20px;">🏮</span>
+            <span class="art-art-subicon" style="bottom: 18px; left: 22px;">✨</span>
+            <span class="art-art-subicon" style="top: 20px; left: 25px;">🌙</span>
+          </div>
+
+          <h2 class="card-title">Shakrain Kite Soar</h2>
+          <p class="card-desc">
+            Tranquil dusk rooftop horizon with colorful swaying paper kites, rising warm glowing Fanush lanterns, and golden stardust firework chimes.
+          </p>
+
+          <div class="card-tags">
+            <span class="tag-pill">🪁 Chula Kite</span>
+            <span class="tag-pill">🏮 Glowing Fanush</span>
+            <span class="tag-pill">✨ Golden Stardust</span>
+            <span class="tag-pill">🎶 Music Box Bells</span>
+          </div>
+        </div>
+
+        <button class="card-btn btn-play" style="background: linear-gradient(135deg, #ff7675 0%, #6c5ce7 100%);">
+          <span>Play Now</span>
+          <span>➜</span>
+        </button>
+      </a>
+
+      <!-- 8. Gram Bangla Rickshaw Cruise (PLAYABLE NOW) -->
+      <a href="games/gram-bangla-rickshaw/index.html" class="game-card" tabindex="0" data-game="rickshaw" aria-label="Play Gram Bangla Rickshaw Cruise">
+        <div>
+          <div class="card-top">
+            <span class="card-badge badge-live">🟢 Playable</span>
+            <span class="card-age-tag">Ages 0 - 3</span>
+          </div>
+
+          <div class="card-art-box art-rickshaw">
+            <span class="art-art-icon">🛺</span>
+            <span class="art-art-subicon" style="top: 15px; right: 20px;">🌾</span>
+            <span class="art-art-subicon" style="bottom: 18px; left: 22px;">🕊️</span>
+            <span class="art-art-subicon" style="top: 20px; left: 25px;">🐄</span>
+          </div>
+
+          <h2 class="card-title">Gram Bangla Rickshaw</h2>
+          <p class="card-desc">
+            Scenic low-poly countryside cruise aboard a hand-painted rickshaw through vibrant yellow mustard fields, grazing cows, and soaring white storks with Tring-Tring FM bell chimes.
+          </p>
+
+          <div class="card-tags">
+            <span class="tag-pill">🛺 Painted Rickshaw</span>
+            <span class="tag-pill">🌾 Mustard Fields</span>
+            <span class="tag-pill">🔔 Tring-Tring Bell</span>
+            <span class="tag-pill">🕊️ White Storks</span>
+          </div>
+        </div>
+
+        <button class="card-btn btn-play" style="background: linear-gradient(135deg, #f39c12 0%, #27ae60 100%);">
+          <span>Play Now</span>
+          <span>➜</span>
+        </button>
+      </a>
+
+      <!-- 9. Winter Pitha & Sweet Jaggery Drop (PLAYABLE NOW) -->
+      <a href="games/winter-pitha/index.html" class="game-card" tabindex="0" data-game="pitha" aria-label="Play Winter Pitha and Sweet Jaggery Drop">
+        <div>
+          <div class="card-top">
+            <span class="card-badge badge-live">🟢 Playable</span>
+            <span class="card-age-tag">Ages 0 - 3</span>
+          </div>
+
+          <div class="card-art-box art-pitha">
+            <span class="art-art-icon">🍯</span>
+            <span class="art-art-subicon" style="top: 15px; right: 20px;">🥟</span>
+            <span class="art-art-subicon" style="bottom: 18px; left: 22px;">🍶</span>
+            <span class="art-art-subicon" style="top: 20px; left: 25px;">✨</span>
+          </div>
+
+          <h2 class="card-title">Winter Pitha</h2>
+          <p class="card-desc">
+            Cozy misty winter morning with steaming clay stoves, fluffy Bhapa, rolled Patishapta, and golden date jaggery droplets with joyful acoustic kalimba chimes.
+          </p>
+
+          <div class="card-tags">
+            <span class="tag-pill">🍯 Khejur Rosh</span>
+            <span class="tag-pill">🥟 Bhapa Pitha</span>
+            <span class="tag-pill">🥞 Patishapta</span>
+            <span class="tag-pill">🎶 Kalimba Chimes</span>
+          </div>
+        </div>
+
+        <button class="card-btn btn-play" style="background: linear-gradient(135deg, #d35400 0%, #f39c12 100%);">
+          <span>Play Now</span>
+          <span>➜</span>
+        </button>
+      </a>
     </main>
 
     <!-- Dashboard Footer -->
@@ -786,7 +978,16 @@
         // Down / Up arrow (2D grid wrap)
         else if (key === 'ArrowDown' || key === 'ArrowUp' || code === 40 || code === 38 || code === 20 || code === 19) {
           e.preventDefault();
-          const columns = window.innerWidth > 1400 ? 4 : (window.innerWidth > 768 ? 2 : 1);
+          let columns = 1;
+          if (focusableCards.length >= 2) {
+            const firstTop = focusableCards[0].offsetTop;
+            let count = 0;
+            for (let i = 0; i < focusableCards.length; i++) {
+              if (focusableCards[i].offsetTop === firstTop) count++;
+              else break;
+            }
+            columns = Math.max(1, count);
+          }
           const isDown = key === 'ArrowDown' || code === 40 || code === 20;
           let target = isDown ? currentIndex + columns : currentIndex - columns;
           if (target >= focusableCards.length) target = target % focusableCards.length;
@@ -794,7 +995,7 @@
           focusCard(target, true);
         }
         // TV Remote Center Button (OK, Select, Enter, Space, DPAD_CENTER, Play)
-        else if (['Enter', 'Select', 'Accept', 'OK', ' ', 'Space', 'MediaPlay', 'MediaPlayPause'].includes(key) || [13, 23, 32, 415, 10252].includes(code)) {
+        else if (['Enter', 'Select', 'Accept', 'OK', ' ', 'Space', 'MediaPlay', 'MediaPlayPause'].includes(key) || [13, 23, 32, 66, 415, 10252, 29443].includes(code)) {
           const current = focusableCards[currentIndex];
           if (current && current.tagName === 'A') {
             e.preventDefault();

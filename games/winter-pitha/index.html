@@ -1,0 +1,1947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Winter Pitha & Sweet Jaggery Drop - Infant 3D Sensory Experience</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#d35400">
+  <style>
+    /* ==========================================================================
+       RESET & INFANT TOUCH ERGONOMICS (ZERO ACCIDENTAL MENUS, TV-READY)
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    :root {
+      --clay-stove: #c0392b;
+      --clay-terracotta: #d35400;
+      --jaggery-amber: #f39c12;
+      --jaggery-gold: #f1c40f;
+      --pitha-bhapa: #fffdf9;
+      --pitha-patishapta: #f5cd79;
+      --pitha-chitoi: #faece1;
+      --morning-mist: #f7ebe1;
+      --morning-sky: #a8d8ea;
+      --glass-bg: rgba(255, 255, 255, 0.90);
+      --glass-border: rgba(255, 255, 255, 0.95);
+      --text-dark: #2d3436;
+      --text-muted: #636e72;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #f7ebe1;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      touch-action: none;
+      overscroll-behavior: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* 3D Canvas Host */
+    #canvas-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      cursor: pointer;
+    }
+
+    /* Soft Misty Morning Rustic Vignette Overlay */
+    .vignette-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
+      box-shadow: inset 0 0 100px rgba(243, 156, 18, 0.18), inset 0 0 180px rgba(211, 84, 0, 0.25);
+      mix-blend-mode: soft-light;
+    }
+
+    /* Golden Jaggery Drop Multi-Burst Surge Glow */
+    .jaggery-surge-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 3;
+      opacity: 0;
+      background: radial-gradient(circle at center, rgba(241, 196, 15, 0.4) 0%, rgba(243, 156, 18, 0.25) 50%, rgba(211, 84, 0, 0.35) 100%);
+      transition: opacity 0.35s ease;
+    }
+
+    .jaggery-surge-overlay.active {
+      opacity: 1;
+      animation: surgeGlow 0.8s ease-out forwards;
+    }
+
+    @keyframes surgeGlow {
+      0% { opacity: 0.85; transform: scale(0.98); }
+      50% { opacity: 1.0; transform: scale(1.02); }
+      100% { opacity: 0; transform: scale(1.0); }
+    }
+
+    /* Interactive 2D Screen Treats & Pithas */
+    #screen-treats-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 4;
+      overflow: hidden;
+    }
+
+    .screen-treat {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #ffffff 0%, #faece1 50%, #f5cd79 100%);
+      box-shadow: 0 8px 24px rgba(211, 84, 0, 0.25), inset 0 0 12px rgba(255, 255, 255, 0.9);
+      border: 2px solid rgba(255, 255, 255, 0.95);
+      pointer-events: auto;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: floatTreat 5s infinite ease-in-out alternate;
+    }
+
+    .screen-treat:hover, .screen-treat:active {
+      transform: scale(1.25) rotate(12deg);
+    }
+
+    @keyframes floatTreat {
+      0% { transform: translateY(0px) rotate(0deg); }
+      100% { transform: translateY(-22px) rotate(15deg); }
+    }
+
+    /* Tap Ripple Expansion Effect */
+    .touch-ripple {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%) scale(0);
+      animation: rippleExpand 0.85s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+      border: 3px solid rgba(255, 248, 220, 0.95);
+      box-shadow: 0 0 35px rgba(243, 156, 18, 0.85);
+      z-index: 5;
+    }
+
+    @keyframes rippleExpand {
+      0% { transform: translate(-50%, -50%) scale(0.1); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(3.5); opacity: 0; }
+    }
+
+    /* Session Sweetness Progress Indicator */
+    .session-progress-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.28);
+      z-index: 20;
+    }
+
+    .session-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #f39c12 0%, #f1c40f 35%, #e67e22 70%, #d35400 100%);
+      transition: width 0.4s ease-out;
+      box-shadow: 0 0 16px rgba(243, 156, 18, 0.9);
+    }
+
+    /* UI Overlay Layer */
+    .ui-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px 24px;
+      transition: opacity 0.5s ease;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      pointer-events: auto;
+    }
+
+    .brand-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 8px 20px;
+      border-radius: 999px;
+      box-shadow: 0 8px 26px rgba(0, 0, 0, 0.06);
+      border: 2px solid var(--glass-border);
+      animation: floatBadge 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatBadge {
+      0% { transform: translateY(0px); }
+      100% { transform: translateY(-3px); }
+    }
+
+    .brand-icon {
+      font-size: 24px;
+      display: inline-block;
+      animation: wiggle 3.5s ease-in-out infinite;
+    }
+
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(0deg) scale(1); }
+      25% { transform: rotate(-8deg) scale(1.1); }
+      75% { transform: rotate(8deg) scale(1.1); }
+    }
+
+    .brand-title {
+      font-weight: 800;
+      font-size: 18px;
+      letter-spacing: 0.4px;
+      background: linear-gradient(135deg, #d35400 0%, #e67e22 50%, #f39c12 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .tv-ready-pill {
+      font-size: 10px;
+      background: #fef3c7;
+      color: #b45309;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      border: 1px solid #fde68a;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .glass-btn {
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 2px solid var(--glass-border);
+      border-radius: 999px;
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #2d3436;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      outline: none;
+      text-decoration: none;
+      min-width: 48px;
+      min-height: 48px;
+      justify-content: center;
+    }
+
+    .glass-btn:hover, .glass-btn:focus-visible {
+      transform: translateY(-2px) scale(1.05);
+      background: rgba(255, 255, 255, 1.0);
+      box-shadow: 0 10px 25px rgba(243, 156, 18, 0.35);
+      border-color: #f39c12;
+      color: #d35400;
+    }
+
+    .glass-btn:active {
+      transform: translateY(1px) scale(0.97);
+    }
+
+    .icon-btn {
+      width: 48px;
+      height: 48px;
+      padding: 0;
+      border-radius: 50%;
+      font-size: 20px;
+    }
+
+    /* Bottom Info & TV Controls Bar */
+    .bottom-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      width: 100%;
+      pointer-events: none;
+    }
+
+    .hint-bubble {
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 2px solid var(--glass-border);
+      border-radius: 999px;
+      padding: 10px 22px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #57606f;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+      pointer-events: auto;
+      animation: floatHint 5s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatHint {
+      0% { transform: translateY(0px); }
+      100% { transform: translateY(-4px); }
+    }
+
+    .hint-bubble kbd {
+      background: #f1f2f6;
+      border: 1px solid #ced6e0;
+      padding: 2px 7px;
+      border-radius: 5px;
+      font-family: inherit;
+      font-weight: 800;
+      color: #2f3542;
+      font-size: 11px;
+    }
+
+    .stats-bubble {
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 2px solid var(--glass-border);
+      border-radius: 999px;
+      padding: 8px 18px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #d35400;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+      pointer-events: auto;
+    }
+
+    /* Floating Jaggery Drop Notice / Celebration Toast */
+    .sweet-toast {
+      position: absolute;
+      top: 90px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      background: var(--glass-bg);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 2px solid #f39c12;
+      border-radius: 999px;
+      padding: 10px 24px;
+      font-size: 14px;
+      font-weight: 800;
+      color: #d35400;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 10px 30px rgba(243, 156, 18, 0.35);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 30;
+    }
+
+    .sweet-toast.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0px);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 3D Canvas Container -->
+  <div id="canvas-container"></div>
+
+  <!-- Soft Misty Morning Vignette Overlay -->
+  <div class="vignette-overlay"></div>
+
+  <!-- Golden Jaggery Drop Multi-Burst Surge Glow -->
+  <div class="jaggery-surge-overlay" id="surge-overlay"></div>
+
+  <!-- Session Sweetness Progress Indicator -->
+  <div class="session-progress-container">
+    <div class="session-progress-bar" id="session-progress-bar"></div>
+  </div>
+
+  <!-- Interactive 2D Screen Treats & Bubbles -->
+  <div id="screen-treats-container"></div>
+
+  <!-- Sweet Celebration Toast -->
+  <div class="sweet-toast" id="sweet-toast">
+    <span>🍯</span>
+    <span id="toast-text">Fresh Sweet Khejur Rosh Drop!</span>
+    <span>✨</span>
+  </div>
+
+  <!-- UI Overlay Layer -->
+  <div class="ui-layer">
+    <!-- Top Bar -->
+    <header class="top-bar">
+      <div class="brand-badge">
+        <span class="brand-icon">🍯</span>
+        <span class="brand-title">Winter Pitha & Sweet Jaggery</span>
+        <span class="tv-ready-pill">📺 TV &amp; 21:9 Ready</span>
+      </div>
+
+      <div class="top-actions">
+        <a href="../../index.html" class="glass-btn" id="btn-home" title="Return to Playroom Hub" aria-label="Return to Playroom Hub">
+          <span>🏠</span>
+          <span>Playroom</span>
+        </a>
+        <button class="glass-btn icon-btn" id="btn-sound" title="Toggle Sound" aria-label="Toggle Sound">
+          <span id="sound-icon">🔊</span>
+        </button>
+        <button class="glass-btn icon-btn" id="btn-fullscreen" title="Toggle Fullscreen" aria-label="Toggle Fullscreen">
+          <span>⛶</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Bottom Bar -->
+    <footer class="bottom-bar">
+      <div class="hint-bubble">
+        <span>🎮 <strong>Tap screen</strong> or press <kbd>SPACE</kbd> / <kbd>OK</kbd> to drop golden jaggery &amp; pop steam!</span>
+      </div>
+
+      <div class="stats-bubble" id="sweetness-counter">
+        <span>🍯 Sweet Drops: <strong id="drop-count">0</strong></span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Three.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <script>
+    /* ==========================================================================
+       WINTER PITHA & SWEET JAGGERY DROP - INFANT 3D SENSORY ENGINE
+       ========================================================================== */
+    (function() {
+      'use strict';
+
+      // --- TEXTURE CACHE & PROCEDURAL CANVAS GENERATORS (ZERO EXTERNAL ASSETS) ---
+      const textureCache = new Map();
+
+      function createClayPotTexture() {
+        if (textureCache.has('clay_pot')) return textureCache.get('clay_pot');
+        const canvas = document.createElement('canvas');
+        canvas.width = 512;
+        canvas.height = 512;
+        const ctx = canvas.getContext('2d');
+
+        // Warm Terracotta Base with Ceramic Throwing Rings
+        const grad = ctx.createLinearGradient(0, 0, 0, 512);
+        grad.addColorStop(0, '#e17055');
+        grad.addColorStop(0.3, '#d35400');
+        grad.addColorStop(0.7, '#c0392b');
+        grad.addColorStop(1, '#962d22');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 512, 512);
+
+        // Throwing lines / pot wheel rings
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+        ctx.lineWidth = 3;
+        for (let y = 10; y < 512; y += 18) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(512, y);
+          ctx.stroke();
+        }
+
+        // Traditional Bengali White Rice-paste (Alpana) folk motifs
+        ctx.strokeStyle = 'rgba(255, 253, 240, 0.85)';
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+
+        // Alpana wavy chain band
+        const midY = 256;
+        ctx.beginPath();
+        for (let x = 0; x <= 512; x += 32) {
+          ctx.arc(x + 16, midY, 12, 0, Math.PI, false);
+        }
+        ctx.stroke();
+
+        ctx.beginPath();
+        for (let x = 0; x <= 512; x += 32) {
+          ctx.arc(x + 16, midY + 12, 12, 0, Math.PI, true);
+        }
+        ctx.stroke();
+
+        // Decorative rice paste dots
+        ctx.fillStyle = 'rgba(255, 253, 240, 0.9)';
+        for (let x = 16; x < 512; x += 32) {
+          ctx.beginPath();
+          ctx.arc(x, midY - 24, 4, 0, Math.PI * 2);
+          ctx.arc(x, midY + 36, 4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Earth clay speckles
+        for (let i = 0; i < 300; i++) {
+          const rx = Math.random() * 512;
+          const ry = Math.random() * 512;
+          const rAlpha = Math.random() * 0.15;
+          ctx.fillStyle = `rgba(0, 0, 0, ${rAlpha})`;
+          ctx.fillRect(rx, ry, 2, 2);
+        }
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.encoding = THREE.sRGBEncoding;
+        textureCache.set('clay_pot', texture);
+        return texture;
+      }
+
+      function createBhapaPithaTexture() {
+        if (textureCache.has('bhapa')) return textureCache.get('bhapa');
+        const canvas = document.createElement('canvas');
+        canvas.width = 512;
+        canvas.height = 512;
+        const ctx = canvas.getContext('2d');
+
+        // Pure Steamed White Rice Flour Base
+        ctx.fillStyle = '#fffdfa';
+        ctx.fillRect(0, 0, 512, 512);
+
+        // Porous rice grain steam texture
+        for (let i = 0; i < 1200; i++) {
+          const rx = Math.random() * 512;
+          const ry = Math.random() * 512;
+          const rSize = 1 + Math.random() * 3.5;
+          ctx.fillStyle = Math.random() > 0.4 ? 'rgba(247, 235, 225, 0.85)' : 'rgba(255, 255, 255, 0.95)';
+          ctx.beginPath();
+          ctx.arc(rx, ry, rSize, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Sweet Date Jaggery core speckles
+        for (let i = 0; i < 90; i++) {
+          const rx = 128 + Math.random() * 256;
+          const ry = 128 + Math.random() * 256;
+          const rad = Math.sqrt((rx - 256) * (rx - 256) + (ry - 256) * (ry - 256));
+          if (rad < 150) {
+            ctx.fillStyle = Math.random() > 0.3 ? 'rgba(211, 84, 0, 0.75)' : 'rgba(243, 156, 18, 0.85)';
+            ctx.beginPath();
+            ctx.arc(rx, ry, 2 + Math.random() * 4, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+
+        // Grated Coconut Flakes (fine snow-like slivers)
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.98)';
+        ctx.lineWidth = 2;
+        for (let i = 0; i < 140; i++) {
+          const rx = Math.random() * 512;
+          const ry = Math.random() * 512;
+          const len = 4 + Math.random() * 8;
+          const angle = Math.random() * Math.PI * 2;
+          ctx.beginPath();
+          ctx.moveTo(rx, ry);
+          ctx.lineTo(rx + Math.cos(angle) * len, ry + Math.sin(angle) * len);
+          ctx.stroke();
+        }
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.encoding = THREE.sRGBEncoding;
+        textureCache.set('bhapa', texture);
+        return texture;
+      }
+
+      function createPatishaptaTexture() {
+        if (textureCache.has('patishapta')) return textureCache.get('patishapta');
+        const canvas = document.createElement('canvas');
+        canvas.width = 512;
+        canvas.height = 512;
+        const ctx = canvas.getContext('2d');
+
+        // Warm Golden Semolina & Rice Crepe
+        const grad = ctx.createLinearGradient(0, 0, 512, 0);
+        grad.addColorStop(0, '#f5cd79');
+        grad.addColorStop(0.2, '#f7d794');
+        grad.addColorStop(0.5, '#f5cd79');
+        grad.addColorStop(0.8, '#eccc68');
+        grad.addColorStop(1, '#f5cd79');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 512, 512);
+
+        // Pan-fried golden brown caramel patches
+        for (let i = 0; i < 45; i++) {
+          const rx = Math.random() * 512;
+          const ry = Math.random() * 512;
+          const rw = 15 + Math.random() * 40;
+          const rh = 6 + Math.random() * 15;
+          const gradPatch = ctx.createRadialGradient(rx, ry, 2, rx, ry, rw);
+          gradPatch.addColorStop(0, 'rgba(211, 84, 0, 0.45)');
+          gradPatch.addColorStop(0.6, 'rgba(243, 156, 18, 0.25)');
+          gradPatch.addColorStop(1, 'rgba(245, 205, 121, 0)');
+          ctx.fillStyle = gradPatch;
+          ctx.beginPath();
+          ctx.ellipse(rx, ry, rw, rh, Math.random() * Math.PI, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Delicate crepe roll fold seams
+        ctx.strokeStyle = 'rgba(180, 70, 0, 0.22)';
+        ctx.lineWidth = 3;
+        for (let x = 60; x < 512; x += 120) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.bezierCurveTo(x + 10, 150, x - 10, 350, x + 5, 512);
+          ctx.stroke();
+        }
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.encoding = THREE.sRGBEncoding;
+        textureCache.set('patishapta', texture);
+        return texture;
+      }
+
+      function createChitoiTexture() {
+        if (textureCache.has('chitoi')) return textureCache.get('chitoi');
+        const canvas = document.createElement('canvas');
+        canvas.width = 512;
+        canvas.height = 512;
+        const ctx = canvas.getContext('2d');
+
+        // Soft White Rice Honeycomb Sponge
+        ctx.fillStyle = '#fffdf8';
+        ctx.fillRect(0, 0, 512, 512);
+
+        // Hundreds of tiny porous steam holes (characteristic of chitoi pitha)
+        for (let i = 0; i < 400; i++) {
+          const rx = Math.random() * 512;
+          const ry = Math.random() * 512;
+          const rSize = 2 + Math.random() * 5;
+          const gradHole = ctx.createRadialGradient(rx - 1, ry - 1, 1, rx, ry, rSize);
+          gradHole.addColorStop(0, 'rgba(230, 215, 200, 0.95)');
+          gradHole.addColorStop(0.7, 'rgba(245, 235, 225, 0.7)');
+          gradHole.addColorStop(1, 'rgba(255, 253, 248, 0)');
+          ctx.fillStyle = gradHole;
+          ctx.beginPath();
+          ctx.arc(rx, ry, rSize, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Golden pan-crust edge ring
+        const gradEdge = ctx.createRadialGradient(256, 256, 180, 256, 256, 256);
+        gradEdge.addColorStop(0, 'rgba(243, 156, 18, 0)');
+        gradEdge.addColorStop(0.8, 'rgba(211, 84, 0, 0.2)');
+        gradEdge.addColorStop(1, 'rgba(180, 60, 0, 0.45)');
+        ctx.fillStyle = gradEdge;
+        ctx.fillRect(0, 0, 512, 512);
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.encoding = THREE.sRGBEncoding;
+        textureCache.set('chitoi', texture);
+        return texture;
+      }
+
+      function createCourtyardTexture() {
+        if (textureCache.has('courtyard')) return textureCache.get('courtyard');
+        const canvas = document.createElement('canvas');
+        canvas.width = 1024;
+        canvas.height = 1024;
+        const ctx = canvas.getContext('2d');
+
+        // Warm Terracotta Clay Courtyard Floor
+        const grad = ctx.createRadialGradient(512, 512, 50, 512, 512, 512);
+        grad.addColorStop(0, '#e58e6e');
+        grad.addColorStop(0.5, '#d35400');
+        grad.addColorStop(1, '#b03a2e');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 1024, 1024);
+
+        // Circular Bengali Alpana Floor Mandala
+        ctx.strokeStyle = 'rgba(255, 250, 235, 0.45)';
+        ctx.lineWidth = 5;
+        ctx.lineCap = 'round';
+
+        const cx = 512, cy = 512;
+        const rings = [100, 180, 260, 360, 460];
+        rings.forEach(r => {
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.stroke();
+        });
+
+        // Petal / Lotus Motifs around circles
+        for (let i = 0; i < 24; i++) {
+          const angle = (i / 24) * Math.PI * 2;
+          const px1 = cx + Math.cos(angle) * 180;
+          const py1 = cy + Math.sin(angle) * 180;
+          const px2 = cx + Math.cos(angle) * 260;
+          const py2 = cy + Math.sin(angle) * 260;
+          ctx.beginPath();
+          ctx.moveTo(px1, py1);
+          ctx.lineTo(px2, py2);
+          ctx.stroke();
+        }
+
+        for (let i = 0; i < 36; i++) {
+          const angle = (i / 36) * Math.PI * 2;
+          const px = cx + Math.cos(angle) * 360;
+          const py = cy + Math.sin(angle) * 360;
+          ctx.fillStyle = 'rgba(255, 250, 235, 0.55)';
+          ctx.beginPath();
+          ctx.arc(px, py, 8, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.encoding = THREE.sRGBEncoding;
+        textureCache.set('courtyard', texture);
+        return texture;
+      }
+
+      // --- WEB AUDIO API PENTATONIC SYNTHESIZER WITH DYNAMICS COMPRESSOR LIMITER ---
+      let audioCtx = null;
+      let masterGain = null;
+      let limiter = null;
+      let soundEnabled = true;
+      let pentatonicStep = 0;
+
+      // Consonant C Major Pentatonic Notes (Ascending warm melodies)
+      const PENTATONIC_SCALE = [
+        261.63, // C4
+        293.66, // D4
+        329.63, // E4
+        392.00, // G4
+        440.00, // A4
+        523.25, // C5
+        587.33, // D5
+        659.25, // E5
+        783.99, // G5
+        880.00, // A5
+        1046.50 // C6
+      ];
+
+      function initAudio() {
+        if (audioCtx) return;
+        try {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          audioCtx = new AudioContextClass();
+
+          // Mandatory Dynamics Compressor Limiter to protect infant hearing
+          limiter = audioCtx.createDynamicsCompressor();
+          limiter.threshold.setValueAtTime(-14, audioCtx.currentTime);
+          limiter.knee.setValueAtTime(30, audioCtx.currentTime);
+          limiter.ratio.setValueAtTime(12, audioCtx.currentTime);
+          limiter.attack.setValueAtTime(0.003, audioCtx.currentTime);
+          limiter.release.setValueAtTime(0.25, audioCtx.currentTime);
+
+          masterGain = audioCtx.createGain();
+          masterGain.gain.setValueAtTime(0.85, audioCtx.currentTime);
+
+          limiter.connect(masterGain);
+          masterGain.connect(audioCtx.destination);
+        } catch (e) {}
+      }
+
+      // 1. Warm Bubbly Jaggery Plop Sound
+      function playJaggeryPlop(freqOffset = 0) {
+        if (!soundEnabled) return;
+        initAudio();
+        if (!audioCtx || !limiter) return;
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        const baseFreq = 420 + freqOffset;
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(baseFreq, now);
+        osc.frequency.exponentialRampToValueAtTime(160 + (freqOffset * 0.4), now + 0.12);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.linearRampToValueAtTime(0.28, now + 0.015);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
+
+        osc.connect(gain);
+        gain.connect(limiter);
+
+        osc.onended = () => {
+          try { osc.disconnect(); gain.disconnect(); } catch (e) {}
+        };
+
+        osc.start(now);
+        osc.stop(now + 0.25);
+      }
+
+      // 2. Kalimba / Folk Bell Harmonic Chime (Ascending Pentatonic)
+      function playKalimbaChime(stepIndex) {
+        if (!soundEnabled) return;
+        initAudio();
+        if (!audioCtx || !limiter) return;
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const now = audioCtx.currentTime;
+        const noteIndex = stepIndex % PENTATONIC_SCALE.length;
+        const fundamental = PENTATONIC_SCALE[noteIndex];
+
+        // Harmonic layer 1: Fundamental Sine
+        const osc1 = audioCtx.createOscillator();
+        const gain1 = audioCtx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(fundamental, now);
+
+        gain1.gain.setValueAtTime(0.0001, now);
+        gain1.gain.linearRampToValueAtTime(0.22, now + 0.008);
+        gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.75);
+
+        osc1.connect(gain1);
+        gain1.connect(limiter);
+
+        osc1.onended = () => {
+          try { osc1.disconnect(); gain1.disconnect(); } catch (e) {}
+        };
+
+        osc1.start(now);
+        osc1.stop(now + 0.8);
+
+        // Harmonic layer 2: Triangle Overtone for Acoustic Wood Tone
+        const osc2 = audioCtx.createOscillator();
+        const gain2 = audioCtx.createGain();
+        osc2.type = 'triangle';
+        osc2.frequency.setValueAtTime(fundamental * 2.01, now);
+
+        gain2.gain.setValueAtTime(0.0001, now);
+        gain2.gain.linearRampToValueAtTime(0.08, now + 0.005);
+        gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+
+        osc2.connect(gain2);
+        gain2.connect(limiter);
+
+        osc2.onended = () => {
+          try { osc2.disconnect(); gain2.disconnect(); } catch (e) {}
+        };
+
+        osc2.start(now);
+        osc2.stop(now + 0.4);
+      }
+
+      // 3. Steam Puff Pop (Soft airy bubble)
+      function playSteamPop(freq = 880) {
+        if (!soundEnabled) return;
+        initAudio();
+        if (!audioCtx || !limiter) return;
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq * 1.3, now);
+        osc.frequency.exponentialRampToValueAtTime(freq * 0.9, now + 0.08);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.linearRampToValueAtTime(0.12, now + 0.005);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+
+        osc.connect(gain);
+        gain.connect(limiter);
+
+        osc.onended = () => {
+          try { osc.disconnect(); gain.disconnect(); } catch (e) {}
+        };
+
+        osc.start(now);
+        osc.stop(now + 0.15);
+      }
+
+      // 4. Super Bloom Celebration Chord (Multi-touch palm grab)
+      function playSuperBloomChord() {
+        if (!soundEnabled) return;
+        initAudio();
+        if (!audioCtx || !limiter) return;
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const chordNotes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99];
+        chordNotes.forEach((f, idx) => {
+          setTimeout(() => {
+            if (!audioCtx) return;
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(f, now);
+
+            gain.gain.setValueAtTime(0.0001, now);
+            gain.gain.linearRampToValueAtTime(0.14, now + 0.01);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.9);
+
+            osc.connect(gain);
+            gain.connect(limiter);
+
+            osc.onended = () => {
+              try { osc.disconnect(); gain.disconnect(); } catch (e) {}
+            };
+
+            osc.start(now);
+            osc.stop(now + 0.95);
+          }, idx * 45);
+        });
+      }
+
+      // UI chime feedback
+      function playUiChime(freq = 523.25) {
+        if (!soundEnabled) return;
+        initAudio();
+        if (!audioCtx || !limiter) return;
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.linearRampToValueAtTime(0.1, now + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
+
+        osc.connect(gain);
+        gain.connect(limiter);
+
+        osc.onended = () => {
+          try { osc.disconnect(); gain.disconnect(); } catch (e) {}
+        };
+
+        osc.start(now);
+        osc.stop(now + 0.35);
+      }
+
+      // --- THREE.JS 3D SCENE & ENGINE INITIALIZATION ---
+      const container = document.getElementById('canvas-container');
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xf7ebe1);
+      scene.fog = new THREE.FogExp2(0xf7ebe1, 0.018);
+
+      const camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 0.1, 500);
+      camera.position.set(0, 7.5, 14.5);
+      camera.lookAt(0, 2.8, 0);
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.outputEncoding = THREE.sRGBEncoding;
+      container.appendChild(renderer.domElement);
+
+      // Reusable Scratch Objects (Zero GC in animate loop)
+      const _v1 = new THREE.Vector3();
+      const _v2 = new THREE.Vector3();
+      const _v3 = new THREE.Vector3();
+
+      // --- ENVIRONMENT & LIGHTING ---
+      const hemiLight = new THREE.HemisphereLight(0xfff4e6, 0xe17055, 0.9);
+      scene.add(hemiLight);
+
+      const sunLight = new THREE.DirectionalLight(0xfffaed, 0.85);
+      sunLight.position.set(12, 22, 10);
+      sunLight.castShadow = true;
+      sunLight.shadow.mapSize.width = 1024;
+      sunLight.shadow.mapSize.height = 1024;
+      sunLight.shadow.camera.near = 0.5;
+      sunLight.shadow.camera.far = 60;
+      sunLight.shadow.camera.left = -12;
+      sunLight.shadow.camera.right = 12;
+      sunLight.shadow.camera.top = 12;
+      sunLight.shadow.camera.bottom = -12;
+      sunLight.shadow.bias = -0.001;
+      scene.add(sunLight);
+
+      // Stove Hearth Fire Glow PointLight
+      const fireLight = new THREE.PointLight(0xf39c12, 1.6, 12);
+      fireLight.position.set(0, 1.8, 0.2);
+      scene.add(fireLight);
+
+      // --- 3D ENVIRONMENT SCENERY ---
+      // 1. Terracotta Clay Courtyard Base
+      const floorGeo = new THREE.CylinderGeometry(14, 14.5, 0.6, 48);
+      const floorMat = new THREE.MeshStandardMaterial({
+        map: createCourtyardTexture(),
+        roughness: 0.8,
+        metalness: 0.05
+      });
+      const floorMesh = new THREE.Mesh(floorGeo, floorMat);
+      floorMesh.position.y = -0.3;
+      floorMesh.receiveShadow = true;
+      scene.add(floorMesh);
+
+      // 2. Veranda Bamboo Frame & Hanging Pots
+      const bambooGroup = new THREE.Group();
+      const bambooMat = new THREE.MeshStandardMaterial({ color: 0xd35400, roughness: 0.7 });
+
+      // Left & Right Pillars
+      const pillarGeo = new THREE.CylinderGeometry(0.22, 0.25, 12, 16);
+      const leftPillar = new THREE.Mesh(pillarGeo, bambooMat);
+      leftPillar.position.set(-8.5, 5.5, -2);
+      leftPillar.castShadow = true;
+      const rightPillar = new THREE.Mesh(pillarGeo, bambooMat);
+      rightPillar.position.set(8.5, 5.5, -2);
+      rightPillar.castShadow = true;
+      bambooGroup.add(leftPillar, rightPillar);
+
+      // Top Crossbar
+      const crossbarGeo = new THREE.CylinderGeometry(0.18, 0.18, 18, 16);
+      const crossbar = new THREE.Mesh(crossbarGeo, bambooMat);
+      crossbar.rotation.z = Math.PI / 2;
+      crossbar.position.set(0, 10, -2);
+      crossbar.castShadow = true;
+      bambooGroup.add(crossbar);
+      scene.add(bambooGroup);
+
+      // 3. Hanging Clay Pots (Matir Hari) with Harmonic Pendulum Swaying
+      const hangingPots = [];
+      const potRopeMat = new THREE.MeshBasicMaterial({ color: 0xb8860b });
+      const clayPotMat = new THREE.MeshStandardMaterial({
+        map: createClayPotTexture(),
+        roughness: 0.65,
+        metalness: 0.1
+      });
+
+      const potPositions = [-5.5, -2.5, 2.5, 5.5];
+      potPositions.forEach((px, idx) => {
+        const potGroup = new THREE.Group();
+        potGroup.position.set(px, 10, -2);
+
+        const ropeLen = 3.5 + (idx % 2) * 0.8;
+        const ropeGeo = new THREE.CylinderGeometry(0.03, 0.03, ropeLen, 8);
+        const ropeMesh = new THREE.Mesh(ropeGeo, potRopeMat);
+        ropeMesh.position.y = -ropeLen / 2;
+        potGroup.add(ropeMesh);
+
+        // Clay Pot Body (Sphere + Cylinder Neck + Flared Rim)
+        const potBodyGroup = new THREE.Group();
+        potBodyGroup.position.y = -ropeLen;
+
+        const bodyGeo = new THREE.SphereGeometry(0.85, 24, 20);
+        bodyGeo.scale(1, 0.9, 1);
+        const bodyMesh = new THREE.Mesh(bodyGeo, clayPotMat);
+        bodyMesh.castShadow = true;
+        potBodyGroup.add(bodyMesh);
+
+        const neckGeo = new THREE.CylinderGeometry(0.42, 0.52, 0.45, 20);
+        const neckMesh = new THREE.Mesh(neckGeo, clayPotMat);
+        neckMesh.position.y = 0.85;
+        potBodyGroup.add(neckMesh);
+
+        const rimGeo = new THREE.TorusGeometry(0.45, 0.08, 12, 24);
+        rimGeo.rotateX(Math.PI / 2);
+        const rimMesh = new THREE.Mesh(rimGeo, clayPotMat);
+        rimMesh.position.y = 1.05;
+        potBodyGroup.add(rimMesh);
+
+        // Tied Jute Rope Shika netting around the pot
+        const ring1 = new THREE.Mesh(new THREE.TorusGeometry(0.86, 0.04, 8, 24), potRopeMat);
+        ring1.rotation.x = Math.PI / 2;
+        potBodyGroup.add(ring1);
+
+        potGroup.add(potBodyGroup);
+        scene.add(potGroup);
+
+        hangingPots.push({
+          group: potGroup,
+          baseX: px,
+          phase: idx * 1.3,
+          speed: 1.2 + idx * 0.2
+        });
+      });
+
+      // --- CENTERPIECE: MATIR CHULA (TRADITIONAL CLAY STOVE) ---
+      const chulaGroup = new THREE.Group();
+      chulaGroup.position.set(0, 0, 0);
+
+      // 1. Stove Main Clay Base (Earthen mound)
+      const chulaBaseGeo = new THREE.CylinderGeometry(2.4, 2.8, 1.8, 32);
+      const chulaBaseMesh = new THREE.Mesh(chulaBaseGeo, clayPotMat);
+      chulaBaseMesh.position.y = 0.9;
+      chulaBaseMesh.castShadow = true;
+      chulaBaseMesh.receiveShadow = true;
+      chulaGroup.add(chulaBaseMesh);
+
+      // 2. Stove Top Rim & 3 Rounded Clay Horns
+      const chulaRimGeo = new THREE.TorusGeometry(2.2, 0.28, 16, 32);
+      chulaRimGeo.rotateX(Math.PI / 2);
+      const chulaRimMesh = new THREE.Mesh(chulaRimGeo, clayPotMat);
+      chulaRimMesh.position.y = 1.8;
+      chulaGroup.add(chulaRimMesh);
+
+      for (let i = 0; i < 3; i++) {
+        const angle = (i / 3) * Math.PI * 2 + Math.PI / 6;
+        const hornGeo = new THREE.SphereGeometry(0.38, 16, 16);
+        hornGeo.scale(1, 1.4, 1);
+        const hornMesh = new THREE.Mesh(hornGeo, clayPotMat);
+        hornMesh.position.set(Math.cos(angle) * 1.9, 2.1, Math.sin(angle) * 1.9);
+        hornMesh.castShadow = true;
+        chulaGroup.add(hornMesh);
+      }
+
+      // 3. Stove Front Hearth Mouth (Fire cavity)
+      const hearthMouthGeo = new THREE.CylinderGeometry(0.9, 0.9, 1.1, 16, 1, false, 0, Math.PI);
+      const hearthMouthMat = new THREE.MeshBasicMaterial({ color: 0x1e0e0a });
+      const hearthMouthMesh = new THREE.Mesh(hearthMouthGeo, hearthMouthMat);
+      hearthMouthMesh.rotation.y = -Math.PI / 2;
+      hearthMouthMesh.position.set(0, 0.8, 1.9);
+      chulaGroup.add(hearthMouthMesh);
+
+      // 4. Steaming Earthen Pot on the Stove (Matir Hari Steamer)
+      const steamerGroup = new THREE.Group();
+      steamerGroup.position.set(0, 2.2, 0);
+
+      const steamerBodyGeo = new THREE.SphereGeometry(1.65, 32, 24);
+      steamerBodyGeo.scale(1, 0.82, 1);
+      const steamerBodyMesh = new THREE.Mesh(steamerBodyGeo, clayPotMat);
+      steamerBodyMesh.castShadow = true;
+      steamerGroup.add(steamerBodyMesh);
+
+      // Perforated Steamer Lid
+      const lidGeo = new THREE.ConeGeometry(1.4, 0.6, 24);
+      const lidMesh = new THREE.Mesh(lidGeo, clayPotMat);
+      lidMesh.position.y = 1.2;
+      lidMesh.castShadow = true;
+      steamerGroup.add(lidMesh);
+
+      const lidKnob = new THREE.Mesh(new THREE.SphereGeometry(0.24, 16, 16), clayPotMat);
+      lidKnob.position.y = 1.55;
+      steamerGroup.add(lidKnob);
+
+      chulaGroup.add(steamerGroup);
+      scene.add(chulaGroup);
+
+      // --- 3 MAIN INTERACTIVE PITHA TREAT STATIONS ---
+      const pithaStations = [];
+
+      // 1. BHAPA PITHA (Center-Left)
+      const bhapaGroup = new THREE.Group();
+      bhapaGroup.position.set(-4.2, 1.2, 2.8);
+
+      // Earthen Plate / Saucer
+      const plateMat = new THREE.MeshStandardMaterial({ color: 0xe17055, roughness: 0.75 });
+      const saucerGeo = new THREE.CylinderGeometry(1.6, 1.2, 0.18, 32);
+      const saucer1 = new THREE.Mesh(saucerGeo, plateMat);
+      saucer1.receiveShadow = true;
+      bhapaGroup.add(saucer1);
+
+      // Steamed Snowy Bhapa Dome
+      const bhapaDomeGeo = new THREE.CylinderGeometry(0.85, 1.3, 0.9, 32);
+      const bhapaMat = new THREE.MeshStandardMaterial({
+        map: createBhapaPithaTexture(),
+        roughness: 0.9,
+        metalness: 0.02
+      });
+      const bhapaMesh = new THREE.Mesh(bhapaDomeGeo, bhapaMat);
+      bhapaMesh.position.y = 0.55;
+      bhapaMesh.castShadow = true;
+      bhapaGroup.add(bhapaMesh);
+
+      // Garnish top (coconut dome top)
+      const bhapaTopGeo = new THREE.SphereGeometry(0.85, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2);
+      const bhapaTopMesh = new THREE.Mesh(bhapaTopGeo, bhapaMat);
+      bhapaTopMesh.position.y = 1.0;
+      bhapaGroup.add(bhapaTopMesh);
+
+      scene.add(bhapaGroup);
+      pithaStations.push({
+        name: 'Bhapa Pitha',
+        group: bhapaGroup,
+        mesh: bhapaMesh,
+        baseY: 1.2,
+        scaleSpeed: 0,
+        currentScale: 1,
+        rotY: 0,
+        bounceTime: 0
+      });
+
+      // 2. PATISHAPTA CREPES (Center-Right)
+      const patishaptaGroup = new THREE.Group();
+      patishaptaGroup.position.set(4.2, 1.2, 2.8);
+
+      const saucer2 = new THREE.Mesh(saucerGeo, plateMat);
+      saucer2.receiveShadow = true;
+      patishaptaGroup.add(saucer2);
+
+      const patishaptaMat = new THREE.MeshStandardMaterial({
+        map: createPatishaptaTexture(),
+        roughness: 0.7,
+        metalness: 0.05
+      });
+
+      // Rolled Cylindrical Crepe 1
+      const rollGeo = new THREE.CylinderGeometry(0.38, 0.38, 2.0, 24);
+      rollGeo.rotateZ(Math.PI / 2);
+      const roll1 = new THREE.Mesh(rollGeo, patishaptaMat);
+      roll1.position.set(0, 0.45, -0.35);
+      roll1.castShadow = true;
+      patishaptaGroup.add(roll1);
+
+      // Rolled Cylindrical Crepe 2
+      const roll2 = new THREE.Mesh(rollGeo, patishaptaMat);
+      roll2.position.set(0, 0.45, 0.35);
+      roll2.castShadow = true;
+      patishaptaGroup.add(roll2);
+
+      // Kheer Cream filling peeking out of roll ends
+      const kheerMat = new THREE.MeshStandardMaterial({ color: 0xfff9e6, roughness: 0.3 });
+      const kheerGeo = new THREE.SphereGeometry(0.32, 16, 16);
+      const kheer1 = new THREE.Mesh(kheerGeo, kheerMat);
+      kheer1.position.set(-1.0, 0.45, -0.35);
+      const kheer2 = new THREE.Mesh(kheerGeo, kheerMat);
+      kheer2.position.set(1.0, 0.45, 0.35);
+      patishaptaGroup.add(kheer1, kheer2);
+
+      scene.add(patishaptaGroup);
+      pithaStations.push({
+        name: 'Patishapta',
+        group: patishaptaGroup,
+        mesh: roll1,
+        baseY: 1.2,
+        scaleSpeed: 0,
+        currentScale: 1,
+        rotY: 0,
+        bounceTime: 0
+      });
+
+      // 3. CHITOI PITHA & GURER BATI (Front-Center)
+      const chitoiGroup = new THREE.Group();
+      chitoiGroup.position.set(0, 0.5, 5.2);
+
+      const brassThaliMat = new THREE.MeshStandardMaterial({ color: 0xf1c40f, roughness: 0.4, metalness: 0.6 });
+      const thaliGeo = new THREE.CylinderGeometry(2.2, 1.9, 0.15, 32);
+      const thali = new THREE.Mesh(thaliGeo, brassThaliMat);
+      thali.receiveShadow = true;
+      chitoiGroup.add(thali);
+
+      const chitoiMat = new THREE.MeshStandardMaterial({
+        map: createChitoiTexture(),
+        roughness: 0.85,
+        metalness: 0.02
+      });
+
+      // Chitoi Pitha Discs
+      const chitoiGeo = new THREE.SphereGeometry(0.75, 24, 16);
+      chitoiGeo.scale(1, 0.38, 1);
+
+      const pitha1 = new THREE.Mesh(chitoiGeo, chitoiMat);
+      pitha1.position.set(-0.85, 0.3, 0.2);
+      pitha1.castShadow = true;
+      chitoiGroup.add(pitha1);
+
+      const pitha2 = new THREE.Mesh(chitoiGeo, chitoiMat);
+      pitha2.position.set(0.85, 0.3, 0.2);
+      pitha2.castShadow = true;
+      chitoiGroup.add(pitha2);
+
+      // Sweet Date Jaggery Clay Bowl (Gurer Bati) in the center of thali
+      const bowlGeo = new THREE.CylinderGeometry(0.65, 0.42, 0.5, 24);
+      const bowl = new THREE.Mesh(bowlGeo, clayPotMat);
+      bowl.position.set(0, 0.32, -0.6);
+      bowl.castShadow = true;
+      chitoiGroup.add(bowl);
+
+      // Glossy Amber Liquid Jaggery surface inside the bowl
+      const jaggeryLiquidMat = new THREE.MeshStandardMaterial({
+        color: 0xd35400,
+        emissive: 0xf39c12,
+        emissiveIntensity: 0.3,
+        roughness: 0.1,
+        metalness: 0.1
+      });
+      const liquidGeo = new THREE.CylinderGeometry(0.58, 0.58, 0.05, 24);
+      const liquidMesh = new THREE.Mesh(liquidGeo, jaggeryLiquidMat);
+      liquidMesh.position.set(0, 0.55, -0.6);
+      chitoiGroup.add(liquidMesh);
+
+      scene.add(chitoiGroup);
+      pithaStations.push({
+        name: 'Chitoi & Jaggery',
+        group: chitoiGroup,
+        mesh: bowl,
+        baseY: 0.5,
+        scaleSpeed: 0,
+        currentScale: 1,
+        rotY: 0,
+        bounceTime: 0
+      });
+
+      // --- PRE-ALLOCATED OBJECT POOLS (ZERO RUNTIME GC) ---
+
+      // 1. Steam Puffs Pool (Rising from Chula & Pithas)
+      const STEAM_POOL_SIZE = 45;
+      const steamPool = [];
+      const steamGeo = new THREE.DodecahedronGeometry(0.35, 1);
+      const steamMat = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        roughness: 0.9,
+        transparent: true,
+        opacity: 0.65,
+        flatShading: true
+      });
+
+      for (let i = 0; i < STEAM_POOL_SIZE; i++) {
+        const mesh = new THREE.Mesh(steamGeo, steamMat.clone());
+        mesh.visible = false;
+        scene.add(mesh);
+        steamPool.push({
+          mesh: mesh,
+          active: false,
+          pos: new THREE.Vector3(),
+          vel: new THREE.Vector3(),
+          scale: 0.1,
+          maxScale: 1.0,
+          opacity: 0.6,
+          life: 0,
+          maxLife: 100
+        });
+      }
+
+      function spawnSteamPuff(sourcePos, boost = false) {
+        for (let i = 0; i < STEAM_POOL_SIZE; i++) {
+          const item = steamPool[i];
+          if (!item.active) {
+            item.active = true;
+            item.mesh.visible = true;
+            item.pos.copy(sourcePos);
+            item.pos.x += (Math.random() - 0.5) * 0.6;
+            item.pos.z += (Math.random() - 0.5) * 0.6;
+            item.mesh.position.copy(item.pos);
+
+            const speedY = boost ? (0.04 + Math.random() * 0.05) : (0.02 + Math.random() * 0.025);
+            item.vel.set(
+              (Math.random() - 0.5) * 0.015,
+              speedY,
+              (Math.random() - 0.5) * 0.015
+            );
+            item.scale = 0.2 + Math.random() * 0.2;
+            item.maxScale = boost ? (1.6 + Math.random() * 0.8) : (0.9 + Math.random() * 0.5);
+            item.opacity = boost ? 0.85 : 0.6;
+            item.life = 0;
+            item.maxLife = boost ? 90 : 130;
+            item.mesh.scale.setScalar(item.scale);
+            item.mesh.material.opacity = item.opacity;
+            break;
+          }
+        }
+      }
+
+      // 2. Golden Jaggery Droplets Pool (Khejur Rosh Drops)
+      const JAGGERY_POOL_SIZE = 25;
+      const jaggeryPool = [];
+      const dropGeo = new THREE.SphereGeometry(0.35, 16, 16);
+      dropGeo.scale(1, 1.4, 1);
+      const dropMat = new THREE.MeshStandardMaterial({
+        color: 0xf39c12,
+        emissive: 0xd35400,
+        emissiveIntensity: 0.45,
+        roughness: 0.15,
+        metalness: 0.1
+      });
+
+      for (let i = 0; i < JAGGERY_POOL_SIZE; i++) {
+        const mesh = new THREE.Mesh(dropGeo, dropMat);
+        mesh.visible = false;
+        mesh.castShadow = true;
+        scene.add(mesh);
+        jaggeryPool.push({
+          mesh: mesh,
+          active: false,
+          pos: new THREE.Vector3(),
+          targetY: 1.0,
+          velY: 0,
+          targetStation: null
+        });
+      }
+
+      function spawnJaggeryDrop(targetX, targetZ, targetY, station = null) {
+        for (let i = 0; i < JAGGERY_POOL_SIZE; i++) {
+          const item = jaggeryPool[i];
+          if (!item.active) {
+            item.active = true;
+            item.mesh.visible = true;
+            item.pos.set(targetX, 9.5 + Math.random() * 1.5, targetZ);
+            item.mesh.position.copy(item.pos);
+            item.targetY = targetY;
+            item.velY = -0.06;
+            item.targetStation = station;
+            item.mesh.scale.set(1, 1.4, 1);
+            break;
+          }
+        }
+      }
+
+      // 3. Splash Ripple Rings Pool
+      const RIPPLE_POOL_SIZE = 25;
+      const ripplePool = [];
+      const ringGeo = new THREE.RingGeometry(0.1, 0.28, 32);
+      ringGeo.rotateX(-Math.PI / 2);
+      const ringMat = new THREE.MeshBasicMaterial({
+        color: 0xf1c40f,
+        transparent: true,
+        opacity: 0.9,
+        side: THREE.DoubleSide
+      });
+
+      for (let i = 0; i < RIPPLE_POOL_SIZE; i++) {
+        const mesh = new THREE.Mesh(ringGeo, ringMat.clone());
+        mesh.visible = false;
+        scene.add(mesh);
+        ripplePool.push({
+          mesh: mesh,
+          active: false,
+          pos: new THREE.Vector3(),
+          scale: 0.1,
+          maxScale: 2.2,
+          opacity: 0.9,
+          growthRate: 0.08
+        });
+      }
+
+      function spawnRipple(x, y, z, maxScale = 2.2) {
+        for (let i = 0; i < RIPPLE_POOL_SIZE; i++) {
+          const item = ripplePool[i];
+          if (!item.active) {
+            item.active = true;
+            item.mesh.visible = true;
+            item.pos.set(x, y + 0.03, z);
+            item.mesh.position.copy(item.pos);
+            item.scale = 0.2;
+            item.maxScale = maxScale;
+            item.opacity = 0.95;
+            item.growthRate = 0.07;
+            item.mesh.scale.setScalar(item.scale);
+            item.mesh.material.opacity = item.opacity;
+            break;
+          }
+        }
+      }
+
+      // 4. Mini Golden Stars Pool (Steam Pop Burst)
+      const STAR_POOL_SIZE = 60;
+      const starPool = [];
+
+      // Stylized 3D 4-Pointed Star Shape
+      const starShape = new THREE.Shape();
+      starShape.moveTo(0, 0.35);
+      starShape.quadraticCurveTo(0.05, 0.05, 0.35, 0);
+      starShape.quadraticCurveTo(0.05, -0.05, 0, -0.35);
+      starShape.quadraticCurveTo(-0.05, -0.05, -0.35, 0);
+      starShape.quadraticCurveTo(-0.05, 0.05, 0, 0.35);
+
+      const starExtrudeSettings = { depth: 0.08, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: 0.03, bevelThickness: 0.03 };
+      const starGeo = new THREE.ExtrudeGeometry(starShape, starExtrudeSettings);
+      const starMat = new THREE.MeshStandardMaterial({
+        color: 0xf1c40f,
+        emissive: 0xf39c12,
+        emissiveIntensity: 0.6,
+        roughness: 0.2,
+        metalness: 0.3
+      });
+
+      for (let i = 0; i < STAR_POOL_SIZE; i++) {
+        const mesh = new THREE.Mesh(starGeo, starMat);
+        mesh.visible = false;
+        scene.add(mesh);
+        starPool.push({
+          mesh: mesh,
+          active: false,
+          pos: new THREE.Vector3(),
+          vel: new THREE.Vector3(),
+          rotSpeed: new THREE.Vector3(),
+          life: 0,
+          maxLife: 60,
+          scale: 1.0
+        });
+      }
+
+      function spawnStarBurst(x, y, z, count = 6) {
+        let spawned = 0;
+        for (let i = 0; i < STAR_POOL_SIZE && spawned < count; i++) {
+          const item = starPool[i];
+          if (!item.active) {
+            item.active = true;
+            item.mesh.visible = true;
+            item.pos.set(x, y, z);
+            item.mesh.position.copy(item.pos);
+
+            const speed = 0.06 + Math.random() * 0.08;
+            const angle = Math.random() * Math.PI * 2;
+            const elevation = (Math.random() - 0.2) * Math.PI * 0.5;
+
+            item.vel.set(
+              Math.cos(angle) * Math.cos(elevation) * speed,
+              Math.sin(elevation) * speed + 0.05,
+              Math.sin(angle) * Math.cos(elevation) * speed
+            );
+
+            item.rotSpeed.set(
+              (Math.random() - 0.5) * 0.2,
+              (Math.random() - 0.5) * 0.2,
+              (Math.random() - 0.5) * 0.2
+            );
+
+            item.life = 0;
+            item.maxLife = 45 + Math.random() * 25;
+            item.scale = 0.8 + Math.random() * 0.5;
+            item.mesh.scale.setScalar(item.scale);
+            spawned++;
+          }
+        }
+      }
+
+      // --- 2D SCREEN FLOATING TREATS FOR INFANT TAP ACCESS ---
+      const screenTreatsContainer = document.getElementById('screen-treats-container');
+      const treatIcons = ['🥟', '🍯', '🍶', '🪔', '🌾'];
+
+      function createScreenTreats() {
+        const count = window.innerWidth > 1000 ? 5 : 3;
+        for (let i = 0; i < count; i++) {
+          const treat = document.createElement('div');
+          treat.className = 'screen-treat';
+          const size = 56 + Math.random() * 16;
+          treat.style.width = size + 'px';
+          treat.style.height = size + 'px';
+          treat.style.left = (8 + (i * (80 / count)) + Math.random() * 5) + '%';
+          treat.style.top = (15 + Math.random() * 60) + '%';
+          treat.style.animationDelay = (-i * 1.2) + 's';
+          treat.textContent = treatIcons[i % treatIcons.length];
+          treat.setAttribute('aria-label', 'Floating Sweet Treat');
+
+          treat.addEventListener('pointerdown', (e) => {
+            e.stopPropagation();
+            triggerSensoryBurst(e.clientX, e.clientY);
+          });
+
+          screenTreatsContainer.appendChild(treat);
+        }
+      }
+      createScreenTreats();
+
+      // --- SENSORY BURST & ACTION DISPATCHER ---
+      let dropCount = 0;
+      const dropCountEl = document.getElementById('drop-count');
+      const progressBar = document.getElementById('session-progress-bar');
+      const surgeOverlay = document.getElementById('surge-overlay');
+      const sweetToast = document.getElementById('sweet-toast');
+      const toastText = document.getElementById('toast-text');
+      let toastTimer = null;
+
+      const celebrationToasts = [
+        '✨ Golden Khejur Rosh Drop!',
+        '🥟 Steamy Fresh Bhapa Pitha!',
+        '🍯 Sweet Date Jaggery Dip!',
+        '🥞 Rolled Kheer Patishapta!',
+        '🌟 Cozy Winter Morning Glow!'
+      ];
+
+      function showSweetToast(text) {
+        if (toastTimer) clearTimeout(toastTimer);
+        toastText.textContent = text || celebrationToasts[Math.floor(Math.random() * celebrationToasts.length)];
+        sweetToast.classList.add('visible');
+        toastTimer = setTimeout(() => {
+          sweetToast.classList.remove('visible');
+        }, 2200);
+      }
+
+      function createTouchRipple(x, y) {
+        const ripple = document.createElement('div');
+        ripple.className = 'touch-ripple';
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        document.body.appendChild(ripple);
+        setTimeout(() => {
+          if (ripple.parentNode) ripple.parentNode.removeChild(ripple);
+        }, 900);
+      }
+
+      // MAIN SENSORY TRIGGER
+      function triggerSensoryBurst(screenX = null, screenY = null, isSuperBloom = false) {
+        dropCount++;
+        dropCountEl.textContent = dropCount;
+        const progress = Math.min(100, (dropCount % 20) * 5);
+        progressBar.style.width = progress + '%';
+
+        if (screenX !== null && screenY !== null) {
+          createTouchRipple(screenX, screenY);
+        }
+
+        // Cycle pentatonic melody
+        pentatonicStep++;
+
+        if (isSuperBloom) {
+          // SUPER BLOOM MULTI-BURST
+          surgeOverlay.classList.remove('active');
+          void surgeOverlay.offsetWidth; // trigger reflow
+          surgeOverlay.classList.add('active');
+
+          playSuperBloomChord();
+          showSweetToast('🌟 Super Sweet Jaggery Bloom!');
+
+          // Spawn jaggery drops on all 3 stations simultaneously
+          pithaStations.forEach((station) => {
+            station.bounceTime = 1.0;
+            station.scaleSpeed = 0.18;
+            spawnJaggeryDrop(station.group.position.x, station.group.position.z, station.baseY + 0.6, station);
+            spawnStarBurst(station.group.position.x, station.baseY + 1.2, station.group.position.z, 12);
+          });
+
+          // Steamer super puff
+          for (let i = 0; i < 8; i++) {
+            _v1.set(0, 3.8, 0);
+            spawnSteamPuff(_v1, true);
+          }
+
+        } else {
+          // NORMAL SENSORY BURST
+          const targetStation = pithaStations[dropCount % pithaStations.length];
+          targetStation.bounceTime = 1.0;
+          targetStation.scaleSpeed = 0.14;
+
+          // Sound synthesis
+          playJaggeryPlop((dropCount % 5) * 40);
+          playKalimbaChime(pentatonicStep);
+
+          // 3D Visual actions
+          spawnJaggeryDrop(targetStation.group.position.x, targetStation.group.position.z, targetStation.baseY + 0.6, targetStation);
+
+          // Steam puffs from steamer pot
+          _v1.set(0, 3.8, 0);
+          spawnSteamPuff(_v1, true);
+          spawnSteamPuff(targetStation.group.position, false);
+
+          if (dropCount % 4 === 0) {
+            showSweetToast();
+          }
+        }
+      }
+
+      // --- TV REMOTE, KEYBOARD & GAMEPAD EVENT HANDLING ---
+      window.addEventListener('keydown', (e) => {
+        const code = e.keyCode || e.which;
+        const key = e.key;
+
+        // TV Remote Back / Return Keys -> Navigate smoothly to Hub
+        if (['Escape', 'Back', 'GoBack', 'BrowserBack'].includes(key) || [10009, 461, 4, 27].includes(code)) {
+          e.preventDefault();
+          playUiChime(440);
+          setTimeout(() => { window.location.href = '../../index.html'; }, 100);
+          return;
+        }
+
+        // ANY Keyboard Key / TV Remote D-Pad / OK triggers sensory burst
+        e.preventDefault();
+        triggerSensoryBurst(window.innerWidth / 2, window.innerHeight / 2);
+      });
+
+      // Gamepad Polling Loop
+      let lastGamepadAction = 0;
+      function pollGamepads() {
+        if (navigator.getGamepads) {
+          const gamepads = navigator.getGamepads();
+          const now = performance.now();
+          for (let i = 0; i < gamepads.length; i++) {
+            const gp = gamepads[i];
+            if (gp && (now - lastGamepadAction > 200)) {
+              // Button 0 (A / OK / Space) or D-Pad buttons
+              if (gp.buttons.some((btn, bIdx) => btn && btn.pressed && bIdx !== 1)) {
+                lastGamepadAction = now;
+                triggerSensoryBurst(window.innerWidth / 2, window.innerHeight / 2);
+              }
+              // Button 1 (B / Back)
+              else if (gp.buttons[1] && gp.buttons[1].pressed) {
+                lastGamepadAction = now;
+                playUiChime(440);
+                setTimeout(() => { window.location.href = '../../index.html'; }, 100);
+              }
+            }
+          }
+        }
+        requestAnimationFrame(pollGamepads);
+      }
+      requestAnimationFrame(pollGamepads);
+
+      // --- MOBILE & TOUCH GESTURE HANDLING ---
+      // Disable right click / context menu
+      document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+      window.addEventListener('pointerdown', (e) => {
+        // If clicking UI glass buttons, let default button click handler run
+        if (e.target.closest('.top-bar') || e.target.closest('.screen-treat')) return;
+        triggerSensoryBurst(e.clientX, e.clientY);
+      });
+
+      // Multi-Touch Palm Grab Detection (Super Bloom Multi-Burst)
+      window.addEventListener('touchstart', (e) => {
+        if (e.touches.length >= 2) {
+          e.preventDefault();
+          const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+          const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+          triggerSensoryBurst(midX, midY, true);
+        }
+      }, { passive: false });
+
+      // --- UI CONTROLS & BUTTON AUTO-BLUR ---
+      const btnSound = document.getElementById('btn-sound');
+      const soundIcon = document.getElementById('sound-icon');
+      btnSound.addEventListener('click', () => {
+        btnSound.blur();
+        soundEnabled = !soundEnabled;
+        soundIcon.textContent = soundEnabled ? '🔊' : '🔇';
+        if (soundEnabled) playUiChime(587.33);
+      });
+
+      const btnFullscreen = document.getElementById('btn-fullscreen');
+      btnFullscreen.addEventListener('click', () => {
+        btnFullscreen.blur();
+        const docEl = document.documentElement;
+        const isFull = document.fullscreenElement || document.webkitFullscreenElement;
+        if (!isFull) {
+          const req = docEl.requestFullscreen || docEl.webkitRequestFullscreen;
+          if (req) req.call(docEl).catch(() => {});
+        } else {
+          const exit = document.exitFullscreen || document.webkitExitFullscreen;
+          if (exit) exit.call(document).catch(() => {});
+        }
+      });
+
+      const btnHome = document.getElementById('btn-home');
+      btnHome.addEventListener('click', () => {
+        btnHome.blur();
+      });
+
+      // Tab Visibility / Minimize Audio Suspend
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          if (audioCtx && audioCtx.state === 'running') {
+            audioCtx.suspend().catch(() => {});
+          }
+        } else {
+          if (audioCtx && audioCtx.state === 'suspended' && soundEnabled) {
+            audioCtx.resume().catch(() => {});
+          }
+        }
+      });
+
+      // --- RESPONSIVE 21:9 ULTRAWIDE & WINDOW RESIZE ---
+      function handleResize() {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const aspect = width / height;
+
+        camera.aspect = aspect;
+
+        // Dynamic FOV for 21:9 Ultrawide, 16:9 TV, and Mobile Portrait
+        if (aspect > 2.0) {
+          // Ultrawide 21:9 (34-inch monitors)
+          camera.fov = 42;
+          camera.position.set(0, 7.2, 14.0);
+        } else if (aspect >= 1.3) {
+          // Standard 16:9 Landscape / TV
+          camera.fov = 48;
+          camera.position.set(0, 7.5, 14.5);
+        } else {
+          // Mobile / Tablet Portrait
+          camera.fov = 68;
+          camera.position.set(0, 9.2, 18.0);
+        }
+
+        camera.updateProjectionMatrix();
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      }
+      window.addEventListener('resize', handleResize);
+      handleResize();
+
+      // --- MAIN ANIMATION & RENDERING LOOP (ZERO RUNTIME GC) ---
+      let clock = new THREE.Clock();
+      let ambientSteamTimer = 0;
+
+      function animate() {
+        requestAnimationFrame(animate);
+
+        const delta = Math.min(clock.getDelta(), 0.1);
+        const elapsedTime = clock.getElapsedTime();
+
+        // 1. Ambient Fire Hearth Flicker & Light Pulse
+        const flicker = Math.sin(elapsedTime * 8) * 0.15 + Math.sin(elapsedTime * 14) * 0.08;
+        fireLight.intensity = 1.5 + flicker;
+
+        // 2. Hanging Clay Pots Harmonic Swaying
+        for (let i = 0; i < hangingPots.length; i++) {
+          const pot = hangingPots[i];
+          const swayAngle = Math.sin(elapsedTime * pot.speed + pot.phase) * 0.08;
+          pot.group.rotation.z = swayAngle;
+        }
+
+        // 3. Pitha Treats Bobbing & Joyful Bounce Spin
+        for (let i = 0; i < pithaStations.length; i++) {
+          const station = pithaStations[i];
+
+          // Gentle ambient float
+          const floatOffset = Math.sin(elapsedTime * 2.2 + i * 1.5) * 0.06;
+          station.group.position.y = station.baseY + floatOffset;
+
+          // Reactive bounce & spin on trigger
+          if (station.bounceTime > 0) {
+            station.bounceTime -= delta * 1.8;
+            station.rotY += delta * 7.5;
+            const bounceScale = 1.0 + Math.sin(station.bounceTime * Math.PI) * 0.35;
+            station.group.scale.setScalar(bounceScale);
+            station.group.rotation.y = station.rotY;
+          } else {
+            station.group.scale.set(1, 1, 1);
+            station.group.rotation.y += delta * 0.25;
+          }
+        }
+
+        // 4. Ambient Steam Emission from Chula Steamer Pot
+        ambientSteamTimer += delta;
+        if (ambientSteamTimer > 0.22) {
+          ambientSteamTimer = 0;
+          _v1.set(0, 3.6, 0);
+          spawnSteamPuff(_v1, false);
+        }
+
+        // 5. Update Steam Puffs Pool
+        for (let i = 0; i < STEAM_POOL_SIZE; i++) {
+          const item = steamPool[i];
+          if (item.active) {
+            item.life++;
+            item.pos.add(item.vel);
+            item.pos.x += Math.sin(elapsedTime * 3 + i) * 0.005;
+            item.mesh.position.copy(item.pos);
+
+            const lifeRatio = item.life / item.maxLife;
+            const currentScale = THREE.MathUtils.lerp(item.scale, item.maxScale, lifeRatio);
+            item.mesh.scale.setScalar(currentScale);
+
+            const currentOpacity = (1.0 - lifeRatio) * item.opacity;
+            item.mesh.material.opacity = Math.max(0, currentOpacity);
+
+            if (item.life >= item.maxLife) {
+              item.active = false;
+              item.mesh.visible = false;
+            }
+          }
+        }
+
+        // 6. Update Golden Jaggery Drops Pool
+        for (let i = 0; i < JAGGERY_POOL_SIZE; i++) {
+          const item = jaggeryPool[i];
+          if (item.active) {
+            item.velY -= 0.012; // Gravity acceleration
+            item.pos.y += item.velY;
+            item.mesh.position.copy(item.pos);
+
+            // Stretch in flight
+            item.mesh.scale.set(0.9, 1.6, 0.9);
+
+            // Hit Target Surface
+            if (item.pos.y <= item.targetY) {
+              item.active = false;
+              item.mesh.visible = false;
+
+              // Spawn Golden Ripple Ring & Sparkle Stars on impact
+              spawnRipple(item.pos.x, item.targetY, item.pos.z, 2.4);
+              spawnStarBurst(item.pos.x, item.targetY + 0.2, item.pos.z, 8);
+              playSteamPop(950);
+            }
+          }
+        }
+
+        // 7. Update Splash Ripple Rings Pool
+        for (let i = 0; i < RIPPLE_POOL_SIZE; i++) {
+          const item = ripplePool[i];
+          if (item.active) {
+            item.scale += item.growthRate;
+            item.mesh.scale.setScalar(item.scale);
+
+            item.opacity -= 0.028;
+            item.mesh.material.opacity = Math.max(0, item.opacity);
+
+            if (item.opacity <= 0 || item.scale >= item.maxScale) {
+              item.active = false;
+              item.mesh.visible = false;
+            }
+          }
+        }
+
+        // 8. Update Mini Golden Stars Pool
+        for (let i = 0; i < STAR_POOL_SIZE; i++) {
+          const item = starPool[i];
+          if (item.active) {
+            item.life++;
+            item.pos.add(item.vel);
+            item.vel.y -= 0.003; // Light gravity
+            item.mesh.position.copy(item.pos);
+
+            item.mesh.rotation.x += item.rotSpeed.x;
+            item.mesh.rotation.y += item.rotSpeed.y;
+            item.mesh.rotation.z += item.rotSpeed.z;
+
+            const lifeRatio = item.life / item.maxLife;
+            const currentScale = (1.0 - lifeRatio) * item.scale;
+            item.mesh.scale.setScalar(Math.max(0.001, currentScale));
+
+            if (item.life >= item.maxLife) {
+              item.active = false;
+              item.mesh.visible = false;
+            }
+          }
+        }
+
+        // 9. Render Scene
+        renderer.render(scene, camera);
+      }
+
+      requestAnimationFrame(animate);
+
+    })();
+  </script>
+</body>
+</html>
